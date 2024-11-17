@@ -1,0 +1,15 @@
+---
+# tasks file for disk
+- name: Create a physical volume /dev/sdb with /dev/sdb
+  shell: pvcreate /dev/sdb
+  ignore_errors: true
+
+- name: Create a volume group my-vg with /dev/sdb
+  shell: vgcreate my-vg /dev/sdb
+  #shell: vgextend my-vg /dev/sdb
+
+- name: Extend the logical volume to consume all remaining space in the volume group
+  shell: lvextend -l +100%free /dev/my-vg/my-lv
+
+- name: Extend the logical volume to take all remaining space and resize the underlying filesystem
+  shell: resize2fs /dev/my-vg/my-lv

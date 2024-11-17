@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: myapp
+  name: myapp-service
+  namespace: default
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: port-8080
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: port-9090
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: myapp
+  sessionAffinity: None
+  type: ClusterIP

@@ -1,0 +1,26 @@
+---
+# tasks file for adduser
+- name: Add user and group <ansible> and ssh login authorized
+  block:
+    - name: Add User <ansible>
+      user: name=<ansible> group=<ansible>  shell=/bin/bash
+
+    - name: Add group <ansible>
+      group: name=<ansible> state=present
+
+    - name: Create <ansible> .ssh directory
+      #shell: mkdir -p /home/<ansible>/.ssh && chown -R <ansible>.<ansible> /home/<ansible>/.ssh
+      debug:
+
+    - name: Create .ssh directory and add authorized key
+      authorized_key:
+        user: <ansible>
+        state: present
+        key: "{{ lookup('file', '/etc/ansible/keys/east.pub') }}"
+      when: hostnamefix == "east"
+
+    - name: Set user directory permission
+      file: path={{ item }} owner=<ansible> group=<ansible> mode=0755 recurse=yes state=directory
+      loop:
+        - /opt/
+        - /web/

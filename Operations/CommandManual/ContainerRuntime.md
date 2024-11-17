@@ -1,0 +1,429 @@
+# Container Runtime
+
+## docker & podman
+### busybox chroot
+```bash
+mkdir rootfs
+docker export $(docker create busybox) | tar -C rootfs -xvf -
+chroot rootfs /bin/ls
+chroot rootfs /bin/pwd
+chroot rootfs /bin/sh
+ls -ld /proc/$(pidof -s sh)/root
+
+
+# principle: use chroot jail
+mkdir jail/{bin,lib,lib64} -p
+ldd $(which bash)
+cp -r /lib/* jail/lib
+cp -r /lib64/* jail/lib64/
+cp /bin/ls jail/bin/
+cp /bin/bash jail/bin/
+chroot jail /bin/bash
+[I have no name!@ubuntu /]# ls
+bin  lib  lib64
+```
+
+### common command
+```bash
+# common parameters
+--env-file strings      Read in a file of environment variables
+-p, --publish strings   Publish a containers port
+--restart               Restart policy to apply when a container exits
+--rm                    Remove container (and pod if created) after exit
+-v, --volume stringArray   Bind mount a volume into the container.
+
+
+# overwrite the default ENTRYPOINT
+docker run --rm -it --entrypoint sh hashicorp/terraform:latest  
+
+# select container ip
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' yakir-test
+
+# reverse checking Dockerfile content
+docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin/sh -c \#(nop) *##g" |tac
+
+# commit
+docker commmit -m 'commit message' container_id repository/xxx/xxx:tag
+
+# build image
+docker build -t yakir/test:latest -f APP-META/Dockerfile .
+```
+
+### Quick test container
+```bash
+# busybox
+docker run --rm -it busybox sh
+
+# kafka-client
+docker run 
+
+# mysql-server
+docker run --name mysql \
+  -e MYSQL_ROOT_PASSWORD=root_password \
+  -e MYSQL_DATABASE=your_database \
+  -p 3306:3306 \
+  -v $(pwd)/volume-mysql/:/var/lib/mysql
+  -d mysql --character-set-server=utf8mb4
+
+# redis-client
+docker run --rm --name redis-client -it docker.io/bitnami/redis-cluster bash
+
+# knowledge-base
+docker run --name mrdoc_mysql \
+  -e MYSQL_ROOT_PASSWORD=knowledge_base123 \
+  -e MYSQL_DATABASE=knowledge_base \
+  -v $(pwd)/volume-mysql/:/var/lib/mysql \
+  -d mysql --character-set-server=utf8mb4
+docker run --name mrdoc \
+  -p 10086:10086 \
+  -v /opt/MrDoc:/app/MrDoc \
+  -d zmister/mrdoc:v4
+```
+
+### docker compose plugin
+```bash
+docker compose up -d
+docker compose down
+docker compose restart
+```
+
+
+## containerd
+```bash
+# default run by systemd
+systemctl start containerd.service
+# run by k3s
+containerd -c /var/lib/rancher/k3s/agent/etc/containerd/config.toml -a /run/k3s/containerd/containerd.sock --state /run/k3s/containerd --root /var/lib/rancher/k3s/agent/containerd
+
+
+# ctr (see pause container)
+## default 
+ctr --address /run/containerd/containerd.sock namespace ls 
+ctr --address /run/containerd/containerd.sock -n k8s.io images ls 
+## run by k3s
+ctr --address /run/k3s/containerd/containerd.sock namespace ls 
+ctr --address /run/k3s/containerd/containerd.sock -n k8s.io images ls 
+ctr --address /run/k3s/containerd/containerd.sock -n k8s.io container ls
+
+
+# crictl
+endpoint="/run/k3s/containerd/containerd.sock" URL="unix:///run/k3s/containerd/containerd.sock" 
+crictl ps 
+crictl images
+```
+
+## kubectl
+### Basic
+```bash
+# create
+# create a tls secret
+kubectl create secret tls my-tls --cert=./tls.crt --key=./tls.key
+kubectl create secret tls my-tls --save-config \
+    --dry-run=client \
+    --cert=./tls.crt \
+    --key=./tls.key \
+    -oyaml | kubectl apply -f -
+# create a private image repo secret
+# option1: from file
+kubectl create secret generic my-harbor \
+    --from-file=.dockerconfigjson=~/.docker/config.json 
+    --type=kubernetes.io/dockerconfigjson
+# option2: from command
+kubectl create secret docker-registry my-harbor \
+    --docker-server=harbor.yakir.com \
+    --docker-username='username' \
+    --docker-password='password' 
+# config deployment or statefulset
+kubectl edit deployments my-deployment
+      imagePullSecrets:
+      - name: my-harbor
+
+
+# expose 
+kubectl expose service/pod nginx --port=8888 --target-port=8080 --name=myname
+
+
+# run
+kubectl run --rm -it busybox --image=busybox --restart=Never -- sh
+kubectl run --rm -it mysql-client --image bitnami/mysql --restart=Never -- /bin/bash
+
+
+# set
+kubectl set env deployments/my-app KEY_1=VAL_1 ... KEY_N=VAL_N
+
+
+# explain
+kubectl explain cronjobs
+kubectl explain deployments
+kubectl explain statefulset.spec.updateStrategy.rollingUpdate
+
+
+# get
+kubectl get -k ./
+# batch select pod state
+JSONPATH='{range .items[*]};{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status},{end}{end};'
+kubectl get pods -o jsonpath="$JSONPATH" | tr ";" "\n"
+# batch get nodes ip
+kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' |xargs -n1
+# select by custome-columns
+kubectl get pod my-pod -o=custom-columns=\
+PodName:.metadata.name,\
+NodeName:.spec.nodeName,\
+ContainerPort:.spec.containers[*].ports[*].containerPort
+# get all api info
+kubectl get --raw /
+kubectl get --raw /apis/apps/v1
+
+
+# edit
+kubectl edit (resource_type) (resource_name)
+
+
+# delete
+kubectl delete pod pod_name
+kubectl delete pod pod_name --force=true --grace-period=0
+```
+
+
+### Deploy
+```bash
+# rollout 
+kubectl rollout (history|pause|restart|resume|status|undo) (resource_type) (resource_name)
+
+# scale
+kubectl scale [--resource-version=version] [--current-replicas=count] --replicas=COUNT (-f x.yaml | deployment mysql)
+
+# autoscale
+kubectl autoscale (-f x.yaml | deployment/mysql) [--min=MINPODS] --max=MAXPODS [--cpu-percent=CPU] [options]
+```
+
+
+### Cluster Management
+```bash
+# top
+kubectl -n namespace_name top pod
+kubectl top node
+
+# schedulable and evicted
+kubectl cordon <node-name>
+kubectl uncordon <node-name>
+kubectl drain <node-name> [--ignore-daemonsets=true] [--delete-emptydir-data=true]
+
+# taint and affnity
+kubectl describe nodes |grep Taints
+kubectl taint NODE NAME KEY_1=VAL_1:TAINT_EFFECT_1 ... KEY_N=VAL_N:TAINT_EFFECT_N [options]
+```
+
+
+### Troubleshooting and Debugging
+```bash
+# describe
+kubectl describe -k ./
+kubectl describe service service_name
+
+# logs
+kubectl get pod --show-labels
+kubectl logs -f --tail 10 pod_name -l app.kubernetes.io/instance=ingress-nginx --max-log-requests=5
+
+# attach 
+kubectl attach -it pod pod_name [-c container_name]
+
+# exec
+kubectl exec -it pod_name [-c container_name] -- bash/sh
+
+# port-forward
+kubectl -n argocd port-forward --address=0.0.0.0 pods/argocd-server-cd747d9d7-k7k4z 9999:8080
+kubectl -n argocd port-forward --address=0.0.0.0 services/argocd-server 9999:80
+
+# proxy(apiserver)
+kubectl proxy --address=0.0.0.0
+
+# cp
+kubectl cp pod_name:/path/path /tmp/path
+
+
+# auth
+# kubectl auth can-i get pods --as=system:serviceaccount:<namespace>:<serviceaccount-name> -n <namespace>
+kubectl auth can-i create applications --as=system:serviceaccount:argocd:argocd-server -n argocd
+
+
+
+# debug 
+kubectl debug -it pod/pod_name --image=busybox [--target=container_name] -- /bin/sh
+# debug node(need to be deleted pod manually and node persistent in /host/)
+kubectl debug -it node/node_name --image=ubuntu -- /bin/bash
+kubectl delete pod node-debuger-xxx
+
+# events
+kubectl events -n namespace_name
+```
+
+
+### Advanced
+```bash
+# diff
+kubectl diff -f FILENAME [options]
+
+
+# apply
+# manifest file
+kubectl apply -f <manifest.yaml> --dry-run=client
+# kustomize directory
+kubectl apply -k <kustomization_directory> --dry-run=client
+
+
+# patch
+# option1
+kubectl patch ingress harbor-ingress-notary --type='json' -p='[{"op": "add", "path": "/spec", "value":"ingressClassName: nginx"}]'
+# option2
+kubectl patch ingress gitlab-webservice-default --patch '{"spec":{"ingressClassName": "nginx"}}'
+
+
+# replace
+kubectl replace -f FILENAME [options]
+
+
+# wait
+
+
+# kustomize(need kustomization.yaml)
+kubectl kustomize <kustomization_directory>
+kubectl kustomize ./ |kubectl apply -f -
+```
+
+
+### Settings
+```bash
+# label
+kubectl label nodes Node1 node-role.kubernetes.io/control-plane=true
+
+# annotate
+kubectl annotate pods yakir-tools key1=value1
+
+# completion
+source <(kubectl completion bash)
+```
+
+
+### Other
+```bash
+# api resources and versions infomation
+kubectl api-resources
+kubectl api-versions
+
+# config
+# select cluster config
+kubectl config current-context
+kubectl config get-clusters
+kubectl config get-contexts
+kubectl config get-users
+kubectl config view
+# add or set custom config
+kubectl config set PROPERTY_NAME PROPERTY_VALUE
+# add cluster config
+kubectl config set-cluster NAME [--server=server] [--certificate-authority=path/to/certficate/authority] [--insecure-skip-tls-verify=true]
+kubectl config set-context NAME [--cluster=cluster_nickname] [--user=user_nickname] [--namespace=namespace]
+kubectl config set-credentials NAME [--client-certificate=path/to/certfile] [--client-key=path/to/keyfile] [--token=bearer_token] [--username=basic_user] [--password=basic_password]
+# use and set context
+kubectl config use-context CONTEXT_NAME
+kubectl config set-context NAME [--cluster=cluster_nickname] [--user=user_nickname] [--namespace=namespace]
+
+
+# check version
+kubectl version
+```
+
+### Quick test container
+```bash
+# kafka-client
+kubectl -n middleware run kafka-client --image docker.io/bitnami/kafka:3.4.0-debian-11-r22 --command -- sleep infinity
+kubectl -n middleware exec -it kafka-client -- bash
+
+# redis-client
+kubectl -n middleware run redis-client --image docker.io/bitnami/redis-cluster --command -- sleep infinity
+kubectl -n middleware exec -it redis-client -- bash
+
+```
+
+## helm
+```bash
+# parameter
+-n namespace 
+--create-namespace
+--set hostname=xxx
+
+# completion
+source <(helm completion bash)
+
+# create 
+helm create mychart
+
+# dependency
+helm dependency update
+
+# env
+helm env
+
+# get 
+helm get (all|manifest) chart_name --revision int
+
+# history
+helm -n cattle-system history rancher
+
+# install,upgrade,uninstall
+helm install [RELEASE_NAME] ingress-nginx/ingress-nginx
+helm upgrade [RELEASE_NAME] [CHART] --install
+helm uninstall [RELEASE_NAME]
+
+# lint 
+helm lint /opt/helm-charts/*
+
+# list
+helm list -A
+
+# package
+helm package /opt/helm-charts/*
+
+# pull,fetch and push
+helm pull --version=x.x.x rancher-stable/rancher --untar
+helm push [chart] [remote] [flags]
+
+# registry
+helm registry [command]
+
+# repo
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm update
+
+# rollback
+
+# search
+helm search hub ingress-nginx
+helm search repo ingress-nginx 
+--versions           # search repo all charts version
+--max-col-width 150  # search display width
+
+# show 
+helm show values [CHART] [flags]
+
+# status
+helm status RELEASE_NAME [flags]
+
+# template
+helm template [NAME] [CHART] [flags]
+
+# test
+
+# verify
+
+# version
+helm version
+```
+
+
+
+> Reference:
+> 1. [阿里云 ACR 仓库加速地址](taa4w07u.mirror.aliyuncs.com)
+> 2. [Podman Official Website](https://podman.io/docs)
+> 3. [Kubectl Official Website](https://kubernetes.io/docs/reference/kubectl/)
+> 4. [Helm Official Website](https://helm.sh/docs/)

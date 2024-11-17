@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  containers:
+  #- command:
+  #  - "sleep"
+  #  - "infinity"
+  - args:
+    - bash
+    - -c
+    - /run.sh
+    command:
+    - /entrypoint.sh
+    env:
+    - name: TZ
+      value: "Asia/Shanghai"
+    name: busybox
+    image: busybox
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
+  volumes:
+    - name: localtime
+      hostPath:
+        path: /etc/localtime
+    - name: zoneinfo
+      hostPath:
+        path: /usr/share/zoneinfo
