@@ -103,13 +103,6 @@
 ## Environment
 
 * [Overview](Environment/README.md)
-* [Others](Environment/Others/README.md)
-  * [jiracdflow](Environment/Others/jiracdflow/README.md)
-  * [Git Flow](Environment/Others/gitflow.md)
-  * [Hosting](Environment/Others/hosting.md)
-  * [kube-eventer](Environment/Others/kube-eventer.md)
-  * [Openssl](Environment/Others/openssl.md)
-  * [Tunnel Proxy](Environment/Others/tunnel-proxy.md)
 
 ## Operations
 
