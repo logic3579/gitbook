@@ -97,6 +97,13 @@ dnf install gnome-tweak-tool
 
 ### rpm
 ```bash
-#
+# list packages concisely
+rpm -qa
+
+# find which package owning binary or library file
+rpm -qf /bin/ls
+
+# manually install or remove a .rpm file package
+rpm -ivh xxx.rpm
 ```
 

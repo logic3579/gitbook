@@ -55,9 +55,9 @@ curl http://es_server:9200/_template/logstash_template -X PUT -H 'Content-Type: 
 	"index_patterns": ["logstash-*"],
 	"settings": {
 		"number_of_shards": 1,
-		"number_of_replicas": 0
-		"index.lifecycle.name": "mylifeycle"
-		"index.lifecycle.rollover_alias": "myindex-alias"
+		"number_of_replicas": 0,
+		"index.lifecycle.name": "mylifeycle",
+		"index.lifecycle.rollover_alias": "myindex-alias",
 	}
 	...
 }' 
