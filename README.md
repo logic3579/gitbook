@@ -12,12 +12,21 @@ icon: hand-wave
 
   About knowledge record and Technology stack.
 
-## About
+## Table of contents
 
-### Using `gitbook`
+<!-- toc -->
+- [APP-META](#)
+- [CNCF](#)
+- [Development](#)
+- [Environment](#)
+- [Operations](#)
+- [Platform](#)
+<!-- tocstop -->
+
+
+## Using with `gitbook`
 
 ```bash
-# Install denpendicies
 # Nodejs
 brew install node
 node --version
@@ -34,6 +43,3 @@ gitbook serve
 gitbook build
 ```
 
-## Demo
-
-### TODO
