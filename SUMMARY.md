@@ -165,7 +165,9 @@
 
 * [Overview](Misc/README.md)
 * [Gitflow](Misc/gitflow.md)
+* [Hosting](Misc/hosting.md)
 <!--* [Interview](Misc/interview.md)-->
+* [jiracdflow](Misc/jiracdflow/README.md)
 * [Kube Eventer](Misc/kube-eventer.md)
 * [Openssl](Misc/openssl.md)
 * [Tunnel Proxy](Misc/tunnel-proxy.md)
