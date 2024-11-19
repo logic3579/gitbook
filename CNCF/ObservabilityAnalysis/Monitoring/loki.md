@@ -28,6 +28,10 @@ wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-starte
 
 # start
 /opt/loki/bin/loki -config.file=/opt/loki/config/loki-config.yaml
+
+# query
+export LOKI_ADDR=http://localhost:3100
+logcli query --limit 10 '{namespace="default",instance="my-app"} |= "kube-probe"'
 ```
 
 ### Config and Boot
