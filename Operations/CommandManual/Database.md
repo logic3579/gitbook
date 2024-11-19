@@ -235,3 +235,8 @@ redis-cli --cluster check 127.0.0.1:7001
 redis-cli --cluster reshard 127.0.0.1:7001
 redis-cli --cluster rebalance 127.0.0.1:7001
 ```
+
+## tidb
+```bash
+tiup
+```
