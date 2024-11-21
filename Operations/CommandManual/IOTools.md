@@ -76,17 +76,32 @@ lsblk -f /dev/sda
 lsblk -o UUID,PARTUUID,PATH,MOUNTPOINT /dev/sdb
 ```
 
-### fdisk && gdisk
+### fdisk && gdisk && parted
 ```bash
-# show info
+# MBR: fdisk, parted
+# GPT: gdisk, parted
+
+
+# show disk partition info
 fdisk -l /dev/sda
 gdisk -l /dev/sda
-```
+parted -l /dev/sda
 
-### parted && partprobe
-```bash
-# show disk partition info
-parted -l
+
+# partitioning with Legacy Boot(MBR)
+fdisk /dev/sda
+
+
+# partitioning with UEFI(GPT)
+gdisk /dev/sda
+
+
+# partitioning with Legacy Boot(MBR)
+parted /dev/sda -- mklabel msdos
+parted /dev/sda -- mkpart primary 1MB -2GB
+parted /dev/sda -- set 1 boot on
+parted /dev/sda -- mkpart primary linux-swap -2GB 100%
+
 
 # partitioning with UEFI(GPT)
 parted /dev/sdb -- unit mib 
@@ -97,8 +112,32 @@ parted /dev/sdb -- mkpart root ext4 515 -1
 parted /dev/sdb -- set 1 bios_grub on
 parted /dev/sdb -- set 2 esp on
 
-# refresh partition
+
+# flush partition table 
 partprobe
+
+
+# adjust partition
+growpart /dev/sda 1
+
+
+# adjust filesystem
+resize2fs /data        # ext2/ext3/ext4
+xfs_growfs -d /data    # xfs
+```
+
+### mkfs.ext4 && mkfs.xfs
+```bash
+# formatting ext4 filesystem
+mkfs.ext4 /dev/sda1
+mount /dev/sda1 /data
+vim /etc/fstab
+
+
+# formatting xfs filesystem
+mkfs.xfs /dev/sda1
+mount /dev/sda1 /data
+vim /etc/fstab
 ```
 
 ### others
