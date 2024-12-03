@@ -21,10 +21,10 @@ spec:
       namespace: monitoring
     spec:
       containers:
-      - env:
-        - name: NAMESRV_ADDR
-          value: 1.1.1.1:9876
-        image: yakirinp/rocketmq-exporter:v0.0.2-SNAPSHOT
+      - args:
+        - "--rocketmq.config.namesrvAddr=rocketmq-nameserver.middleware.svc:9876"
+        - "--rocketmq.config.rocketmqVersion=V5_3_0"
+        image: apache/rocketmq-exporter:v0.0.2-SNAPSHOT
         imagePullPolicy: IfNotPresent
         name: rocketmq-exporter
         ports:
@@ -32,11 +32,11 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: 500m
-            memory: 500Mi
-          requests:
             cpu: 200m
-            memory: 200Mi
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
