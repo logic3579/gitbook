@@ -897,10 +897,126 @@ func main(){
     ASCII: 1byte = 1character
     Unicode: 2byte = 1character
     UTF8: 1~3byte = 1character
-*/
 
+
+    type stringStruct struct {
+        str unsafe.Pointer
+        len int
+    }
+    stringStruct.str: string first point address
+    stringStruct.len: string length
+*/
+// byte
+var b1 byte
+b1 = 'A'
+fmt.Println(reflect.TypeOf(b1)) // uint8
+fmt.Printf("%c\n",b1)
+fmt.Printf("%d\n",b1)
+fmt.Println(b1)  // ASCII
+
+// uint8
+var b2 uint8
+b2 = 65
+fmt.Println(reflect.TypeOf(b2)) // uint8
+fmt.Printf("%c\n",b2)
+fmt.Printf("%d\n",b2)
+fmt.Println(b2)  // ASCII
+
+// int32
+var b3 rune
+b3 = '中'
+fmt.Println(reflect.TypeOf(b3)) // int32
+fmt.Println(b3, string(b3))
+
+
+// byte and character
+s := "Hello,世界"
+r1 := []byte(s)  // utf8 encode
+r2 := []rune(s)  // Unicode character
+fmt.Println(r1)
+fmt.Println(r2)
+// byte length
+fmt.Println(len(r1))
+// character length
+fmt.Println(len(r2))
+// byte to string
+string(r1)
 ```
 
+#### Read/Write File
+```go
+import (
+    "bufio"
+    "fmt"
+    "io"
+    "os"
+)
+func main() {
+    // open file
+    file, err := os.OpenFile("/tmp/x.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+    if err != nil {
+        fmt.Println("err: ", err)
+    }
+    // close file
+    defer file.Close()
+
+    // (1) for bytes
+    var b = make([]byte, 3)
+    // read
+    n, err := file.Read(b)
+    if err != nil {
+        fmt.Println("err:", err)
+        return
+    }
+    fmt.Printf("read byte count: %d\n", n)
+    fmt.Printf("read byte value: %v\n", b)
+    fmt.Printf("read to string content: %v\n", string(b[:n]))
+    // write
+    str = "new content"
+    file.Write([]byte(str))
+    file.WriteString(str)
+
+    // (2) for lines
+    // read
+    reader := bufio.NewReader(file)
+    for {
+        // read line with string
+        strs, err := reader.ReadString('\n')
+        fmt.Print(err, strs)
+        // read line with bytes
+        bytes, err := reader.ReadBytes('\n')
+        fmt.Print(bytes)
+        if err == io.EOF {
+            break
+        }
+    }
+    // write
+    str = "new content"
+    writer := bufio.NewWriter(file)
+    writer.WriteString("str")
+    writer.Flush()
+
+    // (3) for all file content
+    // read
+    content, err := os.ReadFile("x.txt")
+    if err != nil {
+        fmt.Println("read file failed, err:", err)
+        return
+    }
+    fmt.Print(string(content))
+    // write
+    if _, err = file.WriteAt([]byte(str), 0); err != nil {
+        fmt.Println("Error writing data:", err)
+    }
+
+    // others
+    os.Remove(fname)
+    os.Mkdir(dname, os.ModelDir|os.ModePerm)
+    os.Stat(fname)
+}
+```
+
+### Struct
 
 
 > Reference:
