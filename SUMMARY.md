@@ -153,6 +153,7 @@
 * [AlibabaCloud](Platform/AlibabaCloud/README.md)
   * [ACK Monitorning](Platform/AlibabaCloud/ACK-monitoring.md)
 * [DistributionInstaller](Platform/DistributionInstaller/README.md)
+  * [K3S](Platform/DistributionInstaller/k3s.md)
   * [Kubesphere](Platform/DistributionInstaller/kubesphere.md)
   * [Kubespray](Platform/DistributionInstaller/kubespray.md)
   * [Minikube](Platform/DistributionInstaller/minikube.md)
