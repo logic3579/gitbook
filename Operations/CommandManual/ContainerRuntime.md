@@ -45,8 +45,17 @@ docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin
 # commit
 docker commmit -m 'commit message' container_id repository/xxx/xxx:tag
 
-# build image
-docker build -t yakir/test:latest -f APP-META/Dockerfile .
+# build image 
+docker build -t yakir/test:latest . -f Dockerfile
+
+# buildx plugin
+docker buildx build --platform linux/amd64,linux/arm64 -t yakir/test:latest . -f Dockerfile
+
+# compose plugin
+docker compose up -d
+docker compose down
+docker compose restart
+
 ```
 
 ### Quick test container
@@ -79,14 +88,6 @@ docker run --name mrdoc \
   -v /opt/MrDoc:/app/MrDoc \
   -d zmister/mrdoc:v4
 ```
-
-### docker compose plugin
-```bash
-docker compose up -d
-docker compose down
-docker compose restart
-```
-
 
 ## containerd
 ```bash
