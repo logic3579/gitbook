@@ -11,6 +11,8 @@ Golang/**/**/*.out
 Golang/**/**/go.work
 Golang/**/**/go.work.sum
 
+# Java
+
 
 # Lua
 
@@ -25,6 +27,7 @@ Python/**/**/__pycache__/
 Python/**/**/*.py[cod]
 #Python/poetry.lock
 
+# Ruby
 
 # Env file
 **/**/.env
