@@ -60,3 +60,4 @@ rvm use system
 > Reference:
 > 1. [Official Website](https://ruby-lang.org/)
 > 2. [Repository](https://github.com/ruby/ruby)
+> 3. [RVM](https://rvm.io/rvm)
