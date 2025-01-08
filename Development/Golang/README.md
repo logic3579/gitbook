@@ -474,10 +474,8 @@ type hmap struct {
 // option1: declare
 var m map[string]string
 m["name"] = "logic"
-
 // option2: declare
 m := map[string]string{"name": "logic"}
-
 // option3: make(map[keytype]valuetype, cap)
 m := make(map[string]string, 10)
 fmt.Println(m, len(m))
@@ -495,16 +493,110 @@ delete(m, "name")
 
 #### struct
 ```go
+/*  alloc stack memory
+*/
+
+// declaration and definition
+type Student struct {
+    dstr    string // default: ""
+    dint    int   // default: 0
+    dbool   bool  // default: false
+    dsli    []string  // default: nil
+    dmap    map[string]int  // default: nil
+}
+var s1,s2,s3 Stuent
+// option1
+s1.dstr = "xxx"
+s1.dint = 11
+...
+// option2
+s2 := Student{"xxx", 11, true, []string{"a","b"}, map[string]int{"x":12}}
+// option3: composite literal
+s3 := Student{dstr: "xxx", dint: 11, dbool: true, dsli: []string{"a","b"}, map[string]int{"x":12}}
+
+// syntactic sugar: (*instance).key
+sptr := &s1
+fmt.Println((*sptr).dstr))
+fmt.Println(sptr.dstr))
+
+// constructor function
+func NewStudent(dstr string, dint int8, dbool bool, dsli []string, dmap map[string]int) *Student {
+    return &Student{
+        dstr:    dstr,
+        dint:    dint,
+        dbool:   dbool,
+        dsli:    dsli,
+        dmap:    dmap
+    }
+}
+s4 := NewStudent("xxx", 11, true, []string{"a", "b"}, map[string]int{"x": 12})
+fmt.Println(s4)
+
+// method receiver
+func (s Student) Read(book string) {
+    fmt.Println("Reading book:", book)
+}
+s4.Read()
+
+// anonymous field
+type Addr struct {
+    country  string
+    province string
+    city     string
+}
+type Person struct {
+    string
+    int
+    Addr
+}
+p := Person{
+    "logic",
+    35,
+    Addr{"cn", "gd", "gz"},
+}
+fmt.Println(p.Addr.country)
+
+// inherited struct
+type Animal struct {
+	name string
+}
+func (a *Animal) eat() {
+	fmt.Printf("%s is eating.\n", a.name)
+}
+type Dog struct {
+	Kind string
+	*Animal
+}
+func (d *Dog) bark() {
+	fmt.Printf("%s is barking.\n", d.name)
+}
+func main() {
+	d := &Dog{
+		"X",
+		&Animal{"dog1"},
+	}
+	fmt.Println(d)
+	d.bark()
+	d.eat()
+}
+
+// serialize
+
+```
+
+#### interface
+```go
 /*
 
 */
+type xx interface {
 
+}
 ```
 
 #### channel
 ```go
-/*
-
+/*  alloc heap memory
 */
 
 ```
@@ -1016,7 +1108,10 @@ func main() {
 }
 ```
 
-### Struct
+### Network IO
+
+### Concurrency
+
 
 
 > Reference:

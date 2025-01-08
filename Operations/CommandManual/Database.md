@@ -21,7 +21,7 @@ curl -u "elastic:pwd" http://localhost:9200/_cat
 
 
 # index lifecycle
-# create
+# create lifecycle
 curl http://localhost:9200/_ilm/policy/my-index-policy -X PUT -H'content-type: application/json' \
 -d '{
     "policy": {
@@ -29,16 +29,15 @@ curl http://localhost:9200/_ilm/policy/my-index-policy -X PUT -H'content-type: a
         "hot": {
           "min_age": "0ms",
           "actions": {
-            "rollover": {
-              "max_primary_shard_size": "50gb",
-              "max_age": "30d",
-              "max_docs": 100
-            },
+            #"alias": {
+            #  "hot_alias": {}
+            #},
+            #"rollover": {
+            #  "max_primary_shard_size": "50gb",
+            #  "max_age": "30d"
+            #},
             "set_priority": {
               "priority": "100"
-            },
-            "alias": {
-              "hot_alias": {}
             }
           }
         },
@@ -74,14 +73,14 @@ curl http://localhost:9200/_ilm/policy/my-index-policy -X PUT -H'content-type: a
       }
     }
 }'
-# query
+# query lifecycle
 curl http://localhost:9200/_ilm/policy
 curl http://localhost:9200/_ilm/policy/my-index-policy
 curl http://localhost:9200/my-index-2024-01-01/_ilm/explain
 
 
-# index templates
-# create
+# index template
+# create template
 curl http://localhost:9200/_template/my-index-template -X PUT -H 'Content-Type: application/json' \
 -d '{
 	"index_patterns": ["my-index-*"],
@@ -93,7 +92,7 @@ curl http://localhost:9200/_template/my-index-template -X PUT -H 'Content-Type: 
 	}
 	"mappings": {}
 }' 
-# query
+# query template
 curl http://localhost:9200/_template/my-index-template
 
 
@@ -117,14 +116,14 @@ curl http://localhost:9200/_cat/indices |awk '{print $3}' |sort -rn |uniq
 curl http://localhost:9200/my-index-2024-01-01?pretty
 curl http://localhost:9200/my-index-2024-01-01/_settings?pretty
 curl http://localhost:9200/my-index-2024-01-01/_mappings?pretty
-# query shards
+# query shard
 curl http://localhost:9200/_cat/shards?pretty
 # batch delete index/shard
 curl http://localhost:9200/_cat/shards -u "elastic:pwd" |awk '{print $1}' |sort -rn |uniq |grep -v "^\." |grep 2024-01 > /tmp/index.tmp
 for i in `cat /tmp/index.tmp`;do curl http://localhost:9200/$i -X DELETE -u "elastic:pwd"; done
 
 
-# search
+# index search
 time curl -X POST "http://localhost:9200/index/_search" \
   -H 'Content-Type: application/json' \
   -d '{
@@ -153,7 +152,8 @@ time curl -X POST "http://localhost:9200/index/_search" \
   }'
 
 
-# license error
+# misc
+# resolve license error
 curl -X POST http://localhost:9200/_license/start_basic?acknowledge=true
 ```
 
