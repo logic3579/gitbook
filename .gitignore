@@ -1,19 +1,21 @@
-###Linux###
+# Env
 *~
-
-# KDE directory preferences
-.directory
+.env
 
 
-###OSX###
+# IDE
+.idea/
+.vscode
 
+
+# OSX
 .DS_Store
 **/.DS_Store
 .AppleDouble
 .LSOverride
 
 
-###Yakir###
+# Custom
 tmp/
 .obsidian/workspace.json
 
