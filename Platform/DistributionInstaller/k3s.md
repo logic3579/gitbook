@@ -8,47 +8,103 @@ description: k3s
 
 ### Install
 
-```
+#### Requirements
+
+```bash
+# resources
+cpu
+memory
+disk
+
 # Kernel module
 lsmod |grep -E "nf_conntrack|br_netfilter"
 
-# Master
-curl -sfL https://get.k3s.io | sh -
-cat /var/lib/rancher/k3s/server/node-token  # join token
-# Disable traefik
-kubectl -n kube-system delete helmcharts.helm.cattle.io traefik
-kubectl -n kube-system delete helmcharts.helm.cattle.io traefik-crd
-kubectl -n kube-system delete pod --field-selector=status.phase==Succeeded 
-# Modify /etc/systemd/system/k3s.service
-ExecStart=/usr/local/bin/k3s \
-    server \
-    --disable traefik \
-    --disable traefik-crd \
-##restart k3s server
-rm /var/lib/rancher/k3s/server/manifests/traefik.yaml
-systemctl daemon-reload
-systemctl restart k3s
+# firewalld diables
 
-# Worker
-curl -sfL https://get.k3s.io | K3S_URL=https://k3s_server_ip:6443 K3S_TOKEN=k3s_server_token sh -
+# hostname
+hostnamectl hostname masterX
+hostnamectl hostname workerX
 
-# Get kubectl and helm client
+```
+
+#### Master
+
+```bash
+# specified version env
+# INSTALL_K3S_VERSION=xxx
+
+# install master with etcd and disable traefik
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --cluster-init --disable=traefik" sh -
+K3S_URL=https://master1:443
+K3S_TOKEN=$(cat /var/lib/rancher/k3s/server/node-token)
+
+# join others master
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable=traefik" K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
+
+# check
+kubectl get nodes
+```
+
+#### Worker
+```bash
+# install worker and join cluster
+K3S_URL=https://master1:443
+K3S_TOKEN=$(cat /var/lib/rancher/k3s/server/node-token)
+curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
+
+# check
+kubectl get nodes
+```
+
+#### Manager
+```bash
+# set kubectl client config
+mkdir ~/.kube
+cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+chmod 0600 ~/.kube/config
+
+# kubectl client
+KUBECTL_VERSION=v1.x.x
+curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+chmod +x ./kubectl
+mv ./kubectl /usr/bin/kubectl
+
+# helm client
+HELM_VERSION=v3.x.x
+wget https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz
+tar xf helm-${HELM_VERSION}-linux-amd64.tar.gz && rm -f helm-${HELM_VERSION}-linux-amd64.tar.gz
+chmod +x linux-amd64/helm
+mv linux-amd64/helm /usr/bin/helm && rm -rf ./linux-amd64
+
+# auto-completion
 apt install bash-completion
-curl -LO https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl
-wget https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
 cat >> ~/.bashrc << "EOF"
 complete -o default -F __start_kubectl k
 source <(kubectl completion bash)
 source <(helm completion bash)
 EOF
 
-# kubectl client config
-mkdir ~/.kube
-cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-kubectl get pod -A
-helm list
+# worker label
+kubectl label nodes nodeX node-role.kubernetes.io/worker=true
+
+# master taint
+#kubectl taint nodes masterX node-role.kubernetes.io/master=:NoSchedule
+kubectl taint nodes masterX node-role.kubernetes.io/master=:PreferNoSchedule
 ```
 
+### Others
+
+#### components
+
+#### nfs-driver
+```bash
+# others
+```
+
+#### nfs-driver
+```bash
+# others
+```
 
 
 > Reference:

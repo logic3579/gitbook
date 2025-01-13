@@ -1,5 +1,5 @@
 ---
-description: cert-manager
+description: Automatically provision and manage TLS certificates in Kubernetes
 ---
 
 # cert-manager
