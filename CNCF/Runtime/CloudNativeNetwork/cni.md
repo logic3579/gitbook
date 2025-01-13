@@ -1,5 +1,5 @@
 ---
-description: Container network interface
+description: Container Network Interface - networking for Linux containers
 ---
 
 # CNI
