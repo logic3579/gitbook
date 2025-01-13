@@ -1,5 +1,5 @@
 ---
-description: Higress
+description: 🤖 AI Gateway | AI Native API Gateway
 ---
 
 # Higress

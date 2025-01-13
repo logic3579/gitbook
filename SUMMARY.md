@@ -50,6 +50,7 @@
 * [Orchestration and Management](CNCF/OrchestrationManagement/README.md)
   * [API Gateway](cncf/orchestrationmanagement/api-gateway/README.md)
     * [Higress](CNCF/OrchestrationManagement/APIGateway/higress.md)
+    * [Tyk](CNCF/OrchestrationManagement/APIGateway/tyk.md)
   * [Coordination & Service Discovery](cncf/orchestrationmanagement/coordination-and-service-discovery/README.md)
     * [CoreDNS](CNCF/OrchestrationManagement/CoordinationServiceDiscovery/coredns.md)
     * [etcd](CNCF/OrchestrationManagement/CoordinationServiceDiscovery/etcd.md)
@@ -77,6 +78,7 @@
     * [Vault](CNCF/Provisioning/KeyManagement/vault.md)
   * [Security & Compliance](cncf/provisioning/security-and-compliance/README.md)
     * [cert-manager](CNCF/Provisioning/SecurityCompliance/cert-manager.md)
+    * [Keycloak](CNCF/Provisioning/SecurityCompliance/keycloak.md)
 * [Runtime](CNCF/Runtime/README.md)
   * [Cloud Native Network](cncf/runtime/cloud-native-network/README.md)
     * [Cilium](CNCF/Runtime/CloudNativeNetwork/cilium.md)
@@ -88,7 +90,7 @@
   * [Container Runtime](cncf/runtime/container-runtime/README.md)
     * [Docker](CNCF/Runtime/ContainerRuntime/Docker/README.md)
     * [containerd](CNCF/Runtime/ContainerRuntime/containerd.md)
-    * [CRI-O](CNCF/Runtime/ContainerRuntime/cri-o.md)
+    * [Lima](CNCF/Runtime/ContainerRuntime/lima.md)
 * [Serverless](CNCF/Serverless/README.md)
 
 ## Development
