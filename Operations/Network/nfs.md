@@ -79,9 +79,63 @@ mountOptions:
   - nfsvers=4.1
 EOF
 kubectl apply -f nfs-storageclass.yaml
+```
 
-# create pvc pod verify
-...
+### example
+```bash
+cat > pv-nfs-csi.yaml << "EOF"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/provisioned-by: nfs.csi.k8s.io
+  name: pv-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-csi
+  mountOptions:
+    - nfsvers=4.1
+  csi:
+    driver: nfs.csi.k8s.io
+    # volumeHandle format: {nfs-server-address}#{sub-dir-name}#{share-name}
+    # make sure this value is unique for every share in the cluster
+    volumeHandle: nfs-server.default.svc.cluster.local/share##
+    volumeAttributes:
+      server: nfs-server.default.svc.cluster.local
+      share: /
+EOF
+
+cat > nginx-pod-nfs.yaml << "EOF"
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-nfs
+  namespace: default
+spec:
+  nodeSelector:
+    "kubernetes.io/os": linux
+  containers:
+    - image: mcr.microsoft.com/oss/nginx/nginx:1.19.5
+      name: nginx-nfs
+      command:
+        - "/bin/bash"
+        - "-c"
+        - set -euo pipefail; while true; do echo $(date) >> /mnt/nfs/outfile; sleep 1; done
+      volumeMounts:
+        - name: persistent-storage
+          mountPath: "/mnt/nfs"
+          readOnly: false
+  volumes:
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: pvc-nfs-dynamic
+EOF
 ```
 
 <!-- ### nfs-subdir-external-provisioner -->
