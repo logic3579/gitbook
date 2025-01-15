@@ -78,11 +78,12 @@ allowVolumeExpansion: true
 mountOptions:
   - nfsvers=4.1
 EOF
-kubectl apply -f nfs-storageclass.yaml
+kubectl apply -f storageclass-nfs.yaml
 ```
 
 ### example
 ```bash
+# option1: manual create pv
 cat > pv-nfs-csi.yaml << "EOF"
 ---
 apiVersion: v1
@@ -109,7 +110,9 @@ spec:
       server: nfs-server.default.svc.cluster.local
       share: /
 EOF
+kubectl apply -f pv-nfs-csi.yaml
 
+# option2: dynamics pvc
 cat > nginx-pod-nfs.yaml << "EOF"
 ---
 kind: Pod
@@ -136,6 +139,7 @@ spec:
       persistentVolumeClaim:
         claimName: pvc-nfs-dynamic
 EOF
+kubectl apply -f nginx-pod-nfs.yaml
 ```
 
 <!-- ### nfs-subdir-external-provisioner -->
