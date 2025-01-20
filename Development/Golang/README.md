@@ -513,6 +513,9 @@ s1.dint = 11
 s2 := Student{"xxx", 11, true, []string{"a","b"}, map[string]int{"x":12}}
 // option3: composite literal
 s3 := Student{dstr: "xxx", dint: 11, dbool: true, dsli: []string{"a","b"}, map[string]int{"x":12}}
+// option4: new method
+ps := new(Student)
+fmt.Println(reflect.TypeOf(ps))
 
 // syntactic sugar: (*instance).key
 sptr := &s1
@@ -535,6 +538,9 @@ fmt.Println(s4)
 // method receiver
 func (s Student) Read(book string) {
     fmt.Println("Reading book:", book)
+}
+func (s *Student) Attacked(book string) {
+    fmt.Printf("%s is attacked.\n", s.dstr)
 }
 s4.Read()
 
@@ -581,17 +587,75 @@ func main() {
 }
 
 // serialize
+type Addr struct {
+	Province string
+	City     string
+}
+type Stu struct {
+	Name string `json:"name"` // json tag
+	Age  int    `json:"-"`    // ignore json field
+	Addr Addr
+}
+func main() {
+	// serialization
+	var stuStruct = Stu{Name: "yakir", Age: 33, Addr: Addr{Province: "gd", City: "sz"}}
+	jsonStuStruct, _ := json.Marshal(stuStruct)
+	fmt.Println(string(jsonStuStruct))
+	// deserialization
+    var StuStruct Stu
+    err := json.Unmarshal(jsonStuStruct, &StuStruct)
+    if err != nil {
+        return
+    }
+    fmt.Println(StuStruct.Age)
+    fmt.Println(StuStruct.Addr.City)
+
+}
 
 ```
 
 #### interface
 ```go
-/*
-
-*/
-type xx interface {
-
+/* Polymorphism
+type interfaceName interface {
+    method1(argList1) returnList1
+    method2(argList2) returnList2
+    ...
 }
+*/
+type Sperker interface {
+	speak()
+}
+// pointer receiver
+type Chinese struct{}
+func (c *Chinese) speak() {
+	fmt.Println("Chinese speak")
+}
+// value receiver
+type Japanese struct{}
+func (j Japanese) speak() {
+	fmt.Println("Japanese speak")
+}
+func PublicSpeak(s Sperker){
+    s.speak()
+}
+func main() {
+    // example
+	var s Sperker
+	s = &Chinese{}
+	s.speak()
+	s = Japanese{}
+	s.speak()
+	s = &Japanese{}
+	s.speak()
+
+    // interface type variable
+    c := &Chinese{}
+    j := Japanese{}
+    PublicSpeak(c)
+    PublicSpeak(j)
+}
+
 ```
 
 #### channel

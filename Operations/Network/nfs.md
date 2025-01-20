@@ -4,15 +4,10 @@ description: Network File System
 
 # NFS
 
-## NFS Server
-### 1) Introduction
-首先服务器端启动RPC服务，并开启111端口
-服务器端启动NFS服务，并向RPC注册端口信息
-客户端启动RPC（portmap服务），向服务端的RPC(portmap)服务请求服务端的NFS端口
-服务端的RPC(portmap)服务反馈NFS端口信息给客户端。
-客户端通过获取的NFS端口来建立和服务端的NFS连接并进行数据的传输。
+NFS or Network File System is a distributed file system protocol that allows you to share directories over a network. With NFS, you can mount remote directories on your system and work with the files on the remote machine as if they were local files.
 
-### 2) Install
+## NFS Server
+### Install
 ```bash
 # install server
 apt install nfs-kernel-server
@@ -25,7 +20,7 @@ cat > /etc/exports << "EOF"
 /nfs *(rw,sync,no_subtree_check)
 EOF
 
-# start and reload
+# apply and reload
 exportfs -a
 exportfs –r
 
@@ -40,12 +35,17 @@ systemctl start nfs-kernel-server
 systemctl enable nfs-kernel-server
 ```
 
-### 3) client mount
+### client mount
 ```bash
 # install client
 apt install nfs-common
-mkdir /tmp/nfs
-mount -t nfs 1.1.1.1:/nfs /tmp/nfs
+
+# mount a shared NFS directory
+mkdir /opt/nfs
+mount -t nfs 1.1.1.1:/nfs /opt/nfs
+
+# option: startup mount
+1.1.1.1:/nfs /opt/nfs nfs rsize=8192,wsize=8192,timeo=14,intr
 ```
 
 ## Kubernetes CSI Driver
@@ -78,10 +78,68 @@ allowVolumeExpansion: true
 mountOptions:
   - nfsvers=4.1
 EOF
-kubectl apply -f nfs-storageclass.yaml
+kubectl apply -f storageclass-nfs.yaml
+```
 
-# create pvc pod verify
-...
+### example
+```bash
+# option1: manual create pv
+cat > pv-nfs-csi.yaml << "EOF"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/provisioned-by: nfs.csi.k8s.io
+  name: pv-nfs
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-csi
+  mountOptions:
+    - nfsvers=4.1
+  csi:
+    driver: nfs.csi.k8s.io
+    # volumeHandle format: {nfs-server-address}#{sub-dir-name}#{share-name}
+    # make sure this value is unique for every share in the cluster
+    volumeHandle: nfs-server.default.svc.cluster.local/share##
+    volumeAttributes:
+      server: nfs-server.default.svc.cluster.local
+      share: /
+EOF
+kubectl apply -f pv-nfs-csi.yaml
+
+# option2: dynamics pvc
+cat > nginx-pod-nfs.yaml << "EOF"
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-nfs
+  namespace: default
+spec:
+  nodeSelector:
+    "kubernetes.io/os": linux
+  containers:
+    - image: mcr.microsoft.com/oss/nginx/nginx:1.19.5
+      name: nginx-nfs
+      command:
+        - "/bin/bash"
+        - "-c"
+        - set -euo pipefail; while true; do echo $(date) >> /mnt/nfs/outfile; sleep 1; done
+      volumeMounts:
+        - name: persistent-storage
+          mountPath: "/mnt/nfs"
+          readOnly: false
+  volumes:
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: pvc-nfs-dynamic
+EOF
+kubectl apply -f nginx-pod-nfs.yaml
 ```
 
 <!-- ### nfs-subdir-external-provisioner -->
@@ -110,5 +168,6 @@ kubectl apply -f nfs-storageclass.yaml
 
 
 > Reference:
-> 1. [Kubernetes NFS CSI Driver](https://github.com/kubernetes-csi/csi-driver-nfs)
-> 2. [StorageClass Resources](https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/docs/driver-parameters.md)
+> 1. [NFS](https://ubuntu.com/server/docs/network-file-system-nfs)
+> 2. [Kubernetes NFS CSI Driver](https://github.com/kubernetes-csi/csi-driver-nfs)
+> 3. [StorageClass Resources](https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/docs/driver-parameters.md)
