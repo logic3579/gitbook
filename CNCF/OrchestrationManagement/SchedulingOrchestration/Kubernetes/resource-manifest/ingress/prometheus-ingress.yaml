@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: prometheus.yakir.com
+  - host: prometheus.yakir.top
     http:
       paths:
       - backend:

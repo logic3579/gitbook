@@ -34,9 +34,9 @@ vim values.yaml
 expose:
   ingress:
     hosts:
-      core: harbor-core.yakir.com
-      notary: harbor-notary.yakir.com
-externalURL: https://harbor.yakir.com
+      core: harbor-core.yakir.top
+      notary: harbor-notary.yakir.top
+externalURL: https://harbor.yakir.top
 
 helm -n provisioning install harbor . --create-namespace
 
@@ -48,7 +48,7 @@ kubectl -n provisioning patch ingress harbor-ingress --patch '{"spec":{"ingressC
 kubectl -n provisioning get secrets harbor-core -ogo-template='{{.data.HARBOR_ADMIN_PASSWORD|base64decode}}'
 
 # access by https
-https://harbor-core.yakir.com
+https://harbor-core.yakir.top
 admin
 Harbor12345
 ```

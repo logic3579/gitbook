@@ -84,7 +84,7 @@ kubectl -n cicd patch ingress jenkins --patch '{"spec":{"ingressClassName": "ngi
 kubectl -n cicd get secrets jenkins -ojsonpath='{.data.jenkins-admin-password}' |base64 -d 
 
 # access by https
-https://jenkins.yakir.com
+https://jenkins.yakir.top
 admin
 mxP4KKfGtn6hJ8IF2zMMLt
 ```

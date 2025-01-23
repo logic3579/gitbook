@@ -1,6 +1,6 @@
 # Container Runtime
 
-## docker & podman
+## docker / podman
 ### busybox chroot
 ```bash
 mkdir rootfs
@@ -32,7 +32,6 @@ bin  lib  lib64
 --rm                    Remove container (and pod if created) after exit
 -v, --volume stringArray   Bind mount a volume into the container.
 
-
 # overwrite the default ENTRYPOINT
 docker run --rm -it --entrypoint sh hashicorp/terraform:latest  
 
@@ -61,27 +60,34 @@ docker compose restart
 ### Quick test container
 ```bash
 # busybox
-docker run --rm -it busybox sh
+# option1
+docker run --name busybox --rm -d docker.io/busybox sleep infinity
+docker exec -it busybox sh
+# option2
+docker run --name busybox --rm -it busybox sh
 
 # kafka-client
-docker run 
+docker run --name kafka-client --rm -it bitnami/kafka bash
+
+# mysql-client
+docker run --name mysql-client --rm -it bitnami/mysql bash
+
+# redis-client
+docker run --rm --name redis-client -it bitnami/redis bash
 
 # mysql-server
 docker run --name mysql \
   -e MYSQL_ROOT_PASSWORD=root_password \
   -e MYSQL_DATABASE=your_database \
   -p 3306:3306 \
-  -v $(pwd)/volume-mysql/:/var/lib/mysql
+  -v $(pwd)/data/mysql/:/var/lib/mysql \
   -d mysql --character-set-server=utf8mb4
-
-# redis-client
-docker run --rm --name redis-client -it docker.io/bitnami/redis-cluster bash
 
 # knowledge-base
 docker run --name mrdoc_mysql \
   -e MYSQL_ROOT_PASSWORD=knowledge_base123 \
   -e MYSQL_DATABASE=knowledge_base \
-  -v $(pwd)/volume-mysql/:/var/lib/mysql \
+  -v $(pwd)/data/mysql/:/var/lib/mysql \
   -d mysql --character-set-server=utf8mb4
 docker run --name mrdoc \
   -p 10086:10086 \
@@ -112,52 +118,37 @@ endpoint="/run/k3s/containerd/containerd.sock" URL="unix:///run/k3s/containerd/c
 crictl ps 
 crictl images
 ```
-
 ## kubectl
 ### Basic
 ```bash
 # create
 # create a tls secret
-kubectl create secret tls my-tls --cert=./tls.crt --key=./tls.key
-kubectl create secret tls my-tls --save-config \
-    --dry-run=client \
+kubectl create secret tls my-secret-tls --dry-run=client \
+    --save-config \
     --cert=./tls.crt \
     --key=./tls.key \
     -oyaml | kubectl apply -f -
-# create a private image repo secret
-# option1: from file
-kubectl create secret generic my-harbor \
-    --from-file=.dockerconfigjson=~/.docker/config.json 
-    --type=kubernetes.io/dockerconfigjson
-# option2: from command
+# create a private image registry secret
 kubectl create secret docker-registry my-harbor \
-    --docker-server=harbor.yakir.com \
+    --docker-server=harbor.yakir.top \
     --docker-username='username' \
-    --docker-password='password' 
-# config deployment or statefulset
-kubectl edit deployments my-deployment
-      imagePullSecrets:
-      - name: my-harbor
+    --docker-password='password'
+# create deployment
+kubectl create deployment busybox --image=busybox -- sleep infinity
 
-
-# expose 
+# expose
 kubectl expose service/pod nginx --port=8888 --target-port=8080 --name=myname
 
-
 # run
-kubectl run --rm -it busybox --image=busybox --restart=Never -- sh
-kubectl run --rm -it mysql-client --image bitnami/mysql --restart=Never -- /bin/bash
-
+kubectl run busybox --rm -it --image=busybox --restart=Never -- sh
 
 # set
 kubectl set env deployments/my-app KEY_1=VAL_1 ... KEY_N=VAL_N
-
 
 # explain
 kubectl explain cronjobs
 kubectl explain deployments
 kubectl explain statefulset.spec.updateStrategy.rollingUpdate
-
 
 # get
 kubectl get -k ./
@@ -175,16 +166,12 @@ ContainerPort:.spec.containers[*].ports[*].containerPort
 kubectl get --raw /
 kubectl get --raw /apis/apps/v1
 
-
 # edit
 kubectl edit (resource_type) (resource_name)
 
-
 # delete
-kubectl delete pod pod_name
-kubectl delete pod pod_name --force=true --grace-period=0
+kubectl delete pod busybox [--force=true --grace-period=0]
 ```
-
 
 ### Deploy
 ```bash
@@ -197,7 +184,6 @@ kubectl scale [--resource-version=version] [--current-replicas=count] --replicas
 # autoscale
 kubectl autoscale (-f x.yaml | deployment/mysql) [--min=MINPODS] --max=MAXPODS [--cpu-percent=CPU] [options]
 ```
-
 
 ### Cluster Management
 ```bash
@@ -215,7 +201,6 @@ kubectl describe nodes |grep Taints
 kubectl taint NODE NAME KEY_1=VAL_1:TAINT_EFFECT_1 ... KEY_N=VAL_N:TAINT_EFFECT_N [options]
 ```
 
-
 ### Troubleshooting and Debugging
 ```bash
 # describe
@@ -226,7 +211,7 @@ kubectl describe service service_name
 kubectl get pod --show-labels
 kubectl logs -f --tail 10 pod_name -l app.kubernetes.io/instance=ingress-nginx --max-log-requests=5
 
-# attach 
+# attach
 kubectl attach -it pod pod_name [-c container_name]
 
 # exec
@@ -242,14 +227,11 @@ kubectl proxy --address=0.0.0.0
 # cp
 kubectl cp pod_name:/path/path /tmp/path
 
-
 # auth
 # kubectl auth can-i get pods --as=system:serviceaccount:<namespace>:<serviceaccount-name> -n <namespace>
 kubectl auth can-i create applications --as=system:serviceaccount:argocd:argocd-server -n argocd
 
-
-
-# debug 
+# debug
 kubectl debug -it pod/pod_name --image=busybox [--target=container_name] -- /bin/sh
 # debug node(need to be deleted pod manually and node persistent in /host/)
 kubectl debug -it node/node_name --image=ubuntu -- /bin/bash
@@ -265,13 +247,11 @@ kubectl events -n namespace_name
 # diff
 kubectl diff -f FILENAME [options]
 
-
 # apply
 # manifest file
 kubectl apply -f <manifest.yaml> --dry-run=client
 # kustomize directory
 kubectl apply -k <kustomization_directory> --dry-run=client
-
 
 # patch
 # option1
@@ -279,19 +259,15 @@ kubectl patch ingress harbor-ingress-notary --type='json' -p='[{"op": "add", "pa
 # option2
 kubectl patch ingress gitlab-webservice-default --patch '{"spec":{"ingressClassName": "nginx"}}'
 
-
 # replace
 kubectl replace -f FILENAME [options]
 
-
 # wait
-
 
 # kustomize(need kustomization.yaml)
 kubectl kustomize <kustomization_directory>
 kubectl kustomize ./ |kubectl apply -f -
 ```
-
 
 ### Settings
 ```bash
@@ -304,7 +280,6 @@ kubectl annotate pods yakir-tools key1=value1
 # completion
 source <(kubectl completion bash)
 ```
-
 
 ### Other
 ```bash
@@ -329,21 +304,30 @@ kubectl config set-credentials NAME [--client-certificate=path/to/certfile] [--c
 kubectl config use-context CONTEXT_NAME
 kubectl config set-context NAME [--cluster=cluster_nickname] [--user=user_nickname] [--namespace=namespace]
 
-
 # check version
 kubectl version
 ```
 
 ### Quick test container
 ```bash
+# busybox
+# option1
+kubectl run busybox --rm busybox --image=docker.io/busybox -- sleep infinity
+kubectl exec -it busybox -- sh
+# option2
+kubectl run busybox --rm -it --image=busybox -- sh
+
+# mysql-client
+kubectl run mysql-client --rm -it --image=bitnami/mysql -- bash
+
 # kafka-client
-kubectl -n middleware run kafka-client --image docker.io/bitnami/kafka:3.4.0-debian-11-r22 --command -- sleep infinity
-kubectl -n middleware exec -it kafka-client -- bash
+kubectl run kafka-client --rm -it --image=bitnami/kafka -- bash
 
 # redis-client
-kubectl -n middleware run redis-client --image docker.io/bitnami/redis-cluster --command -- sleep infinity
-kubectl -n middleware exec -it redis-client -- bash
+kubectl run redis-client --rm -it --image=bitnami/redis -- bash
 
+# net-tools
+kubectl run netshoot --rm -it --image=nicolaka/netshoot -- bash
 ```
 
 ## helm
@@ -376,7 +360,7 @@ helm install [RELEASE_NAME] ingress-nginx/ingress-nginx
 helm upgrade [RELEASE_NAME] [CHART] --install
 helm uninstall [RELEASE_NAME]
 
-# lint 
+# lint
 helm lint /opt/helm-charts/*
 
 # list

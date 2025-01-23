@@ -297,7 +297,7 @@ services:
 # 修改 jira tomcat 配置（解决 nginx 代理 http 访问异常问题）
 vim ./jira/conf/server.xml   # connector 标签中添加配置
         <Connector port="8080"
-                   proxyName="jira.yakir.com"
+                   proxyName="jira.yakir.top"
                    proxyPort="80"
     />
 

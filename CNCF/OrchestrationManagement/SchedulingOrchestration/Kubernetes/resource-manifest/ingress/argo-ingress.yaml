@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: argo.yakir.com
+  - host: argo.yakir.top
     http:
       paths:
       - backend:
