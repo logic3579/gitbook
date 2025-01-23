@@ -22,7 +22,7 @@ apt install -y curl openssh-server ca-certificates tzdata perl
 
 # Add the Gitlab package repository and install package
 curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | bash
-GITLAB_ROOT_PASSWORD="passwOrd123" EXTERNAL_URL="http://gitlab.yakir.com" apt install gitlab-ee
+GITLAB_ROOT_PASSWORD="passwOrd123" EXTERNAL_URL="http://gitlab.yakir.top" apt install gitlab-ee
 
 # Browse to the hostname and login
 cat /etc/gitlab/initial_root_password
@@ -80,7 +80,7 @@ vim values.yaml
 
 helm -n cicd install gitlab . --create-namespace \
   --timeout 600s \
-  --set global.hosts.domain=yakir.com \
+  --set global.hosts.domain=yakir.top \
   --set global.hosts.externalIP=1.1.1.1 \
   --set certmanager-issuer.email=yakir@gmail.com \
   --set certmanager.installCRDs=false \
@@ -103,7 +103,7 @@ kubectl -n cicd patch ingress gitlab-webservice-default --patch '{"spec":{"ingre
 kubectl -n cicd get secrets gitlab-gitlab-initial-root-password -ogo-template='{{.data.password|base64decode}}'
 
 # access by https
-https://harbor-core.yakir.com
+https://harbor-core.yakir.top
 admin
 Harbor12345
 ```

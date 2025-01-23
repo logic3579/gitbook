@@ -238,7 +238,7 @@ server {
     listen 443 ssl http2;
     server_name 
 	    example.com
-		yakir.com
+		yakir.top
 	;
     ssl_certificate     $domainCert;
     ssl_certificate_key $domainKey;
