@@ -74,12 +74,15 @@ dnf install zsh git svn telnet wget curl make cmake
 dnf install containerd
 
 
-# Search 
+# search
 dnf search gtk | grep theme
 dnf search shell-theme
 dnf search icon-theme
 dnf search cursor-theme
 
+# show duplicates, in repos, in list/search commands
+dnf list --showduplicates gcc
+dnf search --showduplicates gcc
 
 # Fedora
 # install extensions
