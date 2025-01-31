@@ -53,6 +53,7 @@ velero install \
     --secret-file ./credentials-velero \
     --use-volume-snapshots=false \
     --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://minio.velero.svc:9000
+    # --snapshot-location-config region=mino
 
 # verify
 velero backup-location get
@@ -63,16 +64,16 @@ velero backup-location get
 ### Backup && Restore
 ```bash
 # backup
-velero backup create cluster-full-backup
+velero backup create full-cluster-backup
 velero backup create namespaces-backup --include-namespaces default,public
-velero backup create namespaces-with-pvc-backup --include-namespaces default,public --csi-snapshot-timeout=20m
+velero backup create full-cluster-backup-with-pv --include-cluster-resources=true --snapshot-volumes=true
 
 # schedule backup
 velero schedule create cluster-full-daily-backup --schedule="0 1 * * *" --ttl 168h0m0s
 velero schedule create cluster-full-weekly-backup --schedule="@every 168h" --ttl 720h0m0s
 
 # Restore
-velero restore create --from-backup cluster-full-backup
+velero restore create --from-backup full-cluster-backup
 
 # get info
 velero backup get
