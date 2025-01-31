@@ -44,7 +44,7 @@ docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin
 # commit
 docker commmit -m 'commit message' container_id repository/xxx/xxx:tag
 
-# build image 
+# build image
 docker build -t yakir/test:latest . -f Dockerfile
 
 # buildx plugin
@@ -75,7 +75,14 @@ docker run --name mysql-client --rm -it bitnami/mysql bash
 # redis-client
 docker run --rm --name redis-client -it bitnami/redis bash
 
-# mysql-server
+
+# minio server
+docker run --rm --name minio-server \
+  -p 9000-9001:9000-9001 \
+  -v $(pwd)/data/minio/:/data \
+  quay.io/minio/minio server /data --console-address ":9001"
+
+# mysql server
 docker run --name mysql \
   -e MYSQL_ROOT_PASSWORD=root_password \
   -e MYSQL_DATABASE=your_database \

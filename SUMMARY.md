@@ -87,6 +87,7 @@
     * [CSI](CNCF/Runtime/CloudNativeStorage/csi.md)
     * [Minio](CNCF/Runtime/CloudNativeStorage/minio.md)
     * [Rook](CNCF/Runtime/CloudNativeStorage/rook.md)
+    * [Velero](CNCF/Runtime/CloudNativeStorage/velero.md)
   * [Container Runtime](cncf/runtime/container-runtime/README.md)
     * [Docker](CNCF/Runtime/ContainerRuntime/Docker/README.md)
     * [containerd](CNCF/Runtime/ContainerRuntime/containerd.md)

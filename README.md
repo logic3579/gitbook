@@ -19,6 +19,7 @@ icon: hand-wave
 - [CNCF](#)
 - [Development](#)
 - [Environment](#)
+- [Misc](#)
 - [Operations](#)
 - [Platform](#)
 <!-- tocstop -->
