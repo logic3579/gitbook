@@ -96,15 +96,12 @@ kubectl taint nodes masterX node-role.kubernetes.io/master=:PreferNoSchedule
 
 #### components
 
-#### nfs-driver
-```bash
-# others
-```
 
 #### nfs-driver
 ```bash
-# others
 ```
+
+
 
 
 > Reference:
