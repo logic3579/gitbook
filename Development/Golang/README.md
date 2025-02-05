@@ -202,6 +202,33 @@ fmt.Scanln(&name, &age, &married)
 fmt.Printf("name:%s age:%d married:%t", name, age, married)
 ```
 
+#### package
+```go
+// import multiple package
+import (
+    "fmt"
+    "myproject/api"
+)
+
+// alias
+import F "fmt"
+F.Println()
+
+// omit citation format
+import . "myproject/api"
+RestfulAPI()
+
+// only execute init function
+import _ "myproject/api"
+
+// go mod
+go mod download        // download modules to local cache: $GOPATH/pkg
+go mod graph           // print module requirement graph
+go mod init myproject  // initialize new module in current directory
+go mod tidy            // add missing and remove unused modules
+go mod verify          // add missing and remove unused modules
+```
+
 ### Data type
 
 #### bool
@@ -623,6 +650,7 @@ type interfaceName interface {
     ...
 }
 */
+// example
 type Sperker interface {
 	speak()
 }
@@ -636,26 +664,74 @@ type Japanese struct{}
 func (j Japanese) speak() {
 	fmt.Println("Japanese speak")
 }
+// public function
 func PublicSpeak(s Sperker){
     s.speak()
 }
 func main() {
-    // example
-	var s Sperker
-	s = &Chinese{}
-	s.speak()
-	s = Japanese{}
-	s.speak()
-	s = &Japanese{}
-	s.speak()
+	var cv,jv,jp Sperker
+	cv = &Chinese{}
+	cv.speak()
+	jv = Japanese{}
+	jv.speak()
+	jp = &Japanese{}
+	jp.speak()
 
     // interface type variable
     c := &Chinese{}
-    j := Japanese{}
+    j1 := Japanese{}
+    j2 := &Japanese{}
     PublicSpeak(c)
-    PublicSpeak(j)
+    PublicSpeak(j1)
+    PublicSpeak(j2)
 }
 
+// type nesting
+type Animal interface {
+    bark()
+    run()
+}
+type Barker struct {
+    name string
+}
+func (b *Barker) bark(){
+    fmt.Printf("%v is barking\n", b.name)
+}
+type Dog struct {
+    name string
+    Barker
+}
+func (d *Dog) run(){
+    fmt.Printf("%v is running\n", d.name)
+}
+func main(){
+    var a Animal
+    a = &Dog{
+        name: "dog gbk",
+        Barker: Barker{
+            name: "loud barker",
+        },
+    }
+    a.bark()
+    a.run()
+}
+
+// interface nesting
+type Barker interface {
+    bark()
+}
+type Runner interface {
+    run()
+}
+type Animal interface {
+    Barker
+    Runner
+}
+type Dog struct {
+    name string
+}
+func (d Dog) bark(){}
+func (d Dog) run(){}
 ```
 
 #### channel
@@ -1173,8 +1249,13 @@ func main() {
 ```
 
 ### Network IO
+```go
+```
 
 ### Concurrency
+```go
+go
+```
 
 
 
