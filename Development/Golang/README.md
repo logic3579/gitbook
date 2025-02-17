@@ -1250,11 +1250,171 @@ func main() {
 
 ### Network IO
 ```go
+/* Socket
+src ip
+src port
+dst ip
+dst port
+protocol
+*/
+
+// socket send io buffer data: write() / send()
+// socket recv io buffer data: read() / recv()
+// socket io buffer: default 8k
+
+
+// TCP
+// sync mode
+
+// UDP
+
+// HTTP
+
+```
+
+```go
+// tcp example
+// server.go
+package main
+import (
+        "bufio"
+        "fmt"
+        "net"
+    "strings"
+)
+func main() {
+        // listen local port
+        listener, err := net.Listen("tcp", ":8080")
+        if err != nil {
+                fmt.Println("Error listening:", err.Error())
+                return
+        }
+        defer listener.Close()
+        fmt.Println("Server is listening on port 8080...")
+
+        for {
+                // recv client connect
+                conn, err := listener.Accept()
+                if err != nil {
+                        fmt.Println("Error accepting connection:", err.Error())
+                }
+                fmt.Println("New client connected: ", conn.RemoteAddr())
+
+                // handler request
+                go handleClient(conn)
+        }
+}
+func handleClient(conn net.Conn) {
+        defer conn.Close()
+
+        // recv client data
+        reader := bufio.NewReader(conn)
+        recvData, err := reader.ReadString('\n')
+        if err != nil {
+                fmt.Println("Error reading message:", err.Error())
+                return
+        }
+        fmt.Printf("Received from client: %s", recvData)
+
+    // send server response data
+    sendData := strings.ToUpper(recvData)
+        writer := bufio.NewWriter(conn)
+        _, err = writer.WriteString(sendData)
+        if err != nil {
+                fmt.Println("Error sending response:", err.Error())
+                return
+        }
+        writer.Flush()
+        fmt.Printf("Sent to client: %s", sendData)
+}
+// client.go
+package main
+import (
+        "bufio"
+        "fmt"
+        "net"
+        "os"
+)
+func main() {
+        // connect to server
+        conn, err := net.Dial("tcp", "localhost:8080")
+        if err != nil {
+                fmt.Println("Error connecting to server:", err.Error())
+                return
+        }
+        defer conn.Close()
+        fmt.Println("Connected to server.")
+
+        // get data from stdin
+        reader := bufio.NewReader(os.Stdin)
+        fmt.Print("Enter a message: ")
+        data, _ := reader.ReadString('\n')
+
+        // send data to server
+        writer := bufio.NewWriter(conn)
+        _, err = writer.WriteString(data)
+        if err != nil {
+                fmt.Println("Error sending message:", err.Error())
+                return
+        }
+        writer.Flush()
+        fmt.Printf("Sent to server: %s", data)
+
+        // recv data from server
+        responseReader := bufio.NewReader(conn)
+        response, err := responseReader.ReadString('\n')
+        if err != nil {
+                fmt.Println("Error receiving response:", err.Error())
+                return
+        }
+        fmt.Printf("Received from server: %s", response)
+}
+
+
+// http example
+// net_web.go
+package main
+import (
+    "fmt"
+    "net"
+)
+func main()  {
+    listenner, err := net.Listen("tcp", "0.0.0.0:8888")
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    defer listenner.Close()
+    for {
+        conn, err := listenner.Accept()
+        if err != nil {
+            fmt.Println(err)
+            continue
+        }
+        buf := make([]byte, 1024)
+        n, err := conn.Read(buf)
+        fmt.Println("n",n)
+        conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n<h1>Welcome to Web World!</h1>"))
+    }
+}
+// http_web.go
+package main
+import (
+    "fmt"
+    "net/http"
+)
+func foo (w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Hello Yuan")
+}
+func main() {
+    http.HandleFunc("/foo", foo)
+    http.ListenAndServe(":8080", nil)
+}
 ```
 
 ### Concurrency
 ```go
-go
+
 ```
 
 
