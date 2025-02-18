@@ -15,6 +15,7 @@ icon: hand-wave
 ## Table of contents
 
 <!-- toc -->
+- [AI](#)
 - [APP-META](#)
 - [CNCF](#)
 - [Development](#)

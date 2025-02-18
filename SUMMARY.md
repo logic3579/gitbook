@@ -2,6 +2,10 @@
 
 * [Introduction](README.md)
 
+## AI
+
+* [Overview](AI/README.md)
+
 ## APP-META
 
 * [Overview](APP-META/README.md)
