@@ -739,6 +739,7 @@ func (d Dog) run(){}
 /*  alloc heap memory
 */
 
+
 ```
 
 
@@ -1414,7 +1415,172 @@ func main() {
 
 ### Concurrency
 ```go
+// Process
+// Thread
+// Coroutines
 
+// kernel space model
+// user space model
+
+// scheduling and switching
+
+// thread model
+// M:1 
+// multiple user space thread -> one kernel thread
+// 
+// 1:1
+// one user space thread -> one kernel thread 
+//
+// M:N
+// multiple user space thread -> multiple kernel thread 
+
+
+// goroutine
+package main
+import (
+    "fmt"
+    "time"
+)
+func foo() {
+    fmt.Println("foo")
+    time.Sleep(time.Second)
+    fmt.Println("foo end")
+}
+func main() {
+    go foo()
+    time.Sleep(time.Second * 5)
+}
+// sync.WaitGroup
+package main
+import (
+        "fmt"
+        "sync"
+        "time"
+)
+var wg sync.WaitGroup
+func foo() {
+        defer wg.Done()
+        fmt.Println("foo")
+        time.Sleep(time.Second)
+        fmt.Println("foo end")
+}
+func bar() {
+        defer wg.Done()
+        fmt.Println("bar")
+        time.Sleep(time.Second * 2)
+        fmt.Println("bar end")
+}
+func main() {
+        start := time.Now()
+        wg.Add(2)
+        go foo()
+        go bar()
+        wg.Wait()
+        fmt.Println("Run time duration: ", time.Now().Sub(start))
+}
+
+// GOMAXPROCS(default cpu core number)
+// runtime.GOMAXPROCS()
+
+
+
+// mutex
+package main
+import (
+    "fmt"
+    "sync"
+)
+var wg sync.WaitGroup
+var lock sync.Mutex
+var x = 0
+func add() {
+    //lock.Lock()
+    x++
+    //lock.Unlock()
+    wg.Done()
+}
+func main() {
+    wg.Add(1000)
+    for i := 0; i < 1000 ; i++  {
+        go add()
+    }
+    wg.Wait()
+    fmt.Println(x)
+}
+
+// read write mutex
+package main
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+var rwlock sync.RWMutex
+// var mutex sync.Mutex
+var wg sync.WaitGroup
+var x int
+func write() {
+        //mutex.Lock()
+        rwlock.Lock()
+        x += 1
+        fmt.Println("x",x)
+        time.Sleep(10 * time.Millisecond)
+        //mutex.Unlock()
+        rwlock.Unlock()
+        wg.Done()
+}
+func read(i int) {
+        //mutex.Lock()
+        rwlock.RLock()
+        time.Sleep(time.Millisecond)
+        fmt.Println(x)
+        //mutex.Unlock()
+        rwlock.RUnlock()
+        wg.Done()
+}
+func main() {
+    start := time.Now()
+    wg.Add(1)
+    go write()
+    for i := 0; i < 1000; i++ {
+        wg.Add(1)
+        go read(i)
+    }
+    wg.Wait()
+    fmt.Println("run time duration", time.Now().Sub(start))
+
+}
+
+// map mutex
+package main
+import (
+    "fmt"
+    "sync"
+)
+func main() {
+    wg := sync.WaitGroup{}
+    var m = make(map[int]int)
+    //var m = sync.Map{}
+    // concurrency
+    for i := 0; i < 100; i++ {
+        wg.Add(1)
+        go func(i int) {
+            defer wg.Done()
+            m.Store(i,i*i)
+        }(i)
+    }
+    wg.Wait()
+    fmt.Println(m.Load(1))
+    fmt.Println(m.Load(2))
+}
+
+// Atomic operation
+/*
+AddXxx()
+CompareAndSwapXxx()
+StoreXxx()
+SwapXxx()
+*/
 ```
 
 
