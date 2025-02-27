@@ -737,8 +737,264 @@ func (d Dog) run(){}
 #### channel
 ```go
 /*  alloc heap memory
-*/
+type hchan struct {
+    qcount   uint           // total data in the queue 当前队列里还剩余元素个数
+    dataqsiz uint           // size of the circular queue 环形队列长度，即缓冲区的大小，即make(chan T,N) 中的N
+    buf      unsafe.Pointer // points to an array of dataqsiz elements 环形队列指针
+    elemsize uint16 //每个元素的大小
+    closed   uint32 //标识当前通道是否处于关闭状态，创建通道后，该字段设置0，即打开通道；通道调用close将其设置为1，通道关闭
+    elemtype *_type // element type 元素类型，用于数据传递过程中的赋值
+    sendx    uint   // send index 环形缓冲区的状态字段，它只是缓冲区的当前索引-支持数组，它可以从中发送数据
+    recvx    uint   // receive index 环形缓冲区的状态字段，它只是缓冲区当前索引-支持数组，它可以从中接受数据
+    recvq    waitq  // list of recv waiters 等待读消息的goroutine队列
+    sendq    waitq  // list of send waiters 等待写消息的goroutine队列
 
+    // lock protects all fields in hchan, as well as several
+    // fields in sudogs blocked on this channel.
+    //
+    // Do not change another G's status while holding this lock
+    // (in particular, do not ready a G), as this can deadlock
+    // with stack shrinking.
+    lock mutex //互斥锁，为每个读写操作锁定通道，因为发送和接受必须是互斥操作
+}
+
+// sudog 代表goroutine
+type waitq struct {
+    first *sudog
+    last  *sudog
+}
+*/
+// declaration and definition
+var ch chan int
+ch := make(chan int)
+ch := make(chan int,3)
+
+// example
+package main
+import (
+    "fmt"
+)
+func main() {
+    ch := make(chan int, 10)
+    fmt.Println(len(ch), cap(ch))
+    ch <- 1
+    ch <- 2
+    ch <- 3
+    fmt.Println(len(ch), cap(ch))
+    fmt.Println(<-ch)
+    fmt.Println(<-ch)
+    fmt.Println(<-ch)
+
+    // copy by value
+    ch2 := make(chan int, 3)
+    x := 10
+    ch2 <- x
+    x = 20
+    fmt.Println(<-ch2)
+
+    // copy by reference
+    ch3 := make(chan *int, 3)
+    y := 20
+    ch3 <- &y
+    y = 30
+    p := <-ch3
+    fmt.Println(*p)
+
+    // reference type
+    var ch4 = make(chan int, 3)
+    var ch5 = ch4
+    ch5 <- 100
+    ch5 <- 200
+    fmt.Println(<-ch4)
+    fmt.Println(<-ch4)
+}
+
+// close and loop
+package main
+import "fmt"
+func main() {
+    ch := make(chan int, 10)
+    ch <- 1
+    ch <- 2
+    ch <- 3
+
+    // close use goroutine
+    go func(){
+        time.Sleep(time.Second * 3)
+        ch <-4
+    }()
+    i, ok := <-ch
+    fmt.Println(i, ok) // 1 true
+    i, ok = <-ch
+    i, ok = <-ch
+    i, ok = <-ch
+    fmt.Println(i, ok) // 4 true
+
+    // close use function
+    close(ch)
+    i, ok := <-ch
+    i, ok = <-ch
+    i, ok = <-ch
+    fmt.Println(i, ok) // 3 true
+    i, ok = <-ch
+    fmt.Println(i, ok) // 0 false
+
+    // loop 
+    close(ch)
+    for c := range ch {
+        fmt.Println(c, len(ch))
+    }
+}
+
+// producer consumer model
+package main
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+func producer(ch chan int) {
+    for i := 1; i < 11; i++ {
+        time.Sleep(time.Second * 1)
+        // time.Sleep(time.Second * 3)
+        ch <- i
+        fmt.Println("send key: ", i)
+    }
+    wg.Done()
+}
+func consumer(ch chan int) {
+    for i := 1; i < 11; i++ {
+        // time.Sleep(time.Second * 1)
+        time.Sleep(time.Second * 3)
+        fmt.Println("get key: ", <-ch)
+    }
+    wg.Done()
+}
+var wg sync.WaitGroup
+func main() {
+    // ch := make(chan int) // sync channel
+    ch := make(chan int, 100)
+    wg.Add(2)
+    go producer(ch)
+    go consumer(ch)
+    wg.Wait()
+    fmt.Println("done")
+}
+
+// unbuffered channel(sync channel)
+package main
+import "fmt"
+func main() {
+    ch := make(chan int)
+    go func() {
+            x := <- ch
+            fmt.Println(x)
+    }()
+    ch <- 10
+    fmt.Println("done")
+}
+
+// deadlock
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+var wg sync.WaitGroup
+func main() {
+    pipline := make(chan int)
+    wg.Add(2)
+    // producer
+    go func() {
+        defer wg.Done()
+        for i := 0; i < 10; i++ {
+                time.Sleep(time.Second)
+                pipline <- i
+                fmt.Println("send key:", i)
+        }
+        // resolve deadlock
+        // close(pipline)
+    }()
+    // consumer
+    go func() {
+        defer wg.Done()
+        for v := range pipline {
+                fmt.Println("get key:", v)
+        }
+    }()
+    wg.Wait()
+}
+
+// oneway channel
+package main
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+var wg sync.WaitGroup
+func main() {
+    ch := make(chan int)
+    wg.Add(2)
+    // producer
+    go func(ch chan<- int) {
+        defer wg.Done()
+        for i := range 11 {
+            time.Sleep(time.Second * 1)
+            ch <- i
+            fmt.Println("send key: ", i)
+        }
+    }(ch)
+    // consumer
+    go func(ch <-chan int) {
+        defer wg.Done()
+        for i:=0;i<=11;i++ {
+            time.Sleep(time.Second * 3)
+            fmt.Println("get key: ", <-ch)
+        }
+    }(ch)
+    wg.Wait()
+    fmt.Println("done")
+}
+
+// select
+// permanent sleep state
+func main(){
+    select {}
+}
+// timeout
+package main
+import (
+    "fmt"
+    "time"
+)
+func main() {
+    ch1 := make(chan string)
+    ch2 := make(chan string)
+    // channel1
+    go func(c chan string) {
+        time.Sleep(time.Second * 1)
+        // time.Sleep(time.Second * 3)
+        c <- "get key from channel1"
+    }(ch1)
+    // channel2
+    go func(c chan string) {
+        time.Sleep(time.Second * 1)
+        c <- "get key from channel2"
+    }(ch2)
+    select {
+    case v1 := <-ch1:
+        fmt.Println(v1)
+    case v2 := <-ch2:
+        fmt.Println(v2)
+    case <-time.After(time.Second * 2):
+        fmt.Println("timeout branch")
+    // default:
+    //     fmt.Println("default branch")
+    }
+}
 
 ```
 
@@ -1434,8 +1690,7 @@ func main() {
 // M:N
 // multiple user space thread -> multiple kernel thread 
 
-
-// goroutine
+// goroutine example
 package main
 import (
     "fmt"
@@ -1443,13 +1698,14 @@ import (
 )
 func foo() {
     fmt.Println("foo")
-    time.Sleep(time.Second)
+    time.Sleep(time.Second * 1)
     fmt.Println("foo end")
 }
 func main() {
     go foo()
     time.Sleep(time.Second * 5)
 }
+
 // sync.WaitGroup
 package main
 import (
@@ -1461,13 +1717,13 @@ var wg sync.WaitGroup
 func foo() {
         defer wg.Done()
         fmt.Println("foo")
-        time.Sleep(time.Second)
+        time.Sleep(time.Second * 1)
         fmt.Println("foo end")
 }
 func bar() {
         defer wg.Done()
         fmt.Println("bar")
-        time.Sleep(time.Second * 2)
+        time.Sleep(time.Second * 3)
         fmt.Println("bar end")
 }
 func main() {
@@ -1480,9 +1736,36 @@ func main() {
 }
 
 // GOMAXPROCS(default cpu core number)
-// runtime.GOMAXPROCS()
-
-
+package main
+import (
+    "fmt"
+    "runtime"
+    "sync"
+)
+var wg sync.WaitGroup
+func foo() {
+    for i := 1; i < 10; i++ {
+        fmt.Println("A:", i)
+        //time.Sleep(time.Millisecond*20)
+    }
+    wg.Done()
+}
+func bar() {
+    for i := 1; i < 10; i++ {
+        fmt.Println("B:", i)
+        //time.Sleep(time.Millisecond*30)
+    }
+    wg.Done()
+}
+func main() {
+    wg.Add(2)
+    fmt.Println(runtime.NumCPU())
+    runtime.GOMAXPROCS(1)
+    // runtime.GOMAXPROCS(4)
+    go foo()
+    go bar()
+    wg.Wait()
+}
 
 // mutex
 package main
