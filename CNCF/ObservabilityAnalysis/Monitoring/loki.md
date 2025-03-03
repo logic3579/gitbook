@@ -29,9 +29,18 @@ wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-starte
 # start
 /opt/loki/bin/loki -config.file=/opt/loki/config/loki-config.yaml
 
+# logcli
+# download
+LOGCLI_VERSION=v3.4.2
+wget https://github.com/grafana/loki/releases/download/${LOGCLI_VERSION}/logcli-linux-amd64.zip
+unzip logcli-linux-amd64.zip && rm -f logcli-linux-amd64.zip
+chmod +x logcli-linux-amd64 && mv logcli-linux-amd64 /usr/bin/logcli
 # query
 export LOKI_ADDR=http://localhost:3100
+kubectl port-forward services/loki-query -n logging 3100:3100
 logcli query --limit 10 '{namespace="default",instance="my-app"} |= "kube-probe"'
+logcli query --limit 10 --since=1h '{namespace="default",instance="my-app"} |= "kube-probe"'
+logcli query --limit 10 --from="2025-01-01T00:00:00Z" --to="2025-01-01T08:00:00Z" '{namespace="default",instance="my-app"} |= "kube-probe"'
 ```
 
 ### Config and Boot
