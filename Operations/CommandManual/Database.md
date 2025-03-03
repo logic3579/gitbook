@@ -157,6 +157,20 @@ time curl -X POST "http://localhost:9200/index/_search" \
 curl -X POST http://localhost:9200/_license/start_basic?acknowledge=true
 ```
 
+## mongodb
+```bash
+# connect
+# mongosh "mongodb://<username>:<password>@<host>:<port>/<database>"
+mongosh "mongodb://<host>:<port>" --username root
+
+# usage
+use mydb
+db.myCollection.insertOne({ name: "yakir", age: 333 })
+db.myCollection.find()
+db.myCollection.updateOne({ name: "yakir" }, { $set: { age: 555 } })
+db.myCollection.deleteOne({ name: "yakir" })
+```
+
 ## mysql
 ```bash
 # init reset password

@@ -158,11 +158,8 @@ kubectl explain deployments
 kubectl explain statefulset.spec.updateStrategy.rollingUpdate
 
 # get
-kubectl get -k ./
-# batch select pod state
-JSONPATH='{range .items[*]};{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status},{end}{end};'
-kubectl get pods -o jsonpath="$JSONPATH" | tr ";" "\n"
-# batch get nodes ip
+kubectl get statefulsets redis-cluster -o jsonpath='{.spec.template.spec.containers[*].resources}'
+kubectl get pods -o jsonpath='{range .items[*]};{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status},{end}{end};' | tr ";" "\n"
 kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' |xargs -n1
 # select by custome-columns
 kubectl get pod my-pod -o=custom-columns=\
