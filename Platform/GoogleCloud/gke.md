@@ -1,8 +1,8 @@
 ---
-description: Elastic Kubernetes Service
+description: Google Kubernetes Engine
 ---
 
-# Elastic Kubernetes Service
+# Google Kubernets Engine
 
 ## Introduction
 ...
@@ -13,18 +13,17 @@ description: Elastic Kubernetes Service
 ```console
 # node init
 1. cluster_name
-xx-eks-cluster
+xx-gke-cluster
 2. nodegroup_name
 xxx-app-pool
 xxx-middleware-pool
 3. label settings
 4. taint settings
+5. pod, service CIDR settings
 
 # cluster add-on
-ebs-csi
+pd-csi-driver
 
-# others
-gp3 storageclass
 
 # CICD
 ArgoCD
@@ -41,17 +40,9 @@ rancher
 
 ### manager machine
 ```bash
-# awscli
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
-unzip awscliv2.zip && rm -f /tmp/awscliv2.zip
-./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update && rm -rf /tmp/aws
-
-# eksctl
-ARCH=amd64
-PLATFORM=$(uname -s)_$ARCH
-curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
-tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
-sudo mv /tmp/eksctl /usr/local/bin
+# gcloud
+gcloud components install gke-gcloud-auth-plugin
+gcloud container clusters get-credentials xxx-gke-cluster --region asia-east2 --project your_project
 
 # kubectl
 KUBECTL_VERSION=v1.30.9
@@ -74,5 +65,4 @@ EOF
 
 
 > Reference:
-> 1. [Official Website](https://docs.aws.amazon.com/)
-> 2. [eksctl](https://eksctl.io/)
+> 1. [Official Website](https://cloud.google.com/kubernetes-engine)
