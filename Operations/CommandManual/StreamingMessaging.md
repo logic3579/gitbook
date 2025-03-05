@@ -7,10 +7,8 @@
 ./kafka-configs.sh --bootstrap-server localhost:9092 --entity-type brokers --entity-name 1 --alter --add-config log.cleaner.threads=2
 # 使用 --entity-default 参数为调整整个集群的动态配置
 
-
 # cluster
 ./kafka-cluster.sh cluster-id --bootstrap-server localhost:9092
-
 
 # topic
 # adding topics by special partition and replication 
@@ -21,23 +19,24 @@
 ./kafka-topics.sh --bootstrap-server localhost:9092 --topic myTopic --descibe
 ./kafka-topics.sh --bootstrap-server localhost:9092 --list
 
-
 # production messages
 ./kafka-console-producer.sh --bootstrap-server localhost:9092 --topic myTopic
 first event
 second event
-
 
 # consumer messages
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic myTopic
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --group myGroup
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic myTopic --from-beginning
 
-
 # consumer groups
 ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --descibe --group myGroup [--members] [--verbose]
 ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 
+# offset
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group myGroup --reset-offsets --to-latest --execute --topic myTopic
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group myGroup --reset-offsets --to-offset offsetInt --execute --topic myTopic
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group myGroup --reset-offsets --to-datetime 'YYYY-MM-DDTHH:mm:SS.sss' --execute --topic myTopic
 
 # metadata quorum tool
 ./kafka-metadata-quorum.sh --bootstrap-server localhost:9092 describe --status
