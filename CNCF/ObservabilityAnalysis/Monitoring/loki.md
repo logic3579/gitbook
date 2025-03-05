@@ -117,16 +117,127 @@ docker compose up -d
 helm repo add grafana https://grafana.github.io/helm-charts
 helm update
 
-
 # configure and run
 vim values.yaml
-...
+deploymentMode: SimpleScalable  # single-binary, simple-scalable, distributed(microservices)
+loki:
+  auth_enabled: false
+  limits_config:
+    reject_old_samples: true
+    reject_old_samples_max_age: 168h
+    retention_period: 24h
+    max_cache_freshness_per_query: 10m
+    split_queries_by_interval: 15m
+    query_timeout: 300s
+    volume_enabled: true
+  storage:
+    bucketNames:
+      chunks: xxx-loki-chunks
+      ruler: xxx-loki-ruler
+    type: s3
+    s3:
+      s3: null
+      endpoint: "oss-ap-southeast-1.aliyuncs.com"
+      region: "ap-southeast-1"
+      accessKeyId: "xxx"
+      secretAccessKey: "xxx"
+      signatureVersion: null
+      s3ForcePathStyle: false
+      insecure: false
+      http_config: {}
+      backoff_config: {}
+      disable_dualstack: false
+    gcs:
+      chunkBufferSize: 0
+      requestTimeout: "0s"
+      enableHttp2: true
+    filesystem:
+      chunks_directory: /var/loki/chunks
+      rules_directory: /var/loki/rules
+      admin_api_directory: /var/loki/admin
+  schemaConfig:
+    configs:
+      - from: 2024-04-01
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+  useTestSchema: false
+  compactor:
+    working_directory: /var/loki/compactor
+    retention_enabled: true
+    retention_delete_delay: 2h
+    delete_request_store: s3
+  querier:
+    max_concurrent: 4
+  ingester:
+    chunk_encoding: snappy
+  distributor: {}
+  tracing:
+    enabled: false
+  index_gateway:
+    mode: simple
 
+test:
+  enabled: false
+networkPolicy:
+  enabled: false
+gateway:
+  enabled: true
+  replicas: 2
+ingress:
+  enabled: false
+singleBinary:
+  replicas: 0
+write:
+  replicas: 3
+read:
+  replicas: 3
+backend:
+  replicas: 3
+  resources:
+      requests:
+        cpu: 2000m
+        memory: 4Gi
+      limits:
+        cpu: 4000m
+        memory: 8Gi
+    persistence:
+      volumeClaimsEnabled: true
+      size: 100Gi
+      storageClass: standard-rwo
+ingester:
+  replicas: 0
+distributor:
+  replicas: 0
+querier:
+  replicas: 0
+queryFrontend:
+  replicas: 0
+queryScheduler:
+  replicas: 0
+indexGateway:
+  replicas: 0
+compactor:
+  replicas: 0
+bloomGateway:
+  replicas: 0
+bloomPlanner:
+  replicas: 0
+bloomBuilder:
+  replicas: 0
+ruler:
+  enabled: false
+  replicas: 0
+minio:
+  enabled: false
 
+# install promtail
+helm install promtail grafana/promtail -f values.yaml -n logging
 # install loki
 helm install loki grafana/loki -f values.yaml -n logging
-# install loki-stack: loki, grafana, prometheus, promtail
-helm install loki-stack grafana/loki-stack -f values.yaml -n logging
 ```
 
 
