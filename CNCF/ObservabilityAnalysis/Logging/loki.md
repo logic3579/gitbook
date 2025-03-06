@@ -133,8 +133,9 @@ loki:
   storage:
     bucketNames:
       chunks: xxx-loki-chunks
-      ruler: xxx-loki-ruler
-    type: s3
+      # ruler: FIXME
+      # admin: FIXME
+    type: s3 # s3, gcs, filesystem etc..
     s3:
       s3: null
       endpoint: "oss-ap-southeast-1.aliyuncs.com"
@@ -147,23 +148,30 @@ loki:
       http_config: {}
       backoff_config: {}
       disable_dualstack: false
-    gcs:
-      chunkBufferSize: 0
-      requestTimeout: "0s"
-      enableHttp2: true
-    filesystem:
-      chunks_directory: /var/loki/chunks
-      rules_directory: /var/loki/rules
-      admin_api_directory: /var/loki/admin
+    # gcs:
+    #   chunkBufferSize: 0
+    #   requestTimeout: "0s"
+    #   enableHttp2: true
+    # filesystem:
+    #   chunks_directory: /var/loki/chunks
+    #   rules_directory: /var/loki/rules
+    #   admin_api_directory: /var/loki/admin
   schemaConfig:
     configs:
       - from: 2024-04-01
         store: tsdb
-        object_store: s3
+        object_store: s3 # s3, gcs, filesystem etc..
         schema: v13
         index:
           prefix: index_
           period: 24h
+  rulerConfig:
+    storage:
+      type: local
+      local:
+        directory: /var/loki/rules
+    wal:
+      dir: /var/loki/ruler-wal
   useTestSchema: false
   compactor:
     working_directory: /var/loki/compactor

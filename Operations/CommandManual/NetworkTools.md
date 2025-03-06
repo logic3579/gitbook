@@ -173,11 +173,15 @@ dig www.google.com +subnet=1.1.1.0/24
 
 ## hping3
 ```bash
-# install 
+# install
 apt install hping3
 
 # imitate syn flood
 hping3 -S -p 8877 --flood 127.0.0.1
+
+# multicast
+hping3 -1 224.0.0.8 -a 10.0.0.1 -c 10 -i u1000000
+
 ```
 
 ## iftop
@@ -357,14 +361,14 @@ tcpdump -i eth0 port 8880 -w cvm.pcap -C 100 -W 20
 tcpdump -i eth0 port 31780 -w node-%Y-%m%d-%H%M-%S.pcap -G 120
 
 # protocol
-tcpdump [ip|tcmp|tcp|udp]
+tcpdump [ip|tcmp|tcp|udp|proto 112]
 tcpdump 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'
 tcpdump -i ens4 -nStttv icmp and src 1.1.1.1
 
-# source ip or dest ip 
+# source ip or dest ip
 tcpdump src 1.1.1.1 or dst 1.1.1.1 
 
-# port 
+# port
 tcpdump not port 80
 
 # fileter timeout packet
