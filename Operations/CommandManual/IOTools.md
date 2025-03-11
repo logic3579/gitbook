@@ -1,16 +1,17 @@
 # IO Tools
 
 ## dd
+
 ```bash
 # out of CPU
 dd if=/dev/zero of=/dev/null
 
-# 
+#
 time dd if=/dev/zero of=test.file bs=1G count=2 oflag=direct
-
 ```
 
 ## fio
+
 ```bash
 # sequence read
 fio -filename=/tmp/test.file -direct=1 -iodepth 1 -thread -rw=read -ioengine=psync -bs=16k -size=2G -numjobs=10 -runtime=60 -group_reporting -name=test_r
@@ -28,6 +29,7 @@ fio -filename=/var/test.file -direct=1 -iodepth 1 -thread -rw=randrw -rwmixread=
 ```
 
 ## iostat
+
 ```bash
 # install
 apt install sysstat
@@ -53,22 +55,27 @@ iostat -dhx sda sdb 1 10
 ```
 
 ## iotop
+
 ```bash
 iotop -p xxx
 ```
 
 ## pidstat
+
 ```bash
 pidstat -d 1
 ```
 
 ## sar
+
 ```bash
 sar -b -p 1
 ```
 
 ## Formatting and Partitioning
+
 ### blkid && lsblk
+
 ```bash
 # show all block device infomation
 blkid
@@ -77,6 +84,7 @@ lsblk -o UUID,PARTUUID,PATH,MOUNTPOINT /dev/sdb
 ```
 
 ### fdisk && gdisk && parted
+
 ```bash
 # MBR: fdisk, parted
 # GPT: gdisk, parted
@@ -104,7 +112,7 @@ parted /dev/sda -- mkpart primary linux-swap -2GB 100%
 
 
 # partitioning with UEFI(GPT)
-parted /dev/sdb -- unit mib 
+parted /dev/sdb -- unit mib
 parted /dev/sdb -- mklabel gpt
 parted /dev/sdb -- mkpart primary 1 3
 parted /dev/sdb -- mkpart ESP fat32 3 515
@@ -113,7 +121,7 @@ parted /dev/sdb -- set 1 bios_grub on
 parted /dev/sdb -- set 2 esp on
 
 
-# flush partition table 
+# flush partition table
 partprobe
 
 
@@ -127,6 +135,7 @@ xfs_growfs -d /data    # xfs
 ```
 
 ### mkfs.ext4 && mkfs.xfs
+
 ```bash
 # formatting ext4 filesystem
 mkfs.ext4 /dev/sda1
@@ -141,10 +150,13 @@ vim /etc/fstab
 ```
 
 ### others
+
 ```bash
 # 无需重启服务器,通过刷新磁盘数据总线方式获取新加磁盘
-for host in $(ls /sys/class/scsi_host); 
-do 
+for host in $(ls /sys/class/scsi_host);
+do
   echo "- - -" > /sys/class/scsi_host/$host/scan
 done
+
+# lvm
 ```
