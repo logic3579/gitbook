@@ -6,11 +6,13 @@ icon: icon
 # Overview
 
 ## Introduction
+
 ...
 
-
 ## Deploy By Binary
+
 ### Quick Start
+
 ```bash
 apt install haproxy
 # yum install haproxy
@@ -19,7 +21,9 @@ systemctl start haproxy.service
 ```
 
 ### Config and Boot
+
 #### Config
+
 ```bash
 # options: install and config keepalived
 apt install keepalived
@@ -124,6 +128,7 @@ EOF
 ```
 
 #### Boot(systemd)
+
 ```bash
 # log
 vim /etc/rsyslog.conf
@@ -141,13 +146,16 @@ systemctl enable haproxy.service
 ```
 
 ## Deploy By Container
+
 ### Run In Docker
+
 ```bash
 docker run -d --name my-running-haproxy --sysctl net.ipv4.ip_unprivileged_port_start=0 my-haproxy
 # -v ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
 ```
 
 ### Run In Kubernetes
+
 ```bash
 # add and update repo
 helm repo add haproxytech https://haproxytech.github.io/helm-charts
@@ -161,8 +169,7 @@ vim values.yaml
 helm install haproxytech/haproxy -f values.yaml -n default
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://www.haproxy.com/)
 > 2. [Repository](https://github.com/haproxy/haproxy)
