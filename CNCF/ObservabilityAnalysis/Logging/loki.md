@@ -7,13 +7,17 @@ description: Grafana Loki
 ## Introduction
 
 ### Loki
+
 Log aggregation system.
 
 ### Promtail
+
 Like Prometheus, but for logs.
 
 ## Deploy By Binary
+
 ### Quick Start
+
 ```bash
 # download and decompression
 cd /opt && wget https://github.com/grafana/loki/releases/download/v3.0.1/loki-linux-amd64.zip
@@ -44,7 +48,9 @@ logcli query --limit 10 --from="2025-01-01T00:00:00Z" --to="2025-01-01T08:00:00Z
 ```
 
 ### Config and Boot
+
 #### Config
+
 ```bash
 echo > /opt/loki/config/loki-config.yaml << "EOF"
 ...
@@ -52,6 +58,7 @@ EOF
 ```
 
 #### Boot(systemd)
+
 ```bash
 cat > /etc/systemd/system/loki.service << "EOF"
 [Unit]
@@ -95,7 +102,9 @@ systemctl enable loki.service
 ```
 
 ## Deploy By Container
+
 ### Run In Docker
+
 ```bash
 # Using by docker
 # get loki and promtail config
@@ -108,10 +117,11 @@ docker run --name promtail -d -v $(pwd):/mnt/config -v /var/log:/var/log --link 
 
 # Using by docker compose
 wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-started/docker-compose.yaml -O docker-compose.yaml
-docker compose up -d 
+docker compose up -d
 ```
 
 ### Run In Kubernetes
+
 ```bash
 # add and update repo
 helm repo add grafana https://grafana.github.io/helm-charts
@@ -121,18 +131,33 @@ helm update
 vim values.yaml
 deploymentMode: SimpleScalable  # single-binary, simple-scalable, distributed(microservices)
 loki:
-  auth_enabled: false
+  tenants: []
+  server:
+    http_listen_port: 3100
+    grpc_listen_port: 9095
+    http_server_read_timeout: 600s
+    http_server_write_timeout: 600s
   limits_config:
+    ingestion_rate_mb: 4
+    ingestion_burst_size_mb: 6
+    max_label_names_per_series: 15
     reject_old_samples: true
-    reject_old_samples_max_age: 168h
-    retention_period: 24h
-    max_cache_freshness_per_query: 10m
-    split_queries_by_interval: 15m
-    query_timeout: 300s
-    volume_enabled: true
+    reject_old_samples_max_age: 1w
+    max_line_size: 256KB
+    max_line_size_truncate: true
+    max_streams_per_user: 10000
+    max_global_streams_per_user: 50000
+    per_stream_rate_limit: 3MB
+    per_stream_rate_limit_burst: 15MB
+    max_chunks_per_query: 2000000
+    max_query_length: 30d1h
+    max_query_parallelism: 32
+    query_timeout: 1m
+    split_queries_by_interval: 1h
+    retention_period: 30d
   storage:
     bucketNames:
-      chunks: xxx-loki-chunks
+      chunks: loki-chunks-bucket
       # ruler: FIXME
       # admin: FIXME
     type: s3 # s3, gcs, filesystem etc..
@@ -163,8 +188,13 @@ loki:
         object_store: s3 # s3, gcs, filesystem etc..
         schema: v13
         index:
-          prefix: index_
+          prefix: loki_index_
           period: 24h
+        chunks:
+          prefix: loki_chunks_
+          period: 24h
+  useTestSchema: false
+  testSchemaConfig: {}
   rulerConfig:
     storage:
       type: local
@@ -172,21 +202,32 @@ loki:
         directory: /var/loki/rules
     wal:
       dir: /var/loki/ruler-wal
-  useTestSchema: false
+  query_scheduler: {}
+  storage_config:
+    tsdb_shipper:
+      index_gateway_client:
+        server_address: '{{ include "loki.indexGatewayAddress" . }}'
+    hedging:
+      at: "250ms"
+      max_per_second: 20
+      up_to: 3
   compactor:
     working_directory: /var/loki/compactor
     retention_enabled: true
     retention_delete_delay: 2h
-    delete_request_store: s3
+    delete_request_store: s3 # s3, gcs, filesystem etc..
   querier:
     max_concurrent: 4
   ingester:
+    chunk_retain_period: 0s
+    chunk_idle_period: 30m
+    chunk_block_size: 262144
     chunk_encoding: snappy
+  index_gateway:
+    mode: simple
   distributor: {}
   tracing:
     enabled: false
-  index_gateway:
-    mode: simple
 
 test:
   enabled: false
@@ -248,8 +289,7 @@ helm install promtail grafana/promtail -f values.yaml -n logging
 helm install loki grafana/loki -f values.yaml -n logging
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://grafana.com/docs/loki/latest/)
 > 2. [Repository](https://github.com/grafana/loki)
