@@ -5,41 +5,48 @@ description: Grafana
 # Grafana
 
 ## Introduction
+
 grafana 是一个可视化面板，有着非常漂亮的图表和布局展示，功能齐全的度量仪表盘和图形编辑器，支持 Graphite、zabbix、InfluxDB、Prometheus、OpenTSDB、Elasticsearch 等作为数据源，比 Prometheus 自带的图表展示功能强大太多，更加灵活，有丰富的插件，功能更加强大。
 
-
 ## Deploy With Binary
+
 ### Quick Start
+
 ```bash
 # option.1: Debian / Ubuntu repo
 apt install -y apt-transport-https software-properties-common wget
 wget -q -O /usr/share/keyrings/grafana.key https://apt.grafana.com/gpg.key
-echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list 
+echo "deb [signed-by=/usr/share/keyrings/grafana.key] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list
 apt update
 apt install grafana
 
 # option.2: resource
 wget https://dl.grafana.com/oss/release/grafana-10.0.3.linux-amd64.tar.gz
 tar -zxvf grafana-10.0.3.linux-amd64.tar.gz && rm -f grafana-10.0.3.linux-amd64.tar.gz
-cd grafana-10.0.3 
+cd grafana-10.0.3
 ./bin/grafana server --config ./conf/defaults.ini
 
 ```
 
 ### Config and Boot
+
 #### [[sc-monitoring#Grafana|Grafana Config]]
 
 #### Boot(systemd)
+
 ```bash
 # boot
 systemctl daemon-reload
-systemctl start grafana-server.service 
-systemctl enable grafana-server.service 
+systemctl start grafana-server.service
+systemctl enable grafana-server.service
 ```
 
 ## Deploy With Container
+
 ### Run in Docker
+
 pull images
+
 ```bash
 # default based images: Alpine
 # oss version(open source, default)
@@ -56,9 +63,11 @@ docker pull grafana/grafana-oss:latest-ubuntu
 # enterprise version
 docker pull grafana/grafana-enterprise:latest-ubuntu
 ```
+
 start container
+
 ```bash
-# run 
+# run
 docker run -d -p 3000:3000 grafana/grafana-enterprise
 
 # run with plugins
@@ -82,7 +91,9 @@ docker run -d -p 3000:3000 --name=grafana grafana-custom
 > docker-compose = https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/#docker-compose-example
 
 ### Run in Kubernetes
+
 **deploy on resource manifest**
+
 ```bash
 cat > grafana.yaml << "EOF"
 kind: PersistentVolumeClaim
@@ -102,7 +113,7 @@ kubectl -n monitoring port-forward service/grafana 3000:3000
 ```
 
 **deploy on helm**
-[[cc-helm|helm常用命令]]
+
 ```bash
 # add and update repo
 helm repo add grafana https://grafana.github.io/helm-charts
@@ -123,9 +134,10 @@ imageRenderer:
 helm -n monitorning install grafana .
 ```
 
+## Grafana Labs dashboards
 
-## Grafana Labs
-### Node 
+### Basic
+
 ```bash
 # Node Exporter Full
 1860
@@ -133,6 +145,7 @@ helm -n monitorning install grafana .
 ```
 
 ### Kubernetes
+
 ```bash
 # K8s Cluster Summary
 8685
@@ -143,10 +156,11 @@ helm -n monitorning install grafana .
 # Kubernetes cluster monitoring (via Prometheus)
 315
 
-# 
+#
 ```
 
 ### Middleware
+
 ```bash
 # kafka
 7589
@@ -159,12 +173,22 @@ helm -n monitorning install grafana .
 
 # rocketmq
 10477
-
 ```
 
+### ObservabilityAnalysis
+
+```bash
+# loki logs
+13186
+
+# loki metrics
+17781
+```
 
 ## Alert
+
 ### telegram_bot
+
 ```bash
 # 1.get bot and token
 https://core.telegram.org/bots#how-do-i-create-a-bot
@@ -184,17 +208,19 @@ curl "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<ms
 ```
 
 ### alerting config
+
 1. Dashboard --> edit panel --> create alert rule from this panel
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114504.png]]
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114504.png]]
 
 2. Notifications --> add Labels(related Contact points)
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114732.png]]
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114429.png]]
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114732.png]]
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114429.png]]
 
 3. Contact points --> Add template --> create notification template
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821143025.png]]
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821143025.png]]
 
 ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230822100216.png]]
+
 ```jinja2
 {{ define "tg_alert_template" -}}
 {{/* firing info */}}
@@ -232,7 +258,8 @@ curl "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<ms
 ```
 
 4. Contact points --> Add contact point --> create telegram contact point
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115559.png]]
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115559.png]]
+
 ```jinja2
 # Message
 {{ template "tg_alert_template" . }}
@@ -241,14 +268,13 @@ curl "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<ms
 ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230822100054.png]]
 
 5. Notification policies --> New nested policy --> create new notification policy
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115717.png]]
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115717.png]]
 
 6. Check alert notification
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230823080802.png]]
-
-
+   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230823080802.png]]
 
 > Reference:
+>
 > 1. [Official Website](https://grafana.com/docs/)
 > 2. [Repository](https://github.com/grafana/grafana)
 > 3. [Grafana CN Doc](https://www.qikqiak.com/k8s-book/docs/56.Grafana%E7%9A%84%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8.html)
