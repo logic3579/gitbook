@@ -138,8 +138,8 @@ loki:
     http_server_read_timeout: 600s
     http_server_write_timeout: 600s
   limits_config:
-    ingestion_rate_mb: 4
-    ingestion_burst_size_mb: 6
+    ingestion_rate_mb: 10
+    ingestion_burst_size_mb: 20
     max_label_names_per_series: 15
     reject_old_samples: true
     reject_old_samples_max_age: 1w
@@ -222,20 +222,22 @@ loki:
     chunk_retain_period: 0s
     chunk_idle_period: 30m
     chunk_block_size: 262144
+    chunk_target_size: 1572864
     chunk_encoding: snappy
   index_gateway:
     mode: simple
   distributor: {}
   tracing:
     enabled: false
-
 test:
+  enabled: false
+lokiCanary:
   enabled: false
 networkPolicy:
   enabled: false
 gateway:
   enabled: true
-  replicas: 2
+  replicas: 3
 ingress:
   enabled: false
 singleBinary:
@@ -256,7 +258,7 @@ backend:
     persistence:
       volumeClaimsEnabled: true
       size: 100Gi
-      storageClass: standard-rwo
+      storageClass: premium-rwo
 ingester:
   replicas: 0
 distributor:
@@ -280,6 +282,24 @@ bloomBuilder:
 ruler:
   enabled: false
   replicas: 0
+resultsCache:
+  enabled: true
+  defaultValidity: 12h
+  timeout: 500ms
+  replicas: 1
+  writebackSizeLimit: 500MB
+  writebackBuffer: 500000
+  writebackParallelism: 5
+chunksCache:
+  enabled: true
+  batchSize: 4
+  parallelism: 5
+  timeout: 2000ms
+  defaultValidity: 12h
+  replicas: 1
+  writebackSizeLimit: 500MB
+  writebackBuffer: 500000
+  writebackParallelism: 5
 minio:
   enabled: false
 
