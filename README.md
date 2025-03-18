@@ -6,9 +6,7 @@ icon: hand-wave
 
 # Introduction
 
-[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/yakir3/gitbook/docker-publish-dockerhub.yml?label=DockerHub&logo=github&logoColor=white)](https://github.com/yakir3/gitbook/actions/workflows/docker-publish-dockerhub.yml)
-
-[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/yakir3/gitbook/docker-publish-gcr.yml?label=GitHubPackages&logo=github&logoColor=white)](https://github.com/yakir3/gitbook/actions/workflows/docker-publish-gcr.yml)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/yakir3/gitbook/docker-publish.yml?label=DockerContainerArtifact&logo=github&logoColor=white)](https://github.com/yakir3/gitbook/actions/workflows/docker-publish.yml)
 
 This is a gitbook by [Yakir](https://github.com/yakir3/gitbook/).
 
