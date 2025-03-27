@@ -130,6 +130,7 @@
   - [Systemd](Operations/CommandManual/Systemd.md)
   - [Text Swordsman](Operations/CommandManual/TextSwordsman.md)
   - [Version Control](Operations/CommandManual/VersionControl.md)
+  - [Video Tools](/Operations/CommandManual/VideoTools.md)
 - [Network](Operations/Network/README.md)
   - [CDN](Operations/Network/CDN.md)
   - [Computer Network](Operations/Network/computer-network.md)
