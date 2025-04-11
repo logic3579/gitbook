@@ -8,14 +8,49 @@ description: tunnel proxy
 
 ### Tinyproxy
 ```bash
+# config
 vim /etc/tinyproxy/tinyproxy.conf
 ...
 Allow 10.0.0.1
 ...
+# start server
 systemctl start tinyproy && systemctl enable tinyproxy
 ```
 
 ## VPN Tunnel
+
+### ipsec
+```bash
+mkdir /opt/ipsec
+cat > /opt/ipsec/vpn.env << "EOF"
+VPN_IPSEC_PSK=ipsecpskkey1234567890
+VPN_USER=ipsec123
+VPN_PASSWORD=ipsec123
+#VPN_ADDL_USERS=additional_username_1 additional_username_2
+#VPN_ADDL_PASSWORDS=additional_password_1 additional_password_2
+VPN_ENABLE_MODP1024=yes
+EOF
+# run server
+docker run \
+    --name ipsec-vpn-server \
+    --env-file /opt/ipsec/vpn.env \
+    --restart=always \
+    -v ikev2-vpn-data:/etc/ipsec.d \
+    -v /lib/modules:/lib/modules:ro \
+    -p 500:500/udp \
+    -p 4500:4500/udp \
+    -d --privileged \
+    hwdsl2/ipsec-vpn-server
+```
+
+### OpenVPN
+```bash
+```
+
+### SSR
+```bash
+wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh
+```
 
 ### V2ray
 ```bash
@@ -122,37 +157,9 @@ docker run \
     v2fly/v2fly-core run -c /etc/v2ray/config.json [-format jsonv5]
 ```
 
-### ipsec
+### WireGuard
 ```bash
-mkdir /opt/ipsec
-cat > /opt/ipsec/vpn.env << "EOF"
-VPN_IPSEC_PSK=ipsecpskkey1234567890
-VPN_USER=ipsec123
-VPN_PASSWORD=ipsec123
-#VPN_ADDL_USERS=additional_username_1 additional_username_2
-#VPN_ADDL_PASSWORDS=additional_password_1 additional_password_2
-VPN_ENABLE_MODP1024=yes
-EOF
-# run server
-docker run \
-    --name ipsec-vpn-server \
-    --env-file /opt/ipsec/vpn.env \
-    --restart=always \
-    -v ikev2-vpn-data:/etc/ipsec.d \
-    -v /lib/modules:/lib/modules:ro \
-    -p 500:500/udp \
-    -p 4500:4500/udp \
-    -d --privileged \
-    hwdsl2/ipsec-vpn-server
-```
 
-### OpenVPN
-```bash
-```
-
-### SSR
-```bash
-wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh
 ```
 
 ## SSH Tunnel
