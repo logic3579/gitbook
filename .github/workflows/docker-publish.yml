@@ -6,6 +6,7 @@ on:
       - "main"
 
 env:
+  ACR_REGISTRY: crpi-fkl1s7fwluzapj2o.cn-hongkong.personal.cr.aliyuncs.com
   DOCKERHUB_REGISTRY: docker.io
   GHCR_REGISTRY: ghcr.io
   IMAGE_OWNER: ${{ github.repository_owner }}
@@ -16,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        registry: [dockerhub, ghcr]
+        registry: [acr, dockerhub, ghcr]
     permissions:
       contents: read
       packages: write
@@ -39,6 +40,9 @@ jobs:
         id: vars
         run: |
           case "${{ matrix.registry }}" in
+            acr)
+              echo "REGISTRY=${{ env.ACR_REGISTRY }}" >> $GITHUB_ENV
+              ;;
             dockerhub)
               echo "REGISTRY=${{ env.DOCKERHUB_REGISTRY }}" >> $GITHUB_ENV
               ;;
@@ -52,7 +56,10 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ matrix.registry == 'dockerhub' && secrets.DOCKERHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          password: ${{
+            matrix.registry == 'acr' && secrets.ACR_PWD ||
+            matrix.registry == 'dockerhub' && secrets.DOCKERHUB_TOKEN ||
+            secrets.GITHUB_TOKEN }}
 
       - name: Extract Docker metadata
         id: meta
