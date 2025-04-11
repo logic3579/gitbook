@@ -131,6 +131,7 @@ VPN_USER=ipsec123
 VPN_PASSWORD=ipsec123
 #VPN_ADDL_USERS=additional_username_1 additional_username_2
 #VPN_ADDL_PASSWORDS=additional_password_1 additional_password_2
+VPN_ENABLE_MODP1024=yes
 EOF
 # run server
 docker run \
