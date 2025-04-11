@@ -5,23 +5,23 @@ description: tunnel proxy
 # Tunnel Proxy
 
 ## Forward Proxy
-### Proxychains
-```bash
-#
-```
 
 ### Tinyproxy
 ```bash
-# 
+vim /etc/tinyproxy/tinyproxy.conf
+...
+Allow 10.0.0.1
+...
+systemctl start tinyproy && systemctl enable tinyproxy
 ```
-
 
 ## VPN Tunnel
 
-### v2ray
+### V2ray
 ```bash
-mkdir /etc/v2ray
-cat > /etc/v2ray/config.json << "EOF"
+mkdir /opt/v2ray
+# server config
+cat > /opt/v2ray/server.json << "EOF"
 {
   "log": {
     "access": "/tmp/v2ray-access.log",
@@ -32,12 +32,12 @@ cat > /etc/v2ray/config.json << "EOF"
   "stats": {},
   "inbounds": [
     {
-      "port": 12306,
+      "port": 12306,  # server listen port
       "protocol": "vmess",
       "settings": {
         "clients": [
           {
-            "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2d",
+            "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2d", # generate random clients uuid
             "alterId": 32
           }
         ]
@@ -79,32 +79,79 @@ cat > /etc/v2ray/config.json << "EOF"
   "transport": {}
 }
 EOF
-
-docker run -d --name v2ray -e TZ=Asia/Shanghai -v /etc/v2ray:/etc/v2ray -p 12306:12306 v2ray/official v2ray -config=/etc/v2ray/config.json
+# client config
+cat > /opt/v2ray/client.json << "EOF"
+{
+  "inbounds": [{
+    "port": 1080,  // SOCKS proy port, configure the proxy in your browser
+    "listen": "127.0.0.1",
+    "protocol": "socks",
+    "settings": {
+      "udp": true
+    }
+  }],
+  "outbounds": [{
+    "protocol": "vmess",
+    "settings": {
+      "vnext": [{
+        "address": "server", // your server public IP
+        "port": 12306,  // your server listen port
+        "users": [{ "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2d" }] # your server random clients uuid
+      }]
+    }
+  },{
+    "protocol": "freedom",
+    "tag": "direct",
+    "settings": {}
+  }],
+  "routing": {
+    "domainStrategy": "IPOnDemand",
+    "rules": [{
+      "type": "field",
+      "ip": ["geoip:private"],
+      "outboundTag": "direct"
+    }]
+  }
+}
+# run server
+docker run \
+    --name v2ray \
+    -v /opt/v2ray/server.json:/etc/v2ray/config.json \
+    -p 12306:12306 \
+    -d --privileged \
+    v2fly/v2fly-core run -c /etc/v2ray/config.json [-format jsonv5]
 ```
 
 ### ipsec
 ```bash
-cat > vpn.env << "EOF"
+mkdir /opt/ipsec
+cat > /opt/ipsec/vpn.env << "EOF"
 VPN_IPSEC_PSK=ipsecpskkey1234567890
 VPN_USER=ipsec123
 VPN_PASSWORD=ipsec123
 #VPN_ADDL_USERS=additional_username_1 additional_username_2
 #VPN_ADDL_PASSWORDS=additional_password_1 additional_password_2
 EOF
+# run server
+docker run \
+    --name ipsec-vpn-server \
+    --env-file /opt/ipsec/vpn.env \
+    --restart=always \
+    -v ikev2-vpn-data:/etc/ipsec.d \
+    -v /lib/modules:/lib/modules:ro \
+    -p 500:500/udp \
+    -p 4500:4500/udp \
+    -d --privileged \
+    hwdsl2/ipsec-vpn-server
+```
 
-docker run --name ipsecvpn --env-file ./vpn.env --restart=always -p 500:500/udp -p 4500:4500/udp -d --privileged hwdsl2/ipsec-vpn-server
+### OpenVPN
+```bash
 ```
 
 ### SSR
 ```bash
 wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh
-```
-
-### OVS
-
-```bash
-# 
 ```
 
 ## SSH Tunnel
@@ -133,3 +180,9 @@ ssh -o PermitLocalCommand=yes \
  -w 5:5 root@[server_ip] \
  'ip link set tun5 up && ip addr add 10.0.0.1/32 peer 10.0.0.2 dev tun5' （Server端ssh需打开Tunnel和Rootlogin 配置）
 ```
+
+> Reference:
+> 1. [V2ray](https://github.com/v2fly/v2ray-core)
+> 2. [OpenVPN](https://openvpn.net/)
+> 3. [ipsec-vpn-server](https://github.com/hwdsl2/docker-ipsec-vpn-server/blob/master/docs/advanced-usage-zh.md#%E4%BB%8E%E6%BA%90%E4%BB%A3%E7%A0%81%E6%9E%84%E5%BB%BA)
+
