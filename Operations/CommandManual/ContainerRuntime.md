@@ -1,7 +1,9 @@
 # Container Runtime
 
 ## docker / podman
+
 ### busybox chroot
+
 ```bash
 mkdir rootfs
 docker export $(docker create busybox) | tar -C rootfs -xvf -
@@ -24,6 +26,7 @@ bin  lib  lib64
 ```
 
 ### common command
+
 ```bash
 # common parameters
 --env-file strings      Read in a file of environment variables
@@ -33,7 +36,7 @@ bin  lib  lib64
 -v, --volume stringArray   Bind mount a volume into the container.
 
 # overwrite the default ENTRYPOINT
-docker run --rm -it --entrypoint sh hashicorp/terraform:latest  
+docker run --rm -it --entrypoint sh hashicorp/terraform:latest
 
 # select container ip
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' yakir-test
@@ -58,6 +61,7 @@ docker compose restart
 ```
 
 ### Quick test container
+
 ```bash
 # busybox
 # option1
@@ -103,6 +107,7 @@ docker run --name mrdoc \
 ```
 
 ## containerd
+
 ```bash
 # default run by systemd
 systemctl start containerd.service
@@ -111,22 +116,25 @@ containerd -c /var/lib/rancher/k3s/agent/etc/containerd/config.toml -a /run/k3s/
 
 
 # ctr (see pause container)
-## default 
-ctr --address /run/containerd/containerd.sock namespace ls 
-ctr --address /run/containerd/containerd.sock -n k8s.io images ls 
+## default
+ctr --address /run/containerd/containerd.sock namespace ls
+ctr --address /run/containerd/containerd.sock -n k8s.io images ls
 ## run by k3s
-ctr --address /run/k3s/containerd/containerd.sock namespace ls 
-ctr --address /run/k3s/containerd/containerd.sock -n k8s.io images ls 
+ctr --address /run/k3s/containerd/containerd.sock namespace ls
+ctr --address /run/k3s/containerd/containerd.sock -n k8s.io images ls
 ctr --address /run/k3s/containerd/containerd.sock -n k8s.io container ls
 
 
 # crictl
-endpoint="/run/k3s/containerd/containerd.sock" URL="unix:///run/k3s/containerd/containerd.sock" 
-crictl ps 
+endpoint="/run/k3s/containerd/containerd.sock" URL="unix:///run/k3s/containerd/containerd.sock"
+crictl ps
 crictl images
 ```
+
 ## kubectl
+
 ### Basic
+
 ```bash
 # create
 # create a tls secret
@@ -178,8 +186,9 @@ kubectl delete pod busybox [--force=true --grace-period=0]
 ```
 
 ### Deploy
+
 ```bash
-# rollout 
+# rollout
 kubectl rollout (history|pause|restart|resume|status|undo) (resource_type) (resource_name)
 
 # scale
@@ -190,6 +199,7 @@ kubectl autoscale (-f x.yaml | deployment/mysql) [--min=MINPODS] --max=MAXPODS [
 ```
 
 ### Cluster Management
+
 ```bash
 # top
 kubectl -n namespace_name top pod
@@ -206,6 +216,7 @@ kubectl taint NODE NAME KEY_1=VAL_1:TAINT_EFFECT_1 ... KEY_N=VAL_N:TAINT_EFFECT_
 ```
 
 ### Troubleshooting and Debugging
+
 ```bash
 # describe
 kubectl describe -k ./
@@ -245,8 +256,8 @@ kubectl delete pod node-debuger-xxx
 kubectl events -n namespace_name
 ```
 
-
 ### Advanced
+
 ```bash
 # diff
 kubectl diff -f FILENAME [options]
@@ -274,6 +285,7 @@ kubectl kustomize ./ |kubectl apply -f -
 ```
 
 ### Settings
+
 ```bash
 # label
 kubectl label nodes Node1 node-role.kubernetes.io/control-plane=true
@@ -286,6 +298,7 @@ source <(kubectl completion bash)
 ```
 
 ### Other
+
 ```bash
 # api resources and versions infomation
 kubectl api-resources
@@ -313,6 +326,7 @@ kubectl version
 ```
 
 ### Quick test container
+
 ```bash
 # busybox
 # option1
@@ -335,16 +349,17 @@ kubectl run netshoot --rm -it --image=nicolaka/netshoot -- bash
 ```
 
 ## helm
+
 ```bash
 # parameter
--n namespace 
+-n namespace
 --create-namespace
 --set hostname=xxx
 
 # completion
 source <(helm completion bash)
 
-# create 
+# create
 helm create mychart
 
 # dependency
@@ -353,7 +368,7 @@ helm dependency update
 # env
 helm env
 
-# get 
+# get
 helm get (all|manifest) chart_name --revision int
 
 # history
@@ -388,11 +403,11 @@ helm update
 
 # search
 helm search hub ingress-nginx
-helm search repo ingress-nginx 
+helm search repo ingress-nginx
 --versions           # search repo all charts version
 --max-col-width 150  # search display width
 
-# show 
+# show
 helm show values [CHART] [flags]
 
 # status
@@ -409,10 +424,9 @@ helm template [NAME] [CHART] [flags]
 helm version
 ```
 
-
-
 > Reference:
-> 1. [阿里云 ACR 仓库加速地址](taa4w07u.mirror.aliyuncs.com)
+>
+> 1. [Docker Official Website](https://docs.docker.com/)
 > 2. [Podman Official Website](https://podman.io/docs)
 > 3. [Kubectl Official Website](https://kubernetes.io/docs/reference/kubectl/)
 > 4. [Helm Official Website](https://helm.sh/docs/)

@@ -7,6 +7,7 @@ description: tunnel proxy
 ## Forward Proxy
 
 ### Tinyproxy
+
 ```bash
 # config
 vim /etc/tinyproxy/tinyproxy.conf
@@ -20,6 +21,7 @@ systemctl start tinyproy && systemctl enable tinyproxy
 ## VPN Tunnel
 
 ### ipsec
+
 ```bash
 mkdir /opt/ipsec
 cat > /opt/ipsec/vpn.env << "EOF"
@@ -44,15 +46,19 @@ docker run \
 ```
 
 ### OpenVPN
+
 ```bash
+
 ```
 
 ### SSR
+
 ```bash
 wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh
 ```
 
 ### V2ray
+
 ```bash
 mkdir /opt/v2ray
 # server config
@@ -158,16 +164,82 @@ docker run \
 ```
 
 ### WireGuard
+
 ```bash
+# install
+apt install wireguard-tools # Ubuntu
+brew install wireguard-tools # MacOS
+yum install wireguard # Fefora/CentOS
+
+# server
+## generate config and setup
+mkdir -p /etc/wireguard
+wg genkey | sudo tee /etc/wireguard/wg0.key | wg pubkey | sudo tee /etc/wireguard/wg0.pub
+cat > /etc/wireguard/wg0.conf << "EOF"
+[Interface]
+Address = 172.31.0.1/32
+ListenPort = 51820
+PrivateKey = "wg0.key content"
+# DNS = 1.1.1.1,8.8.8.8
+# Table = 12345
+# MTU = 1500
+# PreUp = /bin/example arg1 arg2 %i
+# PostUp = /bin/example arg1 arg2 %i
+# PreDown = /bin/example arg1 arg2 %i
+# PostDown = /bin/example arg1 arg2 %i
+[Peer]
+AllowedIPs = 172.31.0.2/32
+PublicKey = "client0.pub content"
+EOF
+## set permission
+chmod 600 /etc/wireguard/ -R
+## ip forwarding
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv6.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.conf
+sysctl -p
+## firewall
+iptables -I INPUT -p udp --dport 51820 -j ACCEPT
+iptables -I FORWARD -i wg0 -j ACCEPT
+iptables -t nat -A POSTROUTING -s 172.31.0.0/24 -o eth0 -j MASQUERADE
+## start/stop server: wg-quick [up/down] wg0
+systemctl start wg-quick@wg0.service
+systemctl enable wg-quick@wg0.service
+
+# client
+## generate config and setup
+mkdir -p /etc/wireguard
+wg genkey | sudo tee /etc/wireguard/client0.key | wg pubkey | sudo tee /etc/wireguard/client0.pub
+cat > /etc/wireguard/client0.conf << "EOF"
+[Interface]
+Address = 172.31.0.2/32
+DNS = 1.1.1.1,8.8.8.8
+PrivateKey = "client0.key content"
+[Peer]
+AllowedIPs = 0.0.0.0/0
+Endpoint = server_public_ip:51820
+# PresharedKey = "" # options
+PublicKey = "wg0.pub content"
+PersistentKeepalive = 10
+EOF
+## start/stop client: wg-quick [up/down] client0
+systemctl start wg-quick@client0.service
+systemctl enable wg-quick@client0.service
+
+# show info
+ip link show wg0
+wg show all
+wg show wg0
 
 ```
 
 ## SSH Tunnel
 
 ### Layer2
+
 ```bash
 # 客户端执行
-ssh -o Tunnel=ethernet -w 6:6 root@[server_ip] 
+ssh -o Tunnel=ethernet -w 6:6 root@[server_ip]
 
 # 服务端执行
 ip link add br0 type bridge
@@ -181,6 +253,7 @@ arping -I br0 10.0.0.1
 ```
 
 ### Layer3
+
 ```bash
 ssh -o PermitLocalCommand=yes \
  -o LocalCommand="ip link set tun5 up && ip addr add 10.0.0.2/32 peer 10.0.0.1 dev tun5 " \
@@ -190,7 +263,8 @@ ssh -o PermitLocalCommand=yes \
 ```
 
 > Reference:
-> 1. [V2ray](https://github.com/v2fly/v2ray-core)
+>
+> 1. [ipsec-vpn-server](https://github.com/hwdsl2/docker-ipsec-vpn-server/blob/master/docs/advanced-usage-zh.md)
 > 2. [OpenVPN](https://openvpn.net/)
-> 3. [ipsec-vpn-server](https://github.com/hwdsl2/docker-ipsec-vpn-server/blob/master/docs/advanced-usage-zh.md#%E4%BB%8E%E6%BA%90%E4%BB%A3%E7%A0%81%E6%9E%84%E5%BB%BA)
-
+> 3. [V2ray](https://github.com/v2fly/v2ray-core)
+> 4. [WireGuard](https://www.wireguard.com/)
