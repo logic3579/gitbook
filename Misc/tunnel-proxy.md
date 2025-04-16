@@ -184,9 +184,9 @@ PrivateKey = "wg0.key content"
 # Table = 12345
 # MTU = 1500
 # PreUp = /bin/example arg1 arg2 %i
-# PostUp = /bin/example arg1 arg2 %i
 # PreDown = /bin/example arg1 arg2 %i
-# PostDown = /bin/example arg1 arg2 %i
+# PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens0 -j MASQUERADE
+# PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens0 -j MASQUERADE
 [Peer]
 AllowedIPs = 172.31.0.2/32
 PublicKey = "client0.pub content"
