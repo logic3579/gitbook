@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:5
+    container_name: redis
+    restart: always
+    command: redis-server --requirepass 123qwe
+    expose:
+      - "6379"
+    networks:
+      archery-net:
+        ipv4_address: 172.169.88.2
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./mysql/my.cnf:/etc/mysql/my.cnf"
+      - "./mysql/datadir:/var/lib/mysql"
+    environment:
+      MYSQL_DATABASE: archery
+      MYSQL_ROOT_PASSWORD: 123qwe
+    networks:
+      archery-net:
+        ipv4_address: 172.169.88.3
+
+  goinception:
+    image: hanchuanchuan/goinception:v1.3.0
+    container_name: goinception
+    restart: always
+    ports:
+      - "4000:4000"
+    volumes:
+      - "./inception/config.toml:/etc/config.toml"
+    networks:
+      archery-net:
+        ipv4_address: 172.169.88.4
+
+  archery:
+    image: hhyo/archery:v1.9.1
+    container_name: archery
+    restart: always
+    ports:
+      - "9123:9123"
+    volumes:
+      - "./archery/settings.py:/opt/archery/local_settings.py"
+      - "./archery/soar.yaml:/etc/soar.yaml"
+      - "./archery/docs.md:/opt/archery/docs/docs.md"
+      - "./archery/downloads:/opt/archery/downloads"
+      - "./archery/sql/migrations:/opt/archery/sql/migrations"
+      - "./archery/sql/models.py:/opt/archery/sql/models.py"
+      - "./archery/sql/templates/sqlworkflow.html:/opt/archery/sql/templates/sqlworkflow.html"
+      - "./archery/sql/sql_workflow.py:/opt/archery/sql/sql_workflow.py"
+      - "./archery/sql/engines/pgsql.py:/opt/archery/sql/engines/pgsql.py"
+      - "./archery/sql_api/serializers.py:/opt/archery/sql_api/serializers.py"
+      - "./archery/logs:/opt/archery/logs"
+      - "./archery/keys:/opt/archery/keys"
+    entrypoint: "dockerize -wait tcp://mysql:3306 -wait tcp://redis:6379 -timeout 60s /opt/archery/src/docker/startup.sh"
+    env_file:
+      - .env
+    networks:
+      archery-net:
+        ipv4_address: 172.169.88.5
+
+networks:
+  archery-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet:  172.169.88.0/24
+          #gateway: 172.169.88.1
