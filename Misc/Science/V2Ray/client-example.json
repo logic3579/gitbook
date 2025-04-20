@@ -1,4 +1,21 @@
 {
+  "dns": {
+    "servers": [
+      {
+        "address": "119.29.29.29",
+        "port": 53,
+        "domains": ["geosite:cn"],
+        "expectIPs": ["geoip:cn"]
+      },
+      {
+        "address": "8.8.8.8",
+        "port": 53,
+        "domains": ["geosite:geolocation-!cn", "geosite:speedtest"]
+      },
+      "1.1.1.1",
+      "localhost"
+    ]
+  },
   "log": {
     "access": "/tmp/v2ray-access.log",
     "error": "/tmp/v2ray-error.log",
@@ -9,6 +26,10 @@
       "port": 1080,
       "listen": "127.0.0.1",
       "protocol": "socks",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      },
       "settings": {
         "udp": true
       }
@@ -35,15 +56,41 @@
       "protocol": "freedom",
       "tag": "direct",
       "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "adblock",
+      "settings": {}
     }
   ],
   "routing": {
     "domainStrategy": "IPOnDemand",
     "rules": [
       {
+        "domain": ["tanx.com", "googeadsserving.cn", "baidu.com"],
         "type": "field",
-        "ip": ["geoip:private"],
+        "outboundTag": "adblock"
+      },
+      {
+        "domain": [
+          "amazon.com",
+          "microsoft.com",
+          "jd.com",
+          "youku.com",
+          "baidu.com"
+        ],
+        "type": "field",
         "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "domain": ["geosite:cn"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "ip": ["geoip:cn", "geoip:private"]
       }
     ]
   }
