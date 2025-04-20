@@ -5,7 +5,9 @@ description: interview
 # interview
 
 ## Network
+
 ### CDN
+
 ```text
 内容分发网络，其目的是通过限制的 internet 中增加一层新的网络架构。将网站的内容发布到最接近用户的网络边缘，使用户可以就近取得所需的内容，提高用户访问网站的响应速度。
 
@@ -13,16 +15,19 @@ description: interview
 ```
 
 ### DNS
-+ 递归查询与迭代查询
+
+- 递归查询与迭代查询
+
 ```text
 递归查询(本地 DNS 服务器使用的方式)
 如果主机所询问的本地域名服务器不知道被查询的域名的 IP 地址，那么本地 DNS 服务器就以 DNS 客户的身份，向其它根域名服务器继续发出 DNS 请求报文(即替主机继续查询)，而不是让主机自己进行下一步查询。因此，递归查询返回的查询结果或者是所要查询的 IP 地址，或者是报错，表示无法查询到所需的 IP 地址。
 
-迭代查询: 
+迭代查询:
 当根域名服务器收到本地 DNS 服务器发出的迭代 DNS 查询请求报文时，要么给出所要查询的 IP 地址，要么告诉本地 DNS 服务器: “你下一步应当向哪一个域名服务器进行查询”。然后让本地 DNS 服务器进行后续的查询。根域名服务器通常是把自己知道的顶级域名服务器的 IP 地址告诉本地 DNS 服务器，让本地 DNS 服务器再向顶级域名服务器查询。顶级域名服务器在收到本地 DNS 服务器的查询请求后，要么给出所要查询的 IP 地址，要么告诉本地 DNS 服务器下一步应当向哪一个权威域名服务器进行查询。最后，知道了所要解析的 IP 地址或报错，然后把这个结果返回给发起查询的主机.
 ```
 
-+ DNS 解析过程
+- DNS 解析过程
+
 ```text
 1. 本地缓存.
 2. 本地 hosts 文件.
@@ -36,16 +41,18 @@ ISPDNS收到消息后，会在本地保存一份，再将结果返回给客户�
 ```
 
 ### LVS
-+ 调度算法
+
+- 调度算法
+
 ```text
-静态算法: 
+静态算法:
 RR: 轮询算法
 WRR: 加权轮询
 SH: 源 IP 地址 hash,将来自同一个 IP 地址的请求发送给第一次选择的 RS。实现会话绑定。
 DH: 目标地址 hash，第一次做轮询调度，后续将访问同一个目标地址的请求，发送给第一次
 挑中的 RS。适用于正向代理缓存中
 
-动态算法: 
+动态算法:
 LC: least connection 将新的请求发送给当前连接数最小的服务器。
 WLC: 默认调度算法。加权最小连接算法
 SED: 初始连接高权重优先,只检查活动连接,而不考虑非活动连接
@@ -58,7 +65,9 @@ LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均�
 ## Database
 
 ### Redis
-+ 特点
+
+- 特点
+
 ```text
 1. redis 采用多路复用机制
 2. 数据结构简单
@@ -68,7 +77,8 @@ LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均�
 频繁被访问的数据，经常被访问的数据如果放在关系型数据库，每次查询的开销都会很大，而放在 redis 中，因为 redis 是放在内存中的可以很高效的访问。
 ```
 
-+ 数据类型
+- 数据类型
+
 ```text
 1. String 整数，浮点整数或者字符串
 2. Set 集合
@@ -77,7 +87,8 @@ LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均�
 5. List 列表
 ```
 
-+ 使用场景
+- 使用场景
+
 ```text
 1. 缓存
 2. 排行榜 常用实现数据类型: 有序集合实现
@@ -86,7 +97,8 @@ LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均�
 5. Session 共享: 默认 Session 是保存在服务器的文件中，如果是集群服务，同一个用户过来可能落在不同机器上，这就会导致用户频繁登陆；采用 Redis  保存 Session后，无论用户落在那台机器上都能够获取到对应的 Session 信息。
 ```
 
-+ 数据淘汰机制
+- 数据淘汰机制
+
 ```text
 1.volatile-lru     从已设置过期时间的数据集中挑选最近最少使用的数据淘汰
 2.volatile-ttl     从已设置过期时间的数据集中挑选将要过期的数据淘汰
@@ -96,25 +108,27 @@ LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均�
 6.noeviction       禁止驱逐数据
 ```
 
-+ 缓存穿透, 缓存击穿, 缓存雪崩
+- 缓存穿透, 缓存击穿, 缓存雪崩
+
 ```text
 1. 缓存穿透: 就是客户持续向服务器发起对不存在服务器中数据的请求。客户先在Redis 中查询，查询不到后去数据库中查询。
 2. 缓存击穿: 就是一个很热门的数据，突然失效，大量请求到服务器数据库中
 3. 缓存雪崩: 就是大量数据同一时间失效。
 
-缓存穿透: 
+缓存穿透:
 1. 接口层增加校验，对传参进行个校验，比如说我们的id是从1开始的，那么id<=0的直接拦截；
 2. 缓存中取不到的数据，在数据库中也没有取到，这时可以将key-value对写为key-null，这样可以防止攻击用户反复用同一个id暴力攻击
 
-缓存击穿: 
+缓存击穿:
 最好的办法就是设置热点数据永不过期
 
-缓存雪崩: 
+缓存雪崩:
 1. 缓存数据的过期时间设置随机，防止同一时间大量数据过期现象发生。
 2. 如果缓存数据库是分布式部署，将热点数据均匀分布在不同的缓存数据库中。
 ```
 
-+ 数据持久化实现
+- 数据持久化实现
+
 ```text
 rdb 持久化: 在间隔一段时间或者当 key 改变达到一定的数量的时候，就会自动往磁盘保存一次。如未满足设置的条件，就不会触发保存，如出现断电就会丢失数据。
 
@@ -123,7 +137,9 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 ```
 
 ### MySQL
-+ 主从复制
+
+- 主从复制
+
 ```text
 1. 主节点必须启用 mysql binlog 二进制日志，记录任何修改了数据库数据的事件。
 2. 从节点开启一个线程(I/O Thread)把自己扮演成 mysql 的客户端，通过 mysql 协议，请求主节点的二进制日志文件中的事件
@@ -132,7 +148,8 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 5. 从节点启动另外一个线程（sql Thread ），把 Relay log 中的事件读取出来，并在本地再执行一次。
 ```
 
-+ 日志类型
+- 日志类型
+
 ```text
 错误日志: 记录报错或警告信息
 查询日志: 记录所有对数据请求的信息，不论这些请求是否得到正确的执行。
@@ -145,7 +162,9 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 ## CICD
 
 ### Ansible
-+ 常用模块
+
+- 常用模块
+
 ```text
 面试题: 常见的ansible模块？
 command | shell
@@ -161,6 +180,7 @@ group
 ```
 
 ### Saltstack
+
 ```text
 server client 结构
 ssh
@@ -169,8 +189,11 @@ zeromq 轻量级队列
 ```
 
 ## Monitoring
+
 ### Zabbix
-+ 主动模式与被动模式原理
+
+- 主动模式与被动模式原理
+
 ```text
 主动模式: zabbix-agent 会主动开启一个随机端口去向 zabbix-server 的10051端口发送 tcp 连接。zabbix-server 收到请求后，会将检查间隔时间和检查项发送给 zabbix-agent，agent 采集到数据以后发送给 server.
 
@@ -178,11 +201,11 @@ zeromq 轻量级队列
 
 zabbix-proxy
 主动模式: agent 请求的是 proxy，由 proxy 向 server 去获取 agent 的采集间隔时间和采集项。再由 proxy 将数据发送给 agent,agent采集完数据后，再由 proxy 中转发送给 server.
-被动模式: 
+被动模式:
 ```
 
+- 常用监控项
 
-+ 常用监控项
 ```text
 1. 硬件监控: 交换机、防火墙、路由器
 2. 系统监控: cpu、内存、磁盘、进程、tcp 等
@@ -190,7 +213,8 @@ zabbix-proxy
 4. web 监控: 响应时间、加载时间、状态码
 ```
 
-+ 自定义监控
+- 自定义监控
+
 ```text
 编写 shell 脚本非交互式取值，如 mysql 主从复制，监控从节点的 slave 的IO，show slave status\G;
 取出 slave 的俩个线程 Slave_IO_Running 和 Slave_SQL_Running 的值都为yes 则输出一个0，如不同步则输出1，在 zabbix agent  的配置文件中，可以设置执行本地脚本 在zabbix server 的web端上上配置监控项配 mysql_slave_check，在触发器中判断取到的监控值，如1则报警，如0则输出正常。
@@ -201,18 +225,21 @@ zabbix-proxy
 ## Web
 
 ### tomcat
-+ 特点
+
+- 特点
+
 ```text
 Tomcat是一个 JSP/Servlet 容器。其作为 Servlet 容器，有三种工作模式: 独立的 Servlet 容器、进程内的 Servlet 容器和进程外的 Servlet 容器。
 
-进入 Tomcat 的请求可以根据 Tomcat 的工作模式分为如下两类: 
+进入 Tomcat 的请求可以根据 Tomcat 的工作模式分为如下两类:
 1. Tomcat 作为应用程序服务器: 请求来自于前端的 web 服务器，这可能是 Apache, IIS, Nginx 等；
 2. Tomcat 作为独立服务器: 请求来自于 web 浏览器；
 ```
 
-+ 运行模式
+- 运行模式
+
 ```text
-1. bio tomcat7 以下默认模式 
+1. bio tomcat7 以下默认模式
 阻塞式I/O操作，此模式，每一个请求都要创建一个线程，线程开销较大，不能处理高并发的场景。通常最多处理几百个并发，效率低，不常用。
 
 2. nio tomcat8以上默认采用 nio
@@ -221,7 +248,8 @@ niop是内置的模式，是一个基于缓冲区、并能提供非阻塞I/O操�
 3. apr 从操作系统级别解决异步 IO 问题，大幅度的提高服务器的处理和响应性能, 也是 Tomcat 运行高并发应用的首选模式。用这种模式稍微麻烦一些，需要安装一些依赖库。
 ```
 
-+ 优化
+- 优化
+
 ```text
 toncat自身优化
 1、connector 方式选择 nio 或者 apr,默认 bio 支持并发性能低
@@ -234,7 +262,9 @@ JVM（java虚拟机）内存优化
 ```
 
 ### Nginx
-+ 特点
+
+- 特点
+
 ```text
 1. 支持高并发，官方测试连接数支持5万，生产可支持2~4万。
 2. 内存消耗成本低
@@ -244,21 +274,23 @@ JVM（java虚拟机）内存优化
 6. 支持热部署
 ```
 
-+ 常用的模块与参数
+- 常用的模块与参数
+
 ```text
 负载均衡 upstream
 反向代理 proxy_pass
-路由匹配 location 
+路由匹配 location
 重定向规则 rewrite
 
-proxy 参数: 
-proxy_sent_header 
+proxy 参数:
+proxy_sent_header
 proxy_connent_timeout
-proxy_read_timeout 
+proxy_read_timeout
 proxy_send_timeout
 ```
 
-+ rewrite flag
+- rewrite flag
+
 ```text
 last: 表示完成当前的 rewrite 规则
 break: 停止执行当前虚拟主机的后续 rewrite
@@ -267,20 +299,23 @@ permanent :  返回301永久重定向，地址栏会显示跳转后的地址
 ```
 
 ## Docker
-+ 简述
+
+- 简述
+
 ```text
 Docker 一个容器化平台，它以容器的方式将应用程序和其所有依赖打包在一起，以确保应用程序在任何环境都能无缝运行。
 ```
 
-+ 容器隔离实现原理
+- 容器隔离实现原理
 
 **Cgroups**
 
 **Namespace**
+
 ```text
 Docker Enginer 使用了 namespace 对全区操作系统资源进行了抽象，对于命名空间内的进程来说，他们拥有独立的资源实例，在命名空间内部的进程是可以实现资源可见的。
 
-Dcoker Enginer中使用的 NameSpace: 
+Dcoker Enginer中使用的 NameSpace:
 1. UTS nameSpace        提供主机名隔离能力
 UTS namespace（UNIX Timesharing System 包含了运行内核的名称、版本、底层体系结构类型等信息）用于系统标识，其中包含了 hostname 和域名  domainname ，它使得一个容器拥有属于自己 hostname 标识，这个主机名标识独立于宿主机系统和其上的其他容器。
 
@@ -305,12 +340,13 @@ User Namespace 允许在各个宿主机的各个容器空间内创建相同的�
 Linux 系统中，有一个 PID 为 1 的进程(init/systemd)是其他所有进程的父进程，那么在每个容器内也要有一个父进程来管理其下属的子进程，那么多个容器的进程通 PID namespace 进程隔离(比如 PID 编号重复、器内的主进程生成与回收子进程等)。
 ```
 
-+ 网络模型
+- 网络模型
+
 ```text
-1. host 
+1. host
 启动 host 模式，Docker 不会为这个容器分配 NetWork NaneSpace，容器不会虚拟出自己的网卡，而是使用宿主机的 IP 和端口
 
-2. container 
+2. container
 这个模式指定新创建的容器和已经存在的一个容器共享一个 Network Namespace，而不是和宿主机共享。新创建的容器不会创建自己的网卡，配置自己的 IP，而是和一个指定的容器共享 IP、端口范围等。同样，两个容器除了网络方面，其他的如文件系统、进程列表等还是隔离的。两个容器的进程可以通过 lo 网卡设备通信。
 
 3. none
@@ -320,7 +356,8 @@ Linux 系统中，有一个 PID 为 1 的进程(init/systemd)是其他所有进�
 默认模式,此模式会为每一个容器分配 Network Namespace、设置 IP 等，并将一个主机上的 Docker 容器连接到一个虚拟网桥上。下面着重介绍一下此模式。
 ```
 
-+ Dockerfile
+- Dockerfile
+
 ```text
 FROM 应用基础镜像
 
@@ -336,6 +373,7 @@ CMD 运行容器内进程为为1的命令
 ## Kubernetes
 
 ### 概念
+
 ```text
 Pod是kubernetes创建或部署的最小/最简单的基本单位，一个Pod代表集群上正在运行的一个进程。
 
@@ -346,14 +384,16 @@ Pod 里面有 pause 根容器(创建网络?)和用户业务容器
 
 Runtime: docker, containerd, cni-o
 
-Kubernetes 中的 Pod 使用可分两种主要方式: 
+Kubernetes 中的 Pod 使用可分两种主要方式:
 1、one-container-per-Pod: Pod 中运行一个容器。可以将 Pod 视为单个封装的容器，但是 Kubernetes 是直接管理 Pod 而不是容器
 
 2、sidecar: Pod 中运行多个需要一起工作的容器。Pod 可以封装紧密耦合的应用，它们需要由多个容器组成，它们之间能够共享资源(IP,网络、cpu、mem、挂载目录等). 网络共享相同的 net namespace 网络堆栈, 挂载目录可共享 volume mount.
 ```
 
 ### 组件
-+ 核心组件
+
+- 核心组件
+
 ```text
 1. kube-apiserver: 提供了资源操作的唯一入口，并提供认证、授权、访问控制、API 注册和发现等机制；
 
@@ -377,7 +417,8 @@ Kubernetes 中的 Pod 使用可分两种主要方式:
 
 ```
 
-+ 可选组件
+- 可选组件
+
 ```text
 1. kube-dns: 负责为整个集群提供DNS服务
 2. Ingress Controller: 为服务提供外网入口
@@ -387,7 +428,8 @@ Kubernetes 中的 Pod 使用可分两种主要方式:
 6. fluentd-bit:  日志组件
 ```
 
-+ 高可用与扩容
+- 高可用与扩容
+
 ```text
 1. 将 etcd 与 master 节点组件部署一起
 2. 使用独立的 etcd 集群，不与 master 节点混合部署
@@ -397,25 +439,26 @@ Kubernetes 中的 Pod 使用可分两种主要方式:
 ```
 
 ### Pod 创建过程
+
 ```text
 1. kubectl create Pod
-首先进行认证与权限校验后，kubectl 会调用 apiserver 创建对象的接口，然后向 k8s apiserver 发出创建 Pod 的命令 
- 
+首先进行认证与权限校验后，kubectl 会调用 apiserver 创建对象的接口，然后向 k8s apiserver 发出创建 Pod 的命令
+
 2. k8s apiserver
 apiserver 收到请求后，并非直接创建 Pod，而是先创建一个包含 Pod 创建信息的yaml 文件, 保存 etcd
- 
+
 3. controller manager
-创建 Pod 的 yaml 信息会交给 controller manager，controller manager 根据配置信息将要创建的 Pod 资源对象放到等待队列中  
- 
+创建 Pod 的 yaml 信息会交给 controller manager，controller manager 根据配置信息将要创建的 Pod 资源对象放到等待队列中
+
 4. scheduler
 scheduler 查看 apiserver ，类似于通知机制。首先判断 Pod.spec.Node == null? 若为 null，表示这个 Pod 请求是新来的，需要创建；然后进行预选调度和优选调度计算，找出最 “闲” 的且符合调度条件的 Node。最后将信息在 etcd 数据库中更新分配结果: Pod.spec.NodeX(设置一个具体的节点) 同样上述操作的各种信息也要写到 etcd 数据库中。
 分配过程需要两层调度: 预选调度和优选调度
 (1) 预选调度: 一般根据资源对象的配置信息进行筛选。例如 NodeSelector,  HostSeletor 和节点亲和性等。
 (2) 优选调度: 根据资源对象需要的资源和 Node 节点资源的使用情况，为每个节点打分，然后选出最优的节点创建 Pod 资源对象
-  
+
 5. kubelet
 目标 NodeX 上的 kubelet 进程通过 apiserver，查看 etcd 数据库（kubelet通过 apiserver 的 WATCH 接口监听 Pod 信息，如果监听到新的 Pod 副本被调度绑定到本节点）监听到 kube-scheduler 产生的 Pod 绑定事件后获取对应的 Pod清单，然后调用本机中的 container runtime 初始化 volume、分配 IP、下载image 镜像，创建容器并启动应用.
-  
+
 6. controller manager
 controller manmager 通过 apiserver 提供的接口实时监控资源对象的当前状态，当发生各种故障导致系统状态发生变化时，会尝试将其状态修复到 “期望状态”
 
@@ -424,21 +467,24 @@ kubectl  -> http request upgrade to SPDY -> kube-apiserver -> kubelet -> dockers
 ```
 
 ### resources
-+ yaml
+
+- yaml
+
 ```text
 annotation: 注解和 label 类似, 标记一些特殊信息
 configmap: 修改配置参数
 ```
 
-+ RC / RS / Deplyment / StatefulSet
-```text
-1、Replication Controller 和 Replica Set 两种资源对象， RC 和 RS 的功能基本上是差不多的，唯⼀的区别就是 RS ⽀持集合的 selector 
+- RC / RS / Deplyment / StatefulSet
 
-RC: 
+```text
+1、Replication Controller 和 Replica Set 两种资源对象， RC 和 RS 的功能基本上是差不多的，唯⼀的区别就是 RS ⽀持集合的 selector
+
+RC:
 (1)确保 Pod 数量: 它会确保 Kubernetes 中有指定数量的 Pod 在运⾏，如果少于指定数量的 Pod ， RC 就会创建新的，反之这会删除多余的，保证 Pod 的副本数量不变。
 (2)确保 Pod 健康: 当 Pod 不健康，比如运⾏出错了，总之无法提供正常服务时， RC 也会杀死不健康的 Pod ，重新创建一个新的Pod。
 (3)弹性伸缩: 在业务⾼峰或者低峰的时候，可以通过 RC 来动态调整 Pod 数量来提供资源的利用率，当然我们也提到过如何使用 HPA 这种资源对象的话可以做到自动伸缩。
-(4)滚动升级: 滚动升级是⼀种平滑的升级⽅式，通过逐步替换的策略，保证整体系统的稳定性。  
+(4)滚动升级: 滚动升级是⼀种平滑的升级⽅式，通过逐步替换的策略，保证整体系统的稳定性。
 
 Deployment
 和 RC ⼀样的都是保证 Pod 的数量和健康，⼆者大部分功能都是完全⼀致的，我们可以看成是⼀个升级版的 RC 控制器
@@ -454,7 +500,8 @@ StatefulSet
 Pod 采用稳定的持久化存储卷
 ```
 
-+ Service
+- Service
+
 ```text
 一个 Pod 只是一个运行服务的实例，随时可能在一个节点上停止，在另一个节点以一个新的 IP 启动一个新的 Pod，因此不能以确定的 IP 和端口号提供服务。要稳定地提供服务,需要服务发现和负载均衡能力.
 
@@ -465,13 +512,15 @@ ingress -> service -> endpoint
 LB -> NodePort -> CNI bridge -> Pod
 ```
 
-+ Volume
+- Volume
+
 ```text
 volume（存储卷）是 Pod 中能够被多个容器访问的共享目录
-emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配 
+emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 ```
 
 ### lifecycle
+
 ```text
 1. livenessProbe
 存活探针，检测容器是否正在运行，如果存活探测失败，则 kubelet 会杀死容器，并且容器将受到其重启策略的影响，如果容器不提供存活探针，则默认状态为 Success，livenessprobe 用于控制是否重启 Pod.
@@ -484,6 +533,7 @@ emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 ```
 
 ### Others
+
 ```text
 1. hpa 指标以 request 为准
 
@@ -493,8 +543,9 @@ emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 request limit 的分级?
 ```
 
-
-> Reference: 
+> Reference:
+>
 > 1. [乌云知识库](https: //github.com/SuperKieran/WooyunDrops)
 > 2. [mindoc](https: //github.com/mindoc-org/mindoc)
 > 3. [Docker与Containerd](https://www.qikqiak.com/post/containerd-usage/)
+
