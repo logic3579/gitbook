@@ -188,7 +188,25 @@ ssh
 zeromq 轻量级队列
 ```
 
+### Jenkins
+
+```text
+
+```
+
 ## Monitoring
+
+### Grafana
+
+```text
+
+```
+
+### Prometheus
+
+```text
+
+```
 
 ### Zabbix
 
@@ -208,8 +226,8 @@ zabbix-proxy
 
 ```text
 1. 硬件监控: 交换机、防火墙、路由器
-2. 系统监控: cpu、内存、磁盘、进程、tcp 等
-3. 服务监控: nginx、mysql、redis、tomcat 等
+2. 系统监控: CPU、内存、磁盘、进程、TCP 等
+3. 服务监控: Nginx、Mysql、Redis、Tomcat 等
 4. web 监控: 响应时间、加载时间、状态码
 ```
 
@@ -224,7 +242,7 @@ zabbix-proxy
 
 ## Web
 
-### tomcat
+### Tomcat
 
 - 特点
 
@@ -548,4 +566,3 @@ request limit 的分级?
 > 1. [乌云知识库](https: //github.com/SuperKieran/WooyunDrops)
 > 2. [mindoc](https: //github.com/mindoc-org/mindoc)
 > 3. [Docker与Containerd](https://www.qikqiak.com/post/containerd-usage/)
-

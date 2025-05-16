@@ -8,7 +8,7 @@ icon: hand-wave
 
 [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/yakir3/gitbook/docker-publish.yml?label=DockerContainerArtifact&logo=github&logoColor=white)](https://github.com/yakir3/gitbook/actions/workflows/docker-publish.yml)
 
-This is a gitbook by [Yakir](https://github.com/yakir3/gitbook/).
+This is a gitbook by [Logic](https://github.com/yakir3/gitbook/).
 
 About knowledge record and Technology stack.
 
