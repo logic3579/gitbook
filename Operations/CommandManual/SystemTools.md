@@ -1,21 +1,4 @@
 # System Tools
-## openssl
-```bash
-# install 
-apt install openssl
-
-# get crt info
-openssl x509 -dates -noout -in example.com.crt
-openssl x509 -dates -text -noout -in example.com.crt
-
-# email test
-openssl s_client -connect mail.example.com:25
-openssl s_client -starttls smtp -connect mail.example.com:25
-
-# generate key and crt
-openssl req -x509 -newkey rsa:2048 -keyout server.key -out server.crt -days 3650 -nodes -subj "/C=HK/ST=HK/L=HK/O=Example Inc/OU=IT/CN=*.example.com"
-
-```
 
 ## sar
 ```bash
@@ -156,8 +139,8 @@ vmstat -ant 1
 watch -d cat /proc/softirqs
 ```
 
-
+> Reference:
 > 1. [Official systemtap Doc](https://sourceware.org/systemtap/documentation.html)
 > 2. [Ubuntu Install systemtap](https://wiki.ubuntu.com/Kernel/Systemtap#Systemtap_Installation)
 > 3. [IBM Documentation](https://www.ibm.com/docs/zh/power9/9080-M9S?topic=commands-vmstat-command)
-> 4. [timeing-with-curl](https://susam.net/blog/timing-with-curl.html
+> 4. [timeing-with-curl](https://susam.net/blog/timing-with-curl.html)
