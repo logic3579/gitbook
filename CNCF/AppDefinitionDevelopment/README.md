@@ -1,5 +1,5 @@
 ---
-icon: webhook
+icon: server
 description: AppDefinitionDevelopment
 ---
 
