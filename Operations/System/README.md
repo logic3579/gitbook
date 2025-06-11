@@ -1,5 +1,6 @@
 ---
-icon: hashtag
+# icon: hashtag
+icon: server
 description: System doc
 ---
 
