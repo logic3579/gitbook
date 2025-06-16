@@ -1,6 +1,9 @@
 #### Prometheus
+
 ##### main config
+
 /opt/prometheus/prometheus.yml
+
 ```bash
 # Global config
 global:
@@ -44,9 +47,10 @@ scrape_configs:
 #   key_file: <filename>
 ```
 
-
 ##### rule files
+
 /opt/prometheus/alerting.rules.yaml
+
 ```bash
 # alerting rules file
 groups:
@@ -72,6 +76,7 @@ groups:
 ```
 
 /opt/prometheus/recording.rules.yaml
+
 ```bash
 # recoding rules file
 groups:
@@ -87,14 +92,17 @@ groups:
 ```
 
 syntax-checking rules
+
 ```bash
 ./promtool check rules alerting.rules.yml recording.rules.yaml
-``` 
-
+```
 
 #### Alertmanager
+
 ##### main config
+
 /opt/prometheus/alertmanager/alertmanager.yml
+
 ```bash
 global:
   resolve_timeout: 5m
@@ -129,10 +137,11 @@ templates:
 ```
 
 ##### template config
+
 /opt/prometheus/alertmanager/email.tmpl
-```jinja2
-{{ define "email.html" }}
-	{{ range .Alerts }}
+
+```html
+{{ define "email.html" }} {{ range .Alerts }}
 <pre>
 	========start==========
    告警程序: prometheus_alert_email 
@@ -145,13 +154,13 @@ templates:
    触发时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
    ========end==========
 </pre>
-	{{ end }}
-{{ end }}
+{{ end }} {{ end }}
 ```
 
-
 #### Grafana
+
 /etc/grafana/grafana.ini
+
 ```bash
 ...
 [smtp]

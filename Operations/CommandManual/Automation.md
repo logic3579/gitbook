@@ -3,6 +3,7 @@
 ## ansible
 
 ### inventory
+
 ```bash
 # initial: for initalize the system
 inventories/initial.host
@@ -15,12 +16,13 @@ inventories/prod.host
 ```
 
 ### ansible(ad-hoc modules)
+
 ```bash
 # command usage
 # optional arguments
 --vault-password-file VAULT_PASSWORD_FILES
 -B --backgroud SECONDS
--C --check 
+-C --check
 -D --diff
 -P --poll POLL_INTERVAL
 -a --args MODULE_ARGS
@@ -33,7 +35,7 @@ inventories/prod.host
 --become-method BECOME_METHOD
 --become-user BECOME_USER
 -K --ask-become-pass
--b --become 
+-b --become
 # Connection Options
 --private-key PRIVATE_KEY_FILE
 --ssh-extra-args SSH_EXTRA_ARGS
@@ -45,11 +47,11 @@ inventories/prod.host
 
 # check all hosts
 ansible all --list-hosts [-i inventories/test.host]
-ansible all -m ping 
+ansible all -m ping
 ansible '*' -m ping
 # pattern hosts
 ansible '192.*' -m ping
-ansible 'db*' -m ping 
+ansible 'db*' -m ping
 ansible 'web:&db' -m ping
 ansible 'web:db' -m ping
 ansible 'web:!db' -m ping
@@ -87,6 +89,7 @@ ansible test -m async_status -a "jid=488359678239.2844"
 ### vars fact template
 
 #### vars
+
 ```bash
 # how to define
 # 1. extra vars
@@ -118,7 +121,7 @@ ntp_server=ntp.example.com
 # 4. role: roles/x/defaults/main.yml, roles/x/vars/main.yml
 http_port: 80
 # 5. fact
-- host: 
+- host:
   tasks:
     - command: whoami
       register: result
@@ -149,6 +152,7 @@ https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html
 ```
 
 #### fact
+
 ```bash
 # ansible setup info
 ansible test -m setup
@@ -187,6 +191,7 @@ ansible-playbook --flush-cache playbooks/example.yml
 ```
 
 #### template
+
 ```bash
 # jinja2 template
 ansible test -m debug -a "msg={{ now(utc='True',fmt='%H-%m-%d %T') }}"
@@ -205,18 +210,20 @@ tasks:
 ```
 
 ### ansible-console
+
 ```bash
 ansible-console test
 
 root@all (1)[f:5]$ ping
 10.0.0.1 | SUCCESS => {
-    "changed": false, 
+    "changed": false,
     "ping": "pong"
 
 }
 ```
 
 ### ansible-doc
+
 ```bash
 # List available plugins
 ansible-doc --list
@@ -229,6 +236,7 @@ ansible-doc -s ping
 ```
 
 ### ansible-galaxy
+
 ```bash
 # collections
 ansible-galaxy collection
@@ -249,6 +257,7 @@ ansible-galaxy remove geerlingguy.redis
 ```
 
 ### ansible-lint
+
 ```bash
 # install
 pip install ansible-lint
@@ -258,6 +267,7 @@ ansible-lint playbooks/example.yml
 ```
 
 ### ansible-playbook
+
 ```bash
 # execute example playbook
 ansible-playbook playbooks/example.yml
@@ -281,7 +291,7 @@ ansible-playbook -i inventories/initial.hosts playbooks/initial.yml -e "init_hos
 --become-method BECOME_METHOD
 --become-user BECOME_USER
 -K --ask-become-pass
--b --become 
+-b --become
 # Connection Options
 --private-key PRIVATE_KEY_FILE
 --ssh-extra-args SSH_EXTRA_ARGS
@@ -291,7 +301,7 @@ ansible-playbook -i inventories/initial.hosts playbooks/initial.yml -e "init_hos
 -vvvv --verbose
 
 
-# import 
+# import
 # roles/example/tasks/main.yml
 - name: added in 2.4, previously you used 'include'
   import_tasks: redhat.yml
@@ -342,6 +352,7 @@ ansible-playbook playbooks/example.yml --step
 ```
 
 ### ansible-vault
+
 ```bash
 # playbook operation
 ansible-vault create playbooks/new.yml
@@ -351,7 +362,7 @@ ansible-vault encrypt playbooks/example.yml
 ansible-vault decrypt playbooks/example.yml
 
 
-# option1: --ask-vault-pass or --vault-id 
+# option1: --ask-vault-pass or --vault-id
 # --ask-vault-pass
 ansible-vault encrypt_string pwd123 --name root_password
 ansible-playbook playbooks/example.yml --start-at-task "Vault task" --ask-vault-pass
@@ -376,6 +387,7 @@ ansible-playbook playbooks/example.yml --vault-id pwd.vault
 ## saltstack
 
 ### minion keys
+
 ```bash
 # select all keys
 salt-key -L
@@ -396,41 +408,43 @@ salt '*' test.ping
 ```
 
 ### match minion
+
 ```bash
-# regular 
+# regular
 salt '*' test.ping
 salt 'web0[3-7]' test.ping
 
-# regex pcre 
-salt -E 'web*|db*' test.ping 
+# regex pcre
+salt -E 'web*|db*' test.ping
 
-# list 
+# list
 salt -L 'node1,node2' test.ping
 
-# grains 
+# grains
 salt -G 'os:Ubuntu' test.version
 
-# grains pcre 
+# grains pcre
 salt -P 'os:Arch.*' test.ping
 
-# custom groups 
+# custom groups
 cat /etc/salt/master.d/nodegroups.conf
 nodegroups:
    FRONTEND: L@frontend1,frontend2,frontend3
    BACKEND: L@backend1,backend2,backend3
 salt -N FRONTEND test.ping
 
-# compound 
+# compound
 salt -C 'G@roles:apps or I@myname:yakir' test.ping
 
 # pillar
 salt -I 'myname:yakir' test.ping
 
-# CIDR 
+# CIDR
 salt -S '192.168.1.0/24' test.ping
 ```
 
 ### module
+
 ```bash
 # doc
 salt 'node1' sys.doc
@@ -459,6 +473,7 @@ salt 'node1' mydisk.df
 ```
 
 ### state structure
+
 ```bash
 # state sls files
 tee > /srv/salt/base/package/tree.sls << "EOF"
@@ -490,13 +505,13 @@ apache:
 EOF
 
 
-# show state sls 
+# show state sls
 salt 'node1' state.show_highstate [saltenv=dev]
 salt 'node1' state.show_sls template [saltenv=dev]
 salt 'node1' cp.list_states [saltenv=dev]
 
 
-# execute top high state sls 
+# execute top high state sls
 tee > /srv/salt/base/top.sls << "EOF"
 base:
   'node1':
@@ -525,6 +540,7 @@ salt '*' state.sls package.nginx [saltenv=dev] [test=True]
 ```
 
 ### grains
+
 ```bash
 salt '*' saltutil.refresh_grains [saltenv=base|dev|prod]
 salt '*' saltutil.sync_grains
@@ -572,7 +588,7 @@ salt minion01 saltutil.sync_grains
 # in minion
 # option1
 tee > /etc/salt/minion.d/grains.conf << "EOF"
-grains: 
+grains:
   roles: app1
   project: frontend
 EOF
@@ -597,6 +613,7 @@ salt -G 'roles:app1' test.ping
 ```
 
 ### pillar
+
 ```bash
 salt '*' saltutil.refresh_pillar [pillarenv=base|dev|prod]
 salt '*' pillar.ls
@@ -651,3 +668,4 @@ EOF
 
 salt '*' state.sls tmp.init
 ```
+

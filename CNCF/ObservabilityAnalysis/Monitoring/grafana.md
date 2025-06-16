@@ -221,48 +221,31 @@ curl "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<ms
 
 ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230822100216.png]]
 
-```jinja2
-{{ define "tg_alert_template" -}}
-{{/* firing info */}}
-{{- if gt (len .Alerts.Firing) 0 -}}
-{{ range $index, $alert := .Alerts }}
-=========={{ $alert.Status }}==========
-告警名称: {{ $alert.Labels.alertname }}
-告警级别: {{ $alert.Labels.severity }}
-告警详情: {{ $alert.Annotations.summary }};{{ $alert.Annotations.description }}
-故障时间: {{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
-实例信息: {{ $alert.Labels.instance }}
-当前数值: {{ $alert.Values.B }}
-静默告警: {{ .SilenceURL }}
-告警大盘: {{ .DashboardURL }}
-============END============
-{{- end -}}
-{{- end }}
-{{/* resolved info */}}
-{{- if gt (len .Alerts.Resolved) 0 -}}
-{{ range $index, $alert := .Alerts }}
-=========={{ $alert.Status }}==========
-告警名称: {{ $alert.Labels.alertname }}
-告警级别: {{ $alert.Labels.severity }}
-告警详情: {{ $alert.Annotations.summary }};{{ $alert.Annotations.description }}
-故障时间: {{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
-恢复时间: {{ ($alert.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}
-实例信息: {{ $alert.Labels.instance }}
-当前数值: {{ $alert.Values.B }}
-静默告警: {{ .SilenceURL }}
-告警大盘: {{ .DashboardURL }}
-============END============
-{{- end -}}
-{{- end }}
-{{- end -}}
+```html
+{{ define "tg_alert_template" -}} {{/* firing info */}} {{- if gt (len
+.Alerts.Firing) 0 -}} {{ range $index, $alert := .Alerts }} =========={{
+$alert.Status }}========== 告警名称: {{ $alert.Labels.alertname }} 告警级别: {{
+$alert.Labels.severity }} 告警详情: {{ $alert.Annotations.summary }};{{
+$alert.Annotations.description }} 故障时间: {{ ($alert.StartsAt.Add
+28800e9).Format "2006-01-02 15:04:05" }} 实例信息: {{ $alert.Labels.instance }}
+当前数值: {{ $alert.Values.B }} 静默告警: {{ .SilenceURL }} 告警大盘: {{
+.DashboardURL }} ============END============ {{- end -}} {{- end }} {{/*
+resolved info */}} {{- if gt (len .Alerts.Resolved) 0 -}} {{ range $index,
+$alert := .Alerts }} =========={{ $alert.Status }}========== 告警名称: {{
+$alert.Labels.alertname }} 告警级别: {{ $alert.Labels.severity }} 告警详情: {{
+$alert.Annotations.summary }};{{ $alert.Annotations.description }} 故障时间: {{
+($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }} 恢复时间: {{
+($alert.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }} 实例信息: {{
+$alert.Labels.instance }} 当前数值: {{ $alert.Values.B }} 静默告警: {{
+.SilenceURL }} 告警大盘: {{ .DashboardURL }} ============END============ {{- end
+-}} {{- end }} {{- end -}}
 ```
 
 4. Contact points --> Add contact point --> create telegram contact point
    ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115559.png]]
 
-```jinja2
-# Message
-{{ template "tg_alert_template" . }}
+```html
+# Message {{ template "tg_alert_template" . }}
 ```
 
 ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230822100054.png]]
