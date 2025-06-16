@@ -4,16 +4,16 @@ categories:
   - Kubernetes
 ---
 
-### 一、简介
+## Introduction
 
-#### 1）容器网络基本概念
+### 1）容器网络基本概念
 
-- Linux Network Namespace
-  - linux 网络设备：network interface device，loopback device，bridge device，veth device，tun/tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备
-  - linux 路由表（三层 ip 包路由寻址功能），arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等
-  - linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp/udp 包等
-  - linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等
-  <!--more-->
+Linux Network Namespace
+
+- linux 网络设备：network interface device，loopback device，bridge device，veth device，tun/tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备
+- linux 路由表（三层 ip 包路由寻址功能），arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等
+- linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp/udp 包等
+- linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等
 
 {% asset_img k8s-nw1.png %}
 
@@ -30,7 +30,7 @@ linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一�
 总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。
 {% asset_img k8s-nw3.png %}
 
-#### 2）k8s 集群容器网络通讯方式
+### 2）k8s 集群容器网络通讯方式
 
 - 网络负载方式
 
@@ -43,7 +43,7 @@ ipvs：v1.11 版本及之后
 underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数）
 overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等
 
-#### 3）测试环境主机信息
+### 3）测试环境主机信息
 
 | 宿主机 IP     | 角色   | 容器 CIDR    | CNI 网卡地址 | Flannel.1 vtep 设备 |
 | ------------- | ------ | ------------ | ------------ | ------------------- |
@@ -51,17 +51,16 @@ overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等
 | 192.168.205.3 | node1  | 10.42.1.0/24 | 10.42.1.1    | 10.42.1.0           |
 | 192.168.205.5 | node2  | 10.42.2.0/24 | 10.42.2.1    | 10.42.2.0           |
 
-### 二、宿主机内网络
+## 宿主机内网络
 
-#### 1）docker 容器的四种网络类型
+### 1）docker 容器的四种网络类型
 
 - bridge 模式（默认）：--net=bridge
 
 宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机）
 
-> {% asset_img k8s-nw4.png %}
 > 自定义 bridge 网络：宿主机范围创建独立的 network namespace
-> {% asset_img k8s-nw5.png %}
+> {% asset_img k8s-nw4.png %} > {% asset_img k8s-nw5.png %}
 
 - host 模式：--net=host
 
@@ -75,7 +74,7 @@ overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等
 
 - none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络
 
-#### 2）docker 宿主环境中容器网络
+### 2）docker 宿主环境中容器网络
 
 - 每一个container都有一个network namespace，然后拥有container自己的网络设备，路由表，arp表，协议栈，iptable等，各个container的network namespace相互隔离。
 - 在宿主的default netwok nemespace中会有一个linux bridge设备，一般名称为docker0。
@@ -101,13 +100,13 @@ route -n
 docker ps/inspect/container
 ```
 
-### 三、Service：cluster ip 实现原理
+## Service：cluster ip 实现原理
 
-#### 1）cluster ip 如何访问
+### 1）cluster ip 如何访问
 
 k8s 集群中服务需要相互访问，一般为之创建相应的 service，集群内部访问时一般使用 cluster ip。一个 cluster ip 后面会关联多个 endpoints（实际的 pod 地址）。对于 cluster ip 的访问，也就是实现了对 cluster ip 关联的多个 endpoints 负载均衡访问（负载方式为 iptables 或 ipvs）
 
-#### 2）iptables 方式
+### 2）iptables 方式
 
 - 查看 service 信息：cluster ip 以及关联的 endpoints ip
 
@@ -211,18 +210,18 @@ default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100
   - 需要host开启路由转发功能(net.ipv4.ip_forward = 1)。
   - 数据包在host netwok namespace中经过转换以及DNAT之后，由host network namespace的路由表来决定下一跳地址
 
-#### 3）ipvs 方式
+### ipvs 方式
 
 - [https://mp.weixin.qq.com/s?\_\_biz=MzI0MDE3MjAzMg==&mid=2648393263&idx=1&sn=d6f27c502a007aa8be7e75b17afac42f&chksm=f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&scene=178&cur_album_id=2123526506718003213#rd](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393263&idx=1&sn=d6f27c502a007aa8be7e75b17afac42f&chksm=f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&scene=178&cur_album_id=2123526506718003213#rd)
 - [https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
 
-### 四、Service：nodeport 实现原理
+## Service：nodeport 实现原理
 
-#### 1）nodeport ip 如何访问
+### 1）nodeport ip 如何访问
 
 通过访问宿主机端口 --> cluster ip 路径（端口范围：30000-32767）
 
-#### 2）iptables 方式
+### 2）iptables 方式
 
 - 查看 service 信息
 
@@ -313,12 +312,12 @@ Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)
   - 在KUBE-NODEPORTS target会根据prot来匹配KUBE-SVC-XXX target
   - KUBE-SVC-XXX target就和第三部分中的cluster-ip类型service一样，最终流量进入到 Pod 中
 
-#### 3）ipvs 方式
+### 3）ipvs 方式
 
 - [https://mp.weixin.qq.com/s?\_\_biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd)
 - [https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
 
-### 五、Service：ipvs 与 iptables 对比
+## Service：ipvs 与 iptables 对比
 
 > 基于 ipvs 的 k8s 网络负载要求：
 >
@@ -340,9 +339,9 @@ Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)
 - ipvs方式数据在host network namespace的chain中的路径是：PREROUTING-->INPUT-->POSTROUTING 在PREROUTING chain中完成mark masq SNAT，在INPUT chain利用ipvs完成负载均衡和目标地址映射。
 - iptable和ipvs方式在完成负载均衡和目标地址映射后都会根据host network namespace的路由表做下一跳路由选择。
 
-### 六、跨主机网络通信：flannel 组件
+## 跨主机网络通信：flannel 组件
 
-#### 1）flannel underlay 网络：host-gw 方式
+### 1）flannel underlay 网络：host-gw 方式
 
 **underlay 网络概念与配置**
 
@@ -426,7 +425,7 @@ nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9   
 - 要求所有的节点必须开启路由转发功能(net.ipv4.ip_forward = 1)
 - 要求所有的节点都在同一个二层网络里，来完成目标pod所在host的下一跳路由
 
-#### 2）flannel overlay 网络：vxlan 方式
+### 2）flannel overlay 网络：vxlan 方式
 
 **overlay 网络概念与配置**
 
@@ -597,7 +596,7 @@ ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent
 - 数据由linux bridge cni0利用veth pair转发到目标pod。
 - 每个宿主host的flannel服务启动的时候读取etcd中的vxlan配置信息，在宿主host的路由表和mac转发接口表fdb里写入相应数据。
 
-#### 3）flannel underlay 与 overlay 网络对比
+### 3）flannel underlay 与 overlay 网络对比
 
 - 都要求host宿主开启网络转发功能(net.ipv4.ip_forward = 1)。
 - flannel underlay网络没有数据包的额外封包与拆包，效率会更高一些。
@@ -606,11 +605,9 @@ ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent
 - flannel vxlan overlay网络内层包是二层以太包，基于linux vxlan设备
 - flannel underlay网络和flannel vxlan overlay网络所有数据包都由操作系统内核空间处理，没有用户空间的应用程序参与。
 
-> #### 参考
+> Reference:
 >
-> 1、k8s 集群网络：
-> [https://mp.weixin.qq.com/mp/appmsgalbum?\_\_biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
-> 2、iptables 详解：
-> [https://lixiangyun.gitbook.io/iptables_doc_zh_cn/](https://lixiangyun.gitbook.io/iptables_doc_zh_cn/) > [https://www.jianshu.com/p/ee4ee15d3658](https://www.jianshu.com/p/ee4ee15d3658)
-> 3、Docker 网络类型：[https://developer.aliyun.com/article/974008#slide-4](https://developer.aliyun.com/article/974008#slide-4)
-> 4、ipvs 工作模式原理：[https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
+> 1. [k8s 集群网络](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
+> 2. [iptables 详解](https://www.jianshu.com/p/ee4ee15d3658)
+> 3. [Docker 网络类型](https://developer.aliyun.com/article/974008#slide-4)
+> 4. [ipvs 工作模式原理](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)

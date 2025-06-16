@@ -23,8 +23,6 @@ categories:
 - rules代表具体的授权规则，类似于AlicloudRAM中的权限策略Policy
 - Role和ClusterRole区别只在于一个是集群级别的资源控制
 
-<!--more-->
-
 **RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似AlicloudRAM中将Policy赋权给RAM角色或RAM账号）**
 
 - User、Group、ServiceAccount 是 Kubernetes 集群中单独的概念，与系统级别不同。参考：[https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2](https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2)
