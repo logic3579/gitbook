@@ -6,12 +6,12 @@ categories:
 
 ## Introduction
 
-### 1）容器网络基本概念
+### 1) 容器网络基本概念
 
 Linux Network Namespace
 
 - linux 网络设备：network interface device，loopback device，bridge device，veth device，tun/tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备
-- linux 路由表（三层 ip 包路由寻址功能），arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等
+- linux 路由表（三层 ip 包路由寻址功能) ，arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等
 - linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp/udp 包等
 - linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等
 
@@ -30,20 +30,20 @@ linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一�
 总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。
 {% asset_img k8s-nw3.png %}
 
-### 2）k8s 集群容器网络通讯方式
+### 2) k8s 集群容器网络通讯方式
 
 - 网络负载方式
 
-kube-proxy 组件启动参数控制（--proxy-module=ipvs）
+kube-proxy 组件启动参数控制（--proxy-module=ipvs) 
 iptables：默认
 ipvs：v1.11 版本及之后
 
 - 网络通讯方式
 
-underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数）
-overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等
+underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数) 
+overlay：flannel vxlan，calico ipip，flannel udp（一般不使用)  等
 
-### 3）测试环境主机信息
+### 3) 测试环境主机信息
 
 | 宿主机 IP     | 角色   | 容器 CIDR    | CNI 网卡地址 | Flannel.1 vtep 设备 |
 | ------------- | ------ | ------------ | ------------ | ------------------- |
@@ -53,11 +53,11 @@ overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等
 
 ## 宿主机内网络
 
-### 1）docker 容器的四种网络类型
+### 1) docker 容器的四种网络类型
 
-- bridge 模式（默认）：--net=bridge
+- bridge 模式（默认) ：--net=bridge
 
-宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机）
+宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机) 
 
 > 自定义 bridge 网络：宿主机范围创建独立的 network namespace
 > {% asset_img k8s-nw4.png %} > {% asset_img k8s-nw5.png %}
@@ -69,12 +69,12 @@ overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等
 
 - contaniner 模式：--net=container:name or id
 
-指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace）。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信
+指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace) 。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信
 {% asset_img k8s-nw7.png %}
 
 - none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络
 
-### 2）docker 宿主环境中容器网络
+### 2) docker 宿主环境中容器网络
 
 - 每一个container都有一个network namespace，然后拥有container自己的网络设备，路由表，arp表，协议栈，iptable等，各个container的network namespace相互隔离。
 - 在宿主的default netwok nemespace中会有一个linux bridge设备，一般名称为docker0。
@@ -102,11 +102,11 @@ docker ps/inspect/container
 
 ## Service：cluster ip 实现原理
 
-### 1）cluster ip 如何访问
+### 1) cluster ip 如何访问
 
-k8s 集群中服务需要相互访问，一般为之创建相应的 service，集群内部访问时一般使用 cluster ip。一个 cluster ip 后面会关联多个 endpoints（实际的 pod 地址）。对于 cluster ip 的访问，也就是实现了对 cluster ip 关联的多个 endpoints 负载均衡访问（负载方式为 iptables 或 ipvs）
+k8s 集群中服务需要相互访问，一般为之创建相应的 service，集群内部访问时一般使用 cluster ip。一个 cluster ip 后面会关联多个 endpoints（实际的 pod 地址) 。对于 cluster ip 的访问，也就是实现了对 cluster ip 关联的多个 endpoints 负载均衡访问（负载方式为 iptables 或 ipvs）
 
-### 2）iptables 方式
+### 2) iptables 方式
 
 - 查看 service 信息：cluster ip 以及关联的 endpoints ip
 
@@ -161,7 +161,7 @@ pkts bytes target     prot opt in     out     source               destination
 在 KUBE-SERVICES target中我们可以看到目标地址为cluster ip 10.43.6.58 的匹配target 为 KUBE-SVC-7CWUT4JBGBRVUN2L。
 **KUBE-SVC-7CWUT4JBGBRVUN2L 链信息：**
 
-- 存在两个target （对应两个 Pod ）KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX
+- 存在两个target （对应两个 Pod ) KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX
 - 在 KUBE-SEP-U2YYZT2C3O6VM4EV 中有statistic mode random probability 0.5。0.5 利用了iptable内核随机模块，随机比率为0.5，也就是50%
 - 由于一半随机比率进入 KUBE-SEP-U2YYZT2C3O6VM4EV target， 因此另一个 target 的随机比率也为50%，实现负载均衡
 
@@ -217,11 +217,11 @@ default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100
 
 ## Service：nodeport 实现原理
 
-### 1）nodeport ip 如何访问
+### 1) nodeport ip 如何访问
 
-通过访问宿主机端口 --> cluster ip 路径（端口范围：30000-32767）
+通过访问宿主机端口 --> cluster ip 路径（端口范围：30000-32767) 
 
-### 2）iptables 方式
+### 2) iptables 方式
 
 - 查看 service 信息
 
@@ -312,7 +312,7 @@ Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)
   - 在KUBE-NODEPORTS target会根据prot来匹配KUBE-SVC-XXX target
   - KUBE-SVC-XXX target就和第三部分中的cluster-ip类型service一样，最终流量进入到 Pod 中
 
-### 3）ipvs 方式
+### 3) ipvs 方式
 
 - [https://mp.weixin.qq.com/s?\_\_biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd)
 - [https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
@@ -323,14 +323,14 @@ Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)
 >
 > - linux 内核高于2.4.x
 > - 在 kube-proxy 网络组件中启动参数加入--proxy-mode=ipvs
-> - 安装 ipvsadm 工具（可选），用于操作管理 ipvs 规则
+> - 安装 ipvsadm 工具（可选) ，用于操作管理 ipvs 规则
 
 - 两者都是采用linux内核模块完成负载均衡和endpoint的映射，所有操作都在内核空间完成，没有在应用程序的用户空间。
 - iptable方式依赖于linux netfilter/iptable内核模块。
 - ipvs方式依赖linux netfilter/iptable模块，ipset模块，ipvs模块。
 - iptable方式中，host宿主中ipatble的entry数目会随着service和对应endpoints的数目增多而增多。举个例子，比如有10个cluster ip类型的service，每个service有6个endpoints。那么在KUBE-SERVICES target中至少有10个entries(KUBE-SVC-XXX)与10个service对应，每个KUBE-SVC-XXX target中会有6个KUBE-SEP-XXX与6个endpoints来对应，每个KUBE-SEP-XXX会有2个enrties来分别做mark masq和DNAT，这样算起来至少有10*6*2=120个entries在iptable中。试想如果application中service和endpoints数目巨大，iptable entries也是非常庞大的，在一定情况下有可能带来性能上的问题。
 - ipvs方式中host宿主中iptable的entry数目是固定的，因为iptable做匹配的时候会利用ipset(KUBE-CLUSTER-IP或者KUBE-NODE-PORT-TCP)来匹配，service的数目决定了ipset的大小，并不会影响iptable的大小。这样就解决了iptable模式下，entries随着service和endpoints的增多而增多的问题。
-- 对于负载均衡，iptable方式采用random模块来完成负载均衡，ipvs方式支持多种负载均衡，例如round-robin，least connection，source hash等（可参考http://www.linuxvirtualserver.org/），并且由kubelet启动参数--ipvs-scheduler控制。
+- 对于负载均衡，iptable方式采用random模块来完成负载均衡，ipvs方式支持多种负载均衡，例如round-robin，least connection，source hash等（可参考http://www.linuxvirtualserver.org/) ，并且由kubelet启动参数--ipvs-scheduler控制。
 - 对于目标地址的映射，iptable方式采用linux原生的DNAT，ipvs方式则利用ipvs模块完成。
 - ipvs方式会在host netwok namespace中创建网络设备kube-ipvs0，并且绑定了所有的cluster ip，这样保证了cluster-ip类型的service数据进入INPUT chain，从而让ipvs来完成负载均衡和目标地址的映射。
 - iptable方式不会在host netwok namespace中创建额外的网络设备。
@@ -341,7 +341,7 @@ Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)
 
 ## 跨主机网络通信：flannel 组件
 
-### 1）flannel underlay 网络：host-gw 方式
+### 1) flannel underlay 网络：host-gw 方式
 
 **underlay 网络概念与配置**
 
@@ -416,16 +416,16 @@ nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9   
 # traceroute 10.42.1.9
 ```
 
-**flannel underlay（host-gw 方式）总结**
+**flannel underlay（host-gw 方式) 总结**
 
 - 从源pod的network namespace到host network namespace的cni0 linux bridge上。
 - 在源pod所在的host里做三层路由选择，下一跳地址为目标pod所在的host。
-- 数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包）
+- 数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包) 
 - 在目标pod所在的host里做三层路由选择，本地直连路由到目标pod里。
 - 要求所有的节点必须开启路由转发功能(net.ipv4.ip_forward = 1)
 - 要求所有的节点都在同一个二层网络里，来完成目标pod所在host的下一跳路由
 
-### 2）flannel overlay 网络：vxlan 方式
+### 2) flannel overlay 网络：vxlan 方式
 
 **overlay 网络概念与配置**
 
@@ -564,7 +564,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0
 ```
 
-- 宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发）
+- 宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发) 
 
 因为所有的host都运行flannel服务，而flannel连接etcd存储中心，所以每个host就知道自己的子网地址cidr是什么，也知道在这个cidr中自己的flannel.1设备ip地址和mac地址，同时也知道了其它host的子网cidr以及flannel.1设备ip地址和mac地址。而知道了这些信息，就可以在flannel启动的时候写入到路由表和fdb中了，以 **192.168.205.4 **宿主为例：
 
@@ -579,7 +579,7 @@ ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent
 # etcdctl ....
 ```
 
-**flannel overlay（vxlan 方式）总结**
+**flannel overlay（vxlan 方式) 总结**
 
 - 每个宿主都有名字为flannel.x的vxlan网络设备来完成对于vxlan数据的udp封包与拆包，upd数据在宿主的8472端口上(端口值可配置)处理。
 - 数据从pod的network namespace进入到host的network namespace中。
@@ -596,7 +596,7 @@ ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent
 - 数据由linux bridge cni0利用veth pair转发到目标pod。
 - 每个宿主host的flannel服务启动的时候读取etcd中的vxlan配置信息，在宿主host的路由表和mac转发接口表fdb里写入相应数据。
 
-### 3）flannel underlay 与 overlay 网络对比
+### 3) flannel underlay 与 overlay 网络对比
 
 - 都要求host宿主开启网络转发功能(net.ipv4.ip_forward = 1)。
 - flannel underlay网络没有数据包的额外封包与拆包，效率会更高一些。

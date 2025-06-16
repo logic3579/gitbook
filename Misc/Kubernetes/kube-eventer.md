@@ -10,41 +10,44 @@ description: kube-eventer
 
 #### 概述
 
-+ 什么是事件：Kubernetes 的架构设计基于状态机，不同的状态之间进行转换则会生成相应的事件，正常的状态之间转换会生成 Normal 等级的事件，正常状态与异常状态之间的转换会生成Warning等级的事件。
+- 什么是事件：Kubernetes 的架构设计基于状态机，不同的状态之间进行转换则会生成相应的事件，正常的状态之间转换会生成 Normal 等级的事件，正常状态与异常状态之间的转换会生成Warning等级的事件。
 
-+ kube-eventer 组件：阿里云开源组件，用于获取 K8S 集群中事件消息，并转存至自定义中间件或存储中。（K8S 集群默认只保存1小时内事件）
+- kube-eventer 组件：阿里云开源组件，用于获取 K8S 集群中事件消息，并转存至自定义中间件或存储中。（K8S 集群默认只保存1小时内事件)
 
-+ 组件官方地址：https://github.com/AliyunContainerService/kube-eventer
+- 组件官方地址：https://github.com/AliyunContainerService/kube-eventer
 
 #### 部署前提与软件
 
-| 名称                               | 功能                         | 备注               |
-| -------------------------------- | -------------------------- | ---------------- |
-| K8S 集群                           | 应用集群                       | 使用 minikube 测试集群 |
-| kube-eventer                     | 收集 K8S 集群事件                | 集群第三方组件          |
-| Kafka / Elasticsearch / influxDB | 中间件：存储事件消息                 | 存储组件（选型 Kafka）   |
-| kube-eventer-py                  | 从队列获取事件消息发送至 telegram 告警群组 | 事件消费者            |
+| 名称                             | 功能                                       | 备注                   |
+| -------------------------------- | ------------------------------------------ | ---------------------- |
+| K8S 集群                         | 应用集群                                   | 使用 minikube 测试集群 |
+| kube-eventer                     | 收集 K8S 集群事件                          | 集群第三方组件         |
+| Kafka / Elasticsearch / influxDB | 中间件：存储事件消息                       | 存储组件（选型 Kafka)  |
+| kube-eventer-py                  | 从队列获取事件消息发送至 telegram 告警群组 | 事件消费者             |
 
 ### 2. 安装部署步骤
 
-#### a）minikube 集群部署
+#### a) minikube 集群部署
 
 参考：https://minikube.sigs.k8s.io/docs/start/
 
-#### b）存储中间件部署
+#### b) 存储中间件部署
+
 ##### Kafka
+
 使用 helm 部署 Kafka
+
 ```bash
 # 添加 helm 仓库
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
 # 拉取 Kafka chart 包并解压
-mkdir /opt/helm_chats && cd /opt/helm_chats 
+mkdir /opt/helm_chats && cd /opt/helm_chats
 helm pull bitnami/kafka && tar xf kafka-18.2.0.tgz && rm -rf kafka-18.2.0.tgz
 
 # 修改关键配置信息，启动 Kafka
 # 展示部分关键配置
-cat ./values.yaml  
+cat ./values.yaml
 ...
 ...
 # Kafka 启动配置文件，通过 Configmap 挂载
@@ -111,18 +114,19 @@ zookeeper:
 # 部署与验证
 helm install yakir-kafka .
 # 验证部署状态，查看是否为正常 Running 状态
-kubectl get pod  
+kubectl get pod
 NAME                                  READY   STATUS    RESTARTS       AGE
 yakir-kafka-0                         1/1     Running   0              171m
 yakir-kafka-zookeeper-0               1/1     Running   6 (168m ago)   10d
 ```
 
 ##### elasticsearch
+
 [[elasticsearch#Run by Helm|helm 部署]]
 
-#### c）kube-eventer 部署
+#### c) kube-eventer 部署
 
-+ 获取官方 YAML 资源文件进行部署
+- 获取官方 YAML 资源文件进行部署
 
 ```bash
 cat > kube-eventer.yaml << "EOF"
@@ -142,7 +146,7 @@ spec:
     metadata:
       labels:
         app: kube-eventer
-      annotations:      
+      annotations:
         #scheduler.alpha.kubernetes.io/critical-pod: ''
         priorityClassName: ''
     spec:
@@ -161,7 +165,7 @@ spec:
           env:
           # If TZ is assigned, set the TZ value as the time zone
           - name: TZ
-            value: "Asia/Shanghai" 
+            value: "Asia/Shanghai"
           volumeMounts:
             - name: localtime
               mountPath: /etc/localtime
@@ -227,17 +231,17 @@ NAME                               READY   STATUS    RESTARTS        AGE
 kube-eventer-69455778cd-cvr9w      1/1     Running   0               8d
 ```
 
-#### d）从消息队列获取事件，发送至 telegram
+#### d) 从消息队列获取事件，发送至 telegram
 
-+ telegram 机器人以及告警群组创建
+- telegram 机器人以及告警群组创建
 
 > 参考
-> 
+>
 > 1、机器人创建：https://cloud.tencent.com/developer/article/1835051
-> 
+>
 > 2、telegram python SDK：https://github.com/python-telegram-bot/python-telegram-bot
 
-+ Python 脚本信息
+- Python 脚本信息
 
 ```python
 # telegrambot.py 文件
@@ -336,7 +340,7 @@ class KConsumer(object):
                 # 手动拉取消息，间隔时间30s，然后手动 commit 提交当前 offset
                 msg_list_dict = self.consumer.poll(timeout_ms=30000)
                 for tp, msg_list in msg_list_dict.items():
-                    for msg in msg_list: 
+                    for msg in msg_list:
                         ### core operate,send message to telegram
                         send_result = asyncio.run(send_message(msg.value))
                         print(send_result)
@@ -367,12 +371,12 @@ if __name__ == '__main__':
     #consumer.close_consumer()
 ```
 
-+ Dockerfile 配置
+- Dockerfile 配置
 
 ```dockerfile
 FROM python:3.8
 
-# Set an environment variable 
+# Set an environment variable
 ENV APP /app
 
 # Create the directory
@@ -393,7 +397,7 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 CMD ["python", "get_events.py"]
 ```
 
-+ 打包镜像，启动验证
+- 打包镜像，启动验证
 
 ```bash
 # 编译源码打包镜像步骤
@@ -402,7 +406,7 @@ rm -f APP-META/*.py && cp *.py APP-META/
 
 cd APP-META && build -t kube-eventer-telegrambot:latest .
 
-# 启动镜像（docker 或 kubectl）
+# 启动镜像（docker 或 kubectl)
 cat > kube-eventer-telegrambot.yaml << "EOF"
 apiVersion: apps/v1
 kind: Deployment
@@ -424,7 +428,7 @@ spec:
           name: yakir-kube-eventer
           env:
           - name: TZ
-            value: "Asia/Shanghai" 
+            value: "Asia/Shanghai"
       volumes:
         - name: localtime
           hostPath:
@@ -435,16 +439,9 @@ spec:
 EOF
 # 验证启动结果
 kubectl apply -f kube-eventer-telegrambot.yaml
-kubectl get pod                               
+kubectl get pod
 NAME                                  READY   STATUS    RESTARTS        AGE
 yakir-kube-eventer-589bf867bc-tgs5l   1/1     Running   0               27
 ```
 
-+ 事件消息接收验证
-
-
-### 三、后续
-
-1. UAT 环境集群是否必要性探讨。（获取 Pod Warning 级别事件，分析 Pod 重启 / 宕机 原因）
-2. Kafka 中间件自定义持久化存储？
-3. 下一步：结合 NPD 获取节点事件？
+- 事件消息接收验证

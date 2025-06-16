@@ -4,9 +4,9 @@ categories:
   - Kubernetes
 ---
 
-### 一、环境准备
+## 环境准备
 
-#### 1. multipass 虚拟机创建
+### 1. multipass 虚拟机创建
 
 ```shell
 # 生成密钥对
@@ -32,7 +32,7 @@ EOF
 
 > --cloud-init ：导入本地生成的公钥文件到初始化系统中，可以使用密钥免密 SSH
 
-#### 2. 主机与网络规划
+### 2. 主机与网络规划
 
 | **主机 IP**  | **主机名** | **主机配置** | **节点角色** |
 | ------------ | ---------- | ------------ | ------------ |
@@ -46,7 +46,7 @@ EOF
 | PodSubnet       | 172.16.0.0/16   |
 | ServiceSubnet   | 10.10.0.0/16    |
 
-#### 3.软件版本
+### 3.软件版本
 
 | **软件**                | **版本**           |
 | ----------------------- | ------------------ |
@@ -62,11 +62,11 @@ EOF
 | kubelet                 | v1.23.2            |
 | kube-proxy              |                    |
 | etcd                    | v3.5.1             |
-| CNI 插件（calico）      | v3.18              |
+| CNI 插件（calico)       | v3.18              |
 
-### 二、集群配置（所有节点执行）
+## 集群配置（所有节点执行)
 
-#### 1. 节点初始化
+### 1. 节点初始化
 
 - 主机名与 host 解析
 
@@ -152,7 +152,7 @@ EOF
 sudo sysctl --system
 ```
 
-- 配置免密登录（master 节点执行，非必须）
+- 配置免密登录（master 节点执行，非必须)
 
 ```shell
 # master 节点执行
@@ -161,7 +161,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@node1
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@node2
 ```
 
-#### 2. 容器运行时安装
+### 2. 容器运行时安装
 
 ```shell
 # 1.删除旧版本
@@ -221,9 +221,9 @@ sudo ctr version
 
 ```
 
-### 三、构建集群
+## 构建集群
 
-#### 1.组件安装（所有节点执行）
+### 1.组件安装（所有节点执行)
 
 ```shell
 # 使用Alicloud加速镜像
@@ -258,7 +258,7 @@ systemctl status kubelet
 
 ```
 
-#### 2.初始化主节点
+### 2.初始化主节点
 
 - Master 节点执行
 
@@ -341,7 +341,7 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-#### 3.安装 CNI 网络插件（calico）
+### 3.安装 CNI 网络插件（calico)
 
 > calico 插件官方地址: [https://projectcalico.docs.tigera.io/getting-started/kubernetes/quickstart](https://projectcalico.docs.tigera.io/getting-started/kubernetes/quickstart)
 
@@ -378,7 +378,7 @@ source /usr/share/bash-completion/bash_completion
 source <(kubectl completion bash)
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 
-# nerdctl 工具（替代 docker 命令）
+# nerdctl 工具（替代 docker 命令)
 #官方地址
 # https://github.com/containerd/nerdctl
 #下载安装
@@ -399,7 +399,7 @@ ifconfig flannel.1 down && ip link delete flannel.1
 rm -rf /var/lib/cni/
 ```
 
-#### 4.集群部署验证
+### 4.集群部署验证
 
 ```shell
 # 部署 Nginx Deployment
@@ -409,12 +409,12 @@ kubectl create deployment nginx --image=nginx
 kubectl expose deployment nginx --port=80 --target-port=80 --type=NodePort
 
 # 访问验证
-curl 10.10.225.108:80 -I      # 请求 Service 端口（port，集群内部）
-curl 192.168.64.5:31052 -I    # 请求 Node 节点端口（nodePort，可集群外部访问）
-curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容器的启动端口）
+curl 10.10.225.108:80 -I      # 请求 Service 端口（port，集群内部)
+curl 192.168.64.5:31052 -I    # 请求 Node 节点端口（nodePort，可集群外部访问)
+curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容器的启动端口)
 ```
 
-#### 5.Kubernetes 组件
+### 5.Kubernetes 组件
 
 **控制平面组件**
 
@@ -423,11 +423,11 @@ curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容
 - kube-scheduler 调度策略：Pod 资源需求、硬件/软件/策略约束、亲和性和反亲和性规范、数据位置、工作负载间干扰和最后时限
 - kube-controller-manager
 
-**数据平面组件（所有节点）**
+**数据平面组件（所有节点) **
 
 - kubelet
 - kubeproxy
-- 容器运行时（CR）：containerd（Kubernetes 后续版本不使用 docker）
+- 容器运行时（CR) ：containerd（Kubernetes 后续版本不使用 docker）
 
 **插件 Addons**
 
@@ -438,9 +438,9 @@ curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容
 - 日志：fluentd
 - 监控：Prometheus
 
-### 四、Kubernetes 仪表板（Dashboard）
+## Kubernetes 仪表板（Dashboard)
 
-#### 1.Kubernetes 原生仪表板
+### 1. Kubernetes 原生仪表板
 
 > 官方文档：[https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/](https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/)
 
@@ -471,16 +471,16 @@ kubectl edit service kubernetes-dashboard -n kubernetes-dashboard
 # RBAC 参考：https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md
 #登录 Dashboard
 kubectl describe secret -n kubernetes-dashboard $(kubectl get secret -n kubernetes-dashboard |grep kubernetes-dashboard-token |awk '{print $1}')
-#浏览器访问（使用firefox） https://192.168.64.4:30333
-#使用上面获取的 token 值登录（默认 token 只有 kubernetes-dashboard 空间权限）
+#浏览器访问（使用firefox)  https://192.168.64.4:30333
+#使用上面获取的 token 值登录（默认 token 只有 kubernetes-dashboard 空间权限)
 ```
 
-#### 2.K9S 集群管理工具
+### 2. K9S 集群管理工具
 
 官方文档：[https://k9scli.io/](https://k9scli.io/)
 
-### 五、参考文档
-
-1、[multipass 官网](https://multipass.run/)
-2、[Kubernetes 官方文档](https://kubernetes.io/zh/docs/concepts/overview/components/#container-runtime)
-3、[二进制方式安装 Kubernetes 集群](https://blog.weiyigeek.top/2022/5-7-654.html)
+> Reference:
+>
+> 1. [multipass 官网](https://multipass.run/)
+> 2. [Kubernetes 官方文档](https://kubernetes.io/zh/docs/concepts/overview/components/#container-runtime)
+> 3. [二进制方式安装 Kubernetes 集群](https://blog.weiyigeek.top/2022/5-7-654.html)
