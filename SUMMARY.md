@@ -162,7 +162,6 @@
 ## Platform
 
 - [Alibaba Cloud](/Platform/AlibabaCloud/README.md)
-  - [ACK Monitorning](/Platform/AlibabaCloud/ack-monitoring.md)
   - [RAM](/Platform/AlibabaCloud/ram.md)
   - [VPC](/Platform/AlibabaCloud/vpc.md)
 - [AWS](/Platform/AWS/README.md)
