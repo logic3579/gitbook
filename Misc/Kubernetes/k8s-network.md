@@ -15,7 +15,7 @@ Linux Network Namespace
 - linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp/udp 包等
 - linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等
 
-{% asset_img k8s-nw1.png %}
+<!-- {% asset_img k8s-nw1.png %} -->
 
 > linux 不仅仅只有 network namespace 用来进行网络隔离，还有 pid namespace 用来隔离进程，user namespace 用来隔离用户，mount namespace 用来隔离挂载点，ipc namespace 用来隔离信号量和共享内存等，uts namespace 用来隔离主机名和域名。
 > 配合 cgroup 控制组，限制 cpu，memory，io 等资源。构成容器的底层实现
@@ -23,25 +23,27 @@ Linux Network Namespace
 - Linux Bridge Device
 
 linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一个内部虚拟二层交换机，可以进行二层数据包广播。但是注意的是linux bridge设备可以有自己的ip地址。也就是说，多个linux网络设备attach到一个bridge上，那么这些网络设备的ip地址将会失效(只有二层功能)，当一个设备收到数据包的时候，bridge会把数据包转发到其它所有attach到bridge上的从设备，从而实现广播的效果。
-{% asset_img k8s-nw2.png %}
+
+<!-- {% asset_img k8s-nw2.png %} -->
 
 - Linux Veth Device
 
 总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。
-{% asset_img k8s-nw3.png %}
+
+<!-- {% asset_img k8s-nw3.png %} -->
 
 ### 2) k8s 集群容器网络通讯方式
 
 - 网络负载方式
 
-kube-proxy 组件启动参数控制（--proxy-module=ipvs) 
+kube-proxy 组件启动参数控制（--proxy-module=ipvs)
 iptables：默认
 ipvs：v1.11 版本及之后
 
 - 网络通讯方式
 
-underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数) 
-overlay：flannel vxlan，calico ipip，flannel udp（一般不使用)  等
+underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数)
+overlay：flannel vxlan，calico ipip，flannel udp（一般不使用) 等
 
 ### 3) 测试环境主机信息
 
@@ -57,20 +59,23 @@ overlay：flannel vxlan，calico ipip，flannel udp（一般不使用)  等
 
 - bridge 模式（默认) ：--net=bridge
 
-宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机) 
+宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机)
 
 > 自定义 bridge 网络：宿主机范围创建独立的 network namespace
-> {% asset_img k8s-nw4.png %} > {% asset_img k8s-nw5.png %}
+
+<!-- > {% asset_img k8s-nw4.png %} > {% asset_img k8s-nw5.png %} -->
 
 - host 模式：--net=host
 
 共享宿主机网络，容器暴露端口时占用宿主机端口。网络模式简单，性能较好，一般用于单容器服务。
-{% asset_img k8s-nw6.png %}
+
+<!-- {% asset_img k8s-nw6.png %} -->
 
 - contaniner 模式：--net=container:name or id
 
 指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace) 。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信
-{% asset_img k8s-nw7.png %}
+
+<!-- {% asset_img k8s-nw7.png %} -->
 
 - none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络
 
@@ -81,7 +86,7 @@ overlay：flannel vxlan，calico ipip，flannel udp（一般不使用)  等
 - 每一个container对应一个veth pair设备，这个设备的一端在container的network namespace里，另一端attach到宿主networkwork namespace的docker0 linux bridge上。
 - 这样在宿主环境里，就好像有一个二层交换机(docker0 bridge)，把宿主内的所有container连接起来。所以，在宿主内的container都是可以直接相互访问的，而且是直连的方式
 
-{% asset_img k8s-nw8.png %}
+<!-- {% asset_img k8s-nw8.png %} -->
 
 ```shell
 ## 相关命令
@@ -219,7 +224,7 @@ default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100
 
 ### 1) nodeport ip 如何访问
 
-通过访问宿主机端口 --> cluster ip 路径（端口范围：30000-32767) 
+通过访问宿主机端口 --> cluster ip 路径（端口范围：30000-32767)
 
 ### 2) iptables 方式
 
@@ -420,7 +425,7 @@ nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9   
 
 - 从源pod的network namespace到host network namespace的cni0 linux bridge上。
 - 在源pod所在的host里做三层路由选择，下一跳地址为目标pod所在的host。
-- 数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包) 
+- 数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包)
 - 在目标pod所在的host里做三层路由选择，本地直连路由到目标pod里。
 - 要求所有的节点必须开启路由转发功能(net.ipv4.ip_forward = 1)
 - 要求所有的节点都在同一个二层网络里，来完成目标pod所在host的下一跳路由
@@ -564,7 +569,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0
 ```
 
-- 宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发) 
+- 宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发)
 
 因为所有的host都运行flannel服务，而flannel连接etcd存储中心，所以每个host就知道自己的子网地址cidr是什么，也知道在这个cidr中自己的flannel.1设备ip地址和mac地址，同时也知道了其它host的子网cidr以及flannel.1设备ip地址和mac地址。而知道了这些信息，就可以在flannel启动的时候写入到路由表和fdb中了，以 **192.168.205.4 **宿主为例：
 
