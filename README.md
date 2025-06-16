@@ -1,12 +1,12 @@
 ---
+icon: hand-wave
 description: >-
   Knowledge record and Technology stack.
-icon: hand-wave
 ---
 
-# Introduction
-
 [![docker-publish](https://github.com/logic3579/gitbook/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/logic3579/gitbook/actions/workflows/docker-publish.yml)
+
+# Introduction
 
 This is a gitbook by [Logic](https://github.com/logic3579/gitbook/).
 
@@ -21,9 +21,9 @@ About knowledge record and Technology stack.
 - [CNCF](#)
 - [Development](#)
 - [Environment](#)
-- [Misc](#)
 - [Operations](#)
 - [Platform](#)
+- [Misc](#)
 <!-- tocstop -->
 
 ## Using with `gitbook`
