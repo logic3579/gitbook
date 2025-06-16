@@ -2,11 +2,9 @@
 *~
 .env
 
-
 # IDE
 .idea/
 .vscode
-
 
 # OSX
 .DS_Store
@@ -14,8 +12,6 @@
 .AppleDouble
 .LSOverride
 
-
 # Custom
 tmp/
-.obsidian/workspace.json
-
+#.obsidian/workspace.json
