@@ -147,15 +147,14 @@ helm -n monitorning install grafana .
 ### Kubernetes
 
 ```bash
-# K8s Cluster Summary
-8685
+# Kubernetes Dashboard
+18283
 
-# Kubernetes Pods
-3146
+# Kubernetes Cluster (Prometheus)
+6417
 
-# Kubernetes cluster monitoring (via Prometheus)
-315
-
+# K8S Dashboard EN 20250125
+15661
 #
 ```
 
