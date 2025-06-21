@@ -8,7 +8,6 @@ wget https://github.com/v2fly/v2ray-core/releases/download/v5.29.3/v2ray-windows
 
 # macos
 brew install v2ray
-
 ```
 
 ## Start
@@ -31,3 +30,8 @@ docker run \
     -d --privileged \
     v2fly/v2fly-core run -c /etc/v2ray/config.json [-format jsonv5]
 ```
+
+> Reference:
+>
+> 1. [v2fly-guide](https://guide.v2fly.org/)
+> 2. [v2fly-rules](https://github.com/Loyalsoldier/v2ray-rules-dat)
