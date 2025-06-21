@@ -1,18 +1,27 @@
 {
+  "log": {
+    "access": "/tmp/access.log",
+    "error": "/tmp/error.log",
+    "loglevel": "debug"
+  },
   "inbounds": [
     {
-      "port": 443,
+      "port": 10000,
       "protocol": "vmess",
       "settings": {
         "clients": [
           {
-            "id": "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297",
-            "alterId": 64
+            "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2c",
+            "alterId": 0,
+            "security": "auto"
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
+        "network": "ws",
+        "wsSettings": {
+          "path": "/ws"
+        },
         "security": "tls",
         "tlsSettings": {
           "certificates": [
@@ -27,7 +36,13 @@
   ],
   "outbounds": [
     {
+      "tag": "direct",
       "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "tag": "blocked",
+      "protocol": "blackhole",
       "settings": {}
     }
   ]
