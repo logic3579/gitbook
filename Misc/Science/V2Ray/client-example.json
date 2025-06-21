@@ -1,19 +1,29 @@
 {
   "dns": {
+    "hosts": {
+      "dns.google": "8.8.8.8",
+      "dns.pub": "119.29.29.29",
+      "dns.alidns.com": "223.5.5.5",
+      "geosite:category-ads-all": "127.0.0.1"
+    },
     "servers": [
       {
-        "address": "119.29.29.29",
+        "address": "https://1.1.1.1/dns-query",
+        "domains": ["geosite:geolocation-!cn"],
+        "expectIPs": ["geoip:!cn"]
+      },
+      "8.8.8.8",
+      {
+        "address": "114.114.114.114",
         "port": 53,
-        "domains": ["geosite:cn"],
-        "expectIPs": ["geoip:cn"]
+        "domains": ["geosite:cn", "geosite:category-games@cn"],
+        "expectIPs": ["geoip:cn"],
+        "skipFallback": true
       },
       {
-        "address": "8.8.8.8",
-        "port": 53,
-        "domains": ["geosite:geolocation-!cn", "geosite:speedtest"]
-      },
-      "1.1.1.1",
-      "localhost"
+        "address": "localhost",
+        "skipFallback": true
+      }
     ]
   },
   "log": {
