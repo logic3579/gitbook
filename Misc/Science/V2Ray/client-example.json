@@ -51,11 +51,11 @@
       "settings": {
         "vnext": [
           {
-            "address": "34.92.63.183",
+            "address": "1.2.3.4",
             "port": 12306,
             "users": [
               {
-                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2d"
+                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2c"
               }
             ]
           }
