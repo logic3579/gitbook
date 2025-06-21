@@ -22,16 +22,19 @@
             "port": 443,
             "users": [
               {
-                "id": "23ad6b10-8d1a-40f7-8ad0-e3e35cd38297",
-                "alterId": 64
+                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+                "alterId": 0
               }
             ]
           }
         ]
       },
       "streamSettings": {
-        "network": "tcp",
-        "security": "tls"
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "/ws"
+        }
       }
     }
   ]
