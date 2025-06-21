@@ -33,21 +33,35 @@
   },
   "inbounds": [
     {
-      "port": 1080,
-      "listen": "127.0.0.1",
       "protocol": "socks",
+      "listen": "0.0.0.0",
+      "port": 1080,
+      "tag": "Socks-In",
+      "settings": {
+        "ip": "127.0.0.1",
+        "udp": true,
+        "auth": "noauth"
+      }
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls"]
-      },
-      "settings": {
-        "udp": true
+      }
+    },
+    {
+      "protocol": "http",
+      "listen": "127.0.0.1",
+      "port": 2080,
+      "tag": "Http-In",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
       }
     }
   ],
   "outbounds": [
     {
       "protocol": "vmess",
+      "outboundTag": "Proxy",
       "settings": {
         "vnext": [
           {
@@ -63,44 +77,85 @@
       }
     },
     {
+      "protocol": "dns",
+      "tag": "Dns-Out"
+    },
+    {
       "protocol": "freedom",
-      "tag": "direct",
-      "settings": {}
+      "tag": "Direct",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
     },
     {
       "protocol": "blackhole",
-      "tag": "adblock",
-      "settings": {}
+      "tag": "Reject",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
     }
   ],
   "routing": {
-    "domainStrategy": "IPOnDemand",
+    // "domainStrategy": "IPOnDemand",
+    "domainStrategy": "IPIfNonMatch",
+    "domainMatcher": "mph",
     "rules": [
       {
-        "domain": ["tanx.com", "googeadsserving.cn", "baidu.com"],
         "type": "field",
-        "outboundTag": "adblock"
+        "outboundTag": "Direct",
+        "protocol": ["bittorrent"]
       },
       {
+        "type": "field",
+        "outboundTag": "Dns-Out",
+        "inboundTag": ["Socks-In", "Http-In"],
+        "network": "udp",
+        "port": 53
+      },
+      {
+        "type": "field",
+        "outboundTag": "Reject",
+        "domain": ["geosite:category-ads-all"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "Proxy",
         "domain": [
-          "amazon.com",
-          "microsoft.com",
-          "jd.com",
-          "youku.com",
-          "baidu.com"
-        ],
-        "type": "field",
-        "outboundTag": "direct"
+          "full:www.icloud.com",
+          "domain:icloud-content.com",
+          "geosite:google"
+        ]
       },
       {
         "type": "field",
-        "outboundTag": "direct",
-        "domain": ["geosite:cn"]
+        "outboundTag": "Direct",
+        "domain": [
+          "geosite:tld-cn",
+          "geosite:icloud",
+          "geosite:category-games@cn"
+        ]
       },
       {
         "type": "field",
-        "outboundTag": "direct",
+        "outboundTag": "Proxy",
+        "domain": ["geosite:geolocation-!cn"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "Direct",
+        "domain": ["geosite:cn", "geosite:private"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "Direct",
         "ip": ["geoip:cn", "geoip:private"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "Proxy",
+        "network": "tcp,udp"
       }
     ]
   }
