@@ -1,67 +1,43 @@
 {
-  "dns": {
-    "hosts": {
-      "dns.google": "8.8.8.8",
-      "dns.pub": "119.29.29.29",
-      "dns.alidns.com": "223.5.5.5",
-      "geosite:category-ads-all": "127.0.0.1"
-    },
-    "servers": [
-      {
-        "address": "https://1.1.1.1/dns-query",
-        "domains": ["geosite:geolocation-!cn"],
-        "expectIPs": ["geoip:!cn"]
-      },
-      "8.8.8.8",
-      {
-        "address": "114.114.114.114",
-        "port": 53,
-        "domains": ["geosite:cn", "geosite:category-games@cn"],
-        "expectIPs": ["geoip:cn"],
-        "skipFallback": true
-      },
-      {
-        "address": "localhost",
-        "skipFallback": true
-      }
-    ]
-  },
   "log": {
     "access": "/tmp/v2ray-access.log",
     "error": "/tmp/v2ray-error.log",
     "loglevel": "warning"
   },
+  "dns": {
+    "servers": [
+      {
+        "address": "119.29.29.29",
+        "port": 53,
+        "domains": ["geosite:cn"],
+        "expectIPs": ["geoip:cn"]
+      },
+      {
+        "address": "8.8.8.8",
+        "port": 53,
+        "domains": ["geosite:geolocation-!cn", "geosite:speedtest"]
+      },
+      "1.1.1.1",
+      "localhost"
+    ]
+  },
   "inbounds": [
     {
-      "protocol": "socks",
-      "listen": "0.0.0.0",
       "port": 1080,
-      "tag": "Socks-In",
-      "settings": {
-        "ip": "127.0.0.1",
-        "udp": true,
-        "auth": "noauth"
-      }
-      "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls"]
-      }
-    },
-    {
-      "protocol": "http",
       "listen": "127.0.0.1",
-      "port": 2080,
-      "tag": "Http-In",
+      "protocol": "socks",
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls"]
+      },
+      "settings": {
+        "udp": true
       }
     }
   ],
   "outbounds": [
     {
       "protocol": "vmess",
-      "outboundTag": "Proxy",
       "settings": {
         "vnext": [
           {
@@ -69,7 +45,7 @@
             "port": 12306,
             "users": [
               {
-                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2c"
+                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2d"
               }
             ]
           }
@@ -77,85 +53,28 @@
       }
     },
     {
-      "protocol": "dns",
-      "tag": "Dns-Out"
-    },
-    {
       "protocol": "freedom",
-      "tag": "Direct",
-      "settings": {
-        "domainStrategy": "UseIPv4"
-      }
+      "tag": "direct",
+      "settings": {}
     },
     {
       "protocol": "blackhole",
-      "tag": "Reject",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      }
+      "tag": "adblock",
+      "settings": {}
     }
   ],
   "routing": {
-    // "domainStrategy": "IPOnDemand",
-    "domainStrategy": "IPIfNonMatch",
-    "domainMatcher": "mph",
+    "domainStrategy": "IPOnDemand",
     "rules": [
       {
+        "domain": ["tanx.com", "googeadsserving.cn"],
         "type": "field",
-        "outboundTag": "Direct",
-        "protocol": ["bittorrent"]
+        "outboundTag": "adblock"
       },
       {
         "type": "field",
-        "outboundTag": "Dns-Out",
-        "inboundTag": ["Socks-In", "Http-In"],
-        "network": "udp",
-        "port": 53
-      },
-      {
-        "type": "field",
-        "outboundTag": "Reject",
-        "domain": ["geosite:category-ads-all"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "Proxy",
-        "domain": [
-          "full:www.icloud.com",
-          "domain:icloud-content.com",
-          "geosite:google"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "Direct",
-        "domain": [
-          "geosite:tld-cn",
-          "geosite:icloud",
-          "geosite:category-games@cn"
-        ]
-      },
-      {
-        "type": "field",
-        "outboundTag": "Proxy",
-        "domain": ["geosite:geolocation-!cn"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "Direct",
-        "domain": ["geosite:cn", "geosite:private"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "Direct",
-        "ip": ["geoip:cn", "geoip:private"]
-      },
-      {
-        "type": "field",
-        "outboundTag": "Proxy",
-        "network": "tcp,udp"
+        "outboundTag": "direct",
+        "domain": ["geosite:cn", "geoip:cn", "geoip:private"]
       }
     ]
   }

@@ -2,7 +2,7 @@
   "log": {
     "access": "/tmp/access.log",
     "error": "/tmp/error.log",
-    "loglevel": "debug"
+    "loglevel": "warning"
   },
   "inbounds": [
     {
@@ -11,7 +11,7 @@
       "settings": {
         "clients": [
           {
-            "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2c",
+            "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
             "alterId": 0,
             "security": "auto"
           }
