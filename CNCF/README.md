@@ -21,10 +21,10 @@ icon: bullseye-arrow
 
 <!-- tocstop -->
 
-
 ## Nginx config
+
 ```bash
-cat << "EOF" > cncf-nginx.conf 
+cat << "EOF" > cncf.conf
 upstream cluster_ingress {
   server 1.1.1.1;
   server 2.2.2.2;
@@ -41,19 +41,20 @@ server {
 
     server_name
         # AppDefinition and Development
-        argocd.yakir.top
-        gitlab.yakir.top
-        jenkins.yakir.top
-        harbor.yakir.top
-        rancher.yakir.top
+        argocd.example.com
+        gitlab.example.com
+        jenkins.example.com
+        harbor.example.com
+        rancher.example.com
         # Observability and Analysis
-        prometheus.yakir.top
-        grafana.yakir.top
+        prometheus.example.com
+        grafana.example.com
+        kibana.example.com
     ;
 
-    access_log logs/yakir_access.log main;
-    ssl_certificate     "keys/yakir.top.crt";
-    ssl_certificate_key "keys/yakir.top.key";
+    access_log /opt/nginx/logs/access.log main;
+    ssl_certificate     "/opt/nginx/keys/example.com.crt";
+    ssl_certificate_key "/opt/nginx/keys/example.com.key";
 
     allow 127.0.0.1;
     deny all;
@@ -69,8 +70,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         # websocket
         proxy_http_version 1.1;
-        proxy_set_header Connection $connection_upgrade; # upgrade
-        proxy_set_header Upgrade $http_upgrade; # websocket
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Upgrade $http_upgrade;
     }
 }
 EOF

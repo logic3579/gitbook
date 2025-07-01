@@ -1,4 +1,5 @@
 ### nginx.conf
+
 ```bash
 user  nobody nobody;
 worker_processes  auto;
@@ -116,7 +117,7 @@ http {
 	    default no;
 	    ~*(AU|IN|NG|US)$ yes;
     }
-    
+
     # geoip2 = https://github.com/leev/ngx_http_geoip2_module
     geoip2 /opt/nginx/conf/GeoLite2-Country.mmdb {
        $geoip2_country_code country iso_code;
@@ -132,7 +133,7 @@ http {
         default no;
         ~*(AU|IN|NG|US)$ yes;
     }
-    
+
     # websocket connection keepalive
     map $http_upgrade $connection_upgrade {
         default upgrade;
@@ -159,6 +160,7 @@ include modules.conf;
 ```
 
 #### modules.conf
+
 ```bash
 cat > /opt/nginx/conf/modules.conf << EOF
 load_module modules/ndk_http_module.so;
@@ -173,8 +175,8 @@ load_module modules/ngx_stream_geoip2_module.so;
 EOF
 ```
 
-
 ### third iplib
+
 [[IPV6-COUNTRY-REGION-CITY.BIN.gz|ip2location]]
 
 [[GeoLite2-City.mmdb.gz|Geoip2]]
@@ -182,6 +184,7 @@ EOF
 ### vhosts/\*.conf
 
 #### default.conf
+
 ```bash
 server {
   listen 80 default;
@@ -216,7 +219,9 @@ ssl_session_timeout  4h;
 ssl_session_cache shared:SSL:30m;
 ssl_session_tickets off;
 ```
+
 #### real_ip.conf
+
 ```bash
 real_ip_header X-Forwarded-For;
 real_ip_recursive on;
@@ -226,8 +231,9 @@ set_real_ip_from 192.168.1.2/32;
 ```
 
 #### template.conf
+
 ```bash
-upstream bakend_server {
+upstream backend_server {
     server 1.1.1.1:8080;
     server 2.2.2.2:8080;
     server 3.3.3.3:8080;
@@ -236,19 +242,33 @@ upstream bakend_server {
 server {
     listen 80;
     listen 443 ssl http2;
-    server_name 
-	    example.com
-		yakir.top
-	;
+    server_name
+        example.com
+        *.example.com
+    ;
     ssl_certificate     $domainCert;
     ssl_certificate_key $domainKey;
     access_log logs/example_access.log main;
 
+    # frontend project
     location / {
-       if ($request_filename ~ .*\.(htm|html|json)$) {
-            add_header Cache-Control no-cache;
+        root /app/frontend-project;
+
+        # cache settings
+        #if ($request_filename ~ .*\.(htm|html|json)$) {
+        #    add_header Cache-Control no-cache;
+        #}
+        if ($request_filename ~ .*\.(htm|html)$) { add_header Cache-Control "max-age=60, s-maxage=120"; }
+        if ($request_filename !~ .*\.(htm|html)$) { add_header Cache-Control "max-age=31536000, s-maxage=86400"; }
+            root /usr/share/nginx/html;
+            try_files $uri $uri/ /index.html;
         }
-        root /web/PROJECT;
+
+        # Cross-Origin Resource Sharing
+        add_header Access-Control-Allow-Origin '*';
+        add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';
+        add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
+
         proxy_intercept_errors on;
         error_page 404 = /;
         error_page 401   /401;
@@ -258,46 +278,18 @@ server {
         error_page 503   /503;
     }
 
-    # geoip
-    location /geoip2-test {
-        if ( $allowed_country = no ) {
-		    return 444;
-	    }
-        return 200 '{"remote_addr": "$remote_addr",
-        "x_forwarded_for": "$http_x_forwarded_for",
-        "countryCode": "$geoip2_country_code",
-        "countryName": "$geoip2_country_name",
-        "cityName": "$geoip2_city_name",
-        "citySubdivisions": "$geoip2_subdivisions_name",
-        "latitude": "$geoip2_latitude",
-        "longitude": "$geoip2_longitude",
-        "allowed_country": "$allowed_country"}';
+    # backend project
+    location /api/ {
+        proxy_pass http://backend_server;
     }
 
-    # ip2location
-    location /ip2location-test {
-    	if ( $blocked_country = yes ) {
-		    return 444;
-	    }
-	    return 200 '{"remote_addr": "$remote_addr",
-        "x_forwarded_for": "$http_x_forwarded_for",
-        "countryCode": "$ip2location_country_short",
-        "countryName": "$ip2location_country_long",
-        "cityRegion": "$ip2location_region",
-        "cityName": "$ip2location_city",
-        "locationIsp": "$ip2location_isp",
-        "latitude": "$ip2location_latitude",
-        "longitude": "$ip2location_longitude",
-        "blocked_country": "$blocked_country"}';
-    }
-
-    # websocket protocol
-    location /socket/ {        
-        proxy_pass http://bakend_server/;
+    # websocket request
+    location /socket {
+        proxy_pass http://backend_server;
         proxy_http_version 1.1;
         # Upgrade get by http header, Connection get by nginx map
         # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Upgrade
-        proxy_set_header Upgrade $http_upgrade;             
+        proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -306,17 +298,42 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
    }
 
-    # CDN cache
-    location / {
-        if ($request_filename ~ .*\.(htm|html)$) { add_header Cache-Control "max-age=60, s-maxage=120"; }
-        if ($request_filename !~ .*\.(htm|html)$) { add_header Cache-Control "max-age=31536000, s-maxage=86400"; }
-            root /usr/share/nginx/html;
-            try_files $uri $uri/ /index.html;
+    # geoip
+    location /geoip2 {
+        if ( $allowed_country = no ) {
+            return 444;
         }
-        add_header Access-Control-Allow-Origin *;
-        add_header Access-Control-Allow-Methods 'GET, POST, OPTIONS';
-        add_header Access-Control-Allow-Headers 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
+        return 200 '{
+            "remote_addr": "$remote_addr",
+            "x_forwarded_for": "$http_x_forwarded_for",
+            "countryCode": "$geoip2_country_code",
+            "countryName": "$geoip2_country_name",
+            "cityName": "$geoip2_city_name",
+            "citySubdivisions": "$geoip2_subdivisions_name",
+            "latitude": "$geoip2_latitude",
+            "longitude": "$geoip2_longitude",
+            "allowed_country": "$allowed_country"
+            }';
     }
+
+    # ip2location
+    location /ip2location {
+        if ( $blocked_country = yes ) {
+            return 444;
+        }
+        return 200 '{
+            "remote_addr": "$remote_addr",
+            "x_forwarded_for": "$http_x_forwarded_for",
+            "countryCode": "$ip2location_country_short",
+            "countryName": "$ip2location_country_long",
+            "cityRegion": "$ip2location_region",
+            "cityName": "$ip2location_city",
+            "locationIsp": "$ip2location_isp",
+            "latitude": "$ip2location_latitude",
+            "longitude": "$ip2location_longitude",
+            "blocked_country": "$blocked_country"
+            }';
+    }
+
 }
 ```
-

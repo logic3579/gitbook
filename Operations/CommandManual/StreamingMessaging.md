@@ -1,5 +1,7 @@
 # Streaming and Messaging
+
 ## Kafka
+
 ```bash
 # config
 # 动态查看&更新节点配置（官方配置支持 cluster-wide 类型配置才可以更新）
@@ -11,7 +13,7 @@
 ./kafka-cluster.sh cluster-id --bootstrap-server localhost:9092
 
 # topic
-# adding topics by special partition and replication 
+# adding topics by special partition and replication
 ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic myTopic --replication-factor 1 --partitions 1 [--config x=y]
 # modifying a topic partition with manual
 ./kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic myTopic --partitions 3
@@ -43,6 +45,7 @@ second event
 ```
 
 ## RocketMQ
+
 ```bash
 # common
 # ./mqadmin {command} {args}
@@ -69,7 +72,7 @@ second event
 ./mqadmin queryMsgById -i msgId -n 'namersrvName:9876'
 ./mqadmin queryMsgByKey -k msgKey -n 'namersrvName:9876'
 ./mqadmin queryMsgByOffset -t topicName -b brokerName -i queueId -o offsetValue -n 'namersrvName:9876'
-./mqadmin sendMessage -t topicName -b brokerName -p yakirTest -n 'namersrvName:9876'
+./mqadmin sendMessage -t topicName -b brokerName -p testTopic -n 'namersrvName:9876'
 ./mqadmin consumeMessage -t topicName -b brokerName -o offset -i queueId -g consumerGroup
 
 # consumer

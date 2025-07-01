@@ -21,27 +21,27 @@ spec:
       namespace: management
     spec:
       containers:
-      - env:
-        - name: SERVICE_NAME
-          value: redis-insight
-        - name: RITRUSTEDORIGINS
-          value: http://redis-insight.yakir.top,https://redis-insight.yakir.top
-        image: redislabs/redisinsight:1.14.0
-        imagePullPolicy: IfNotPresent
-        name: redis-insight
-        ports:
-        - containerPort: 8001
-          name: port-8001
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 500m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 1Gi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
+        - env:
+            - name: SERVICE_NAME
+              value: redis-insight
+            - name: RITRUSTEDORIGINS
+              value: http://redis-insight.example.com,https://redis-insight.example.com
+          image: redislabs/redisinsight:1.14.0
+          imagePullPolicy: IfNotPresent
+          name: redis-insight
+          ports:
+            - containerPort: 8001
+              name: port-8001
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       securityContext:
@@ -58,13 +58,13 @@ metadata:
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
-  - IPv4
+    - IPv4
   ipFamilyPolicy: SingleStack
   ports:
-  - name: port-8080
-    port: 8001
-    protocol: TCP
-    targetPort: 8001
+    - name: port-8080
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
   selector:
     app: redis-insight
   sessionAffinity: None
@@ -78,17 +78,17 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: redis-insight.yakir.top
-    http:
-      paths:
-      - backend:
-          service:
-            name: redis-insight
-            port:
-              number: 8001
-        path: /
-        pathType: ImplementationSpecific
+    - host: redis-insight.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: redis-insight
+                port:
+                  number: 8001
+            path: /
+            pathType: ImplementationSpecific
 status:
   loadBalancer:
     ingress:
-    - ip: 1.1.1.1
+      - ip: 1.1.1.1

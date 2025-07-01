@@ -2,7 +2,7 @@
 ---
 mysql:
   lookup:
-    name: yakirdb
+    name: myname
     password: 123pwd
-    user: yakir
+    user: myuser
     host: localhost

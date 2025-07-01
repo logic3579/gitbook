@@ -1,6 +1,7 @@
 # Database
 
 ## clickhouse
+
 ```bash
 # client
 clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123
@@ -14,6 +15,7 @@ curl -X POST -u "user:pwd123" "http://clickhouse.com:8123" --data-binary "insert
 ```
 
 ## elasticsearch
+
 ```bash
 # all restful api
 curl http://localhost:9200/_cat
@@ -91,7 +93,7 @@ curl http://localhost:9200/_template/my-index-template -X PUT -H 'Content-Type: 
 		"index.lifecycle.rollover_alias": "my-index-alias"
 	}
 	"mappings": {}
-}' 
+}'
 # query template
 curl http://localhost:9200/_template/my-index-template
 
@@ -158,6 +160,7 @@ curl -X POST http://localhost:9200/_license/start_basic?acknowledge=true
 ```
 
 ## mongodb
+
 ```bash
 # connect
 # mongosh "mongodb://<username>:<password>@<host>:<port>/<database>"
@@ -165,13 +168,14 @@ mongosh "mongodb://<host>:<port>" --username root
 
 # usage
 use mydb
-db.myCollection.insertOne({ name: "yakir", age: 333 })
+db.myCollection.insertOne({ name: "xxx", age: 333 })
 db.myCollection.find()
-db.myCollection.updateOne({ name: "yakir" }, { $set: { age: 555 } })
-db.myCollection.deleteOne({ name: "yakir" })
+db.myCollection.updateOne({ name: "xxx" }, { $set: { age: 555 } })
+db.myCollection.deleteOne({ name: "xxx" })
 ```
 
 ## mysql
+
 ```bash
 # init reset password
 mysql -u root -p
@@ -179,7 +183,7 @@ mysql -u root --skip-password
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'root-password';
 
 # create database with character
-CREATE DATABASE yakir_test DEFAULT CHARACTER SET utf8mb4 COLLATE utf8_general_ci;
+CREATE DATABASE mydatabase DEFAULT CHARACTER SET utf8mb4 COLLATE utf8_general_ci;
 
 # create account and grant
 use mysql
@@ -192,15 +196,16 @@ FLUSH PRIVILEGES;
 ```
 
 ## postgres
+
 ```bash
 # login
 psql -U user [-d database]
 
 # create user,database and grant privileges
-CREATE USER yakirtest WITH PASSWORD 'yakirtest';
-CREATE DATABASE yakirtest OWNER yakirtest;
-GRANT ALL PRIVILEGES ON DATABASE yakirtest TO yakirtest;
-GRANT ALL PRIVILEGES ON all tables in schema public TO yakirtest;
+CREATE USER myuser WITH PASSWORD 'mypassword';
+CREATE DATABASE mydatabase OWNER myuser;
+GRANT ALL PRIVILEGES ON DATABASE mydatabase TO myuser;
+GRANT ALL PRIVILEGES ON all tables in schema public TO mydatabase;
 
 # select all database
 \l
@@ -221,6 +226,7 @@ select * from pg_tables;
 ```
 
 ## redis
+
 ```bash
 # common
 # redis-cli [-h host] [-p port] [-a password] [-c]
@@ -251,6 +257,7 @@ redis-cli --cluster rebalance 127.0.0.1:7001
 ```
 
 ## tidb
+
 ```bash
 tiup
 ```

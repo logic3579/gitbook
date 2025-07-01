@@ -15,7 +15,7 @@ xpack.security.transport.ssl.enabled: false
 path.data: /opt/elasticsearch/data/
 path.logs: /opt/elasticsearch/logs/
 # 集群名称，同一集群必须相同
-cluster.name: yakir-es-cluster
+cluster.name: es-cluster
 # 节点名称，不同节点使用不同名称
 node.name: node-1
 # 节点角色
@@ -47,3 +47,4 @@ cluster.initial_master_nodes: ["node-1", "node-2", "node-3"]
 # node.data: true
 
 ```
+

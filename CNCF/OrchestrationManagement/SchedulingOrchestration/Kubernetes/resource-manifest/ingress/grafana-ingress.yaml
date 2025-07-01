@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: grafana.yakir.top
+  - host: grafana.example.com
     http:
       paths:
       - backend:

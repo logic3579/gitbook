@@ -54,7 +54,7 @@ cat ./values.yaml
 config: |-
   broker.id=0
   listeners=INTERNAL://:9093,CLIENT://:9092
-  advertised.listeners=INTERNAL://yakir-kafka-0.yakir-kafka-headless.default.svc.cluster.local:9093,CLIENT://yakir-kafka-0.yakir-kafka-headless.default.svc.cluster.local:9092
+  advertised.listeners=INTERNAL://kafka-0.kafka-headless.default.svc.cluster.local:9093,CLIENT://kafka-0.kafka-headless.default.svc.cluster.local:9092
   listener.security.protocol.map=INTERNAL:PLAINTEXT,CLIENT:PLAINTEXT
   num.network.threads=5
   num.io.threads=10
@@ -73,7 +73,7 @@ config: |-
   log.retention.bytes=1073741824
   log.segment.bytes=1073741824
   log.retention.check.interval.ms=300000
-  zookeeper.connect=yakir-kafka-zookeeper
+  zookeeper.connect=test-kafka-zookeeper
   zookeeper.connection.timeout.ms=6000
   group.initial.rebalance.delay.ms=0
   allow.everyone.if.no.acl.found=true
@@ -112,12 +112,12 @@ zookeeper:
 
 
 # 部署与验证
-helm install yakir-kafka .
+helm install kafka .
 # 验证部署状态，查看是否为正常 Running 状态
 kubectl get pod
 NAME                                  READY   STATUS    RESTARTS       AGE
-yakir-kafka-0                         1/1     Running   0              171m
-yakir-kafka-zookeeper-0               1/1     Running   6 (168m ago)   10d
+kafka-0                         1/1     Running   0              171m
+kafka-zookeeper-0               1/1     Running   6 (168m ago)   10d
 ```
 
 ##### elasticsearch
@@ -358,9 +358,9 @@ class KConsumer(object):
 
 if __name__ == '__main__':
     # env，中间件配置信息
-    topic = 'yakirtopic'
-    bootstrap_servers = 'yakir-kafka-headless:9092'
-    group_id = 'yakir111.group'
+    topic = 'test_topic'
+    bootstrap_servers = 'kafka-headless:9092'
+    group_id = 'test.group'
     auto_offset_reset = 'earliest'
     enable_auto_commit = False
 
@@ -401,7 +401,7 @@ CMD ["python", "get_events.py"]
 
 ```bash
 # 编译源码打包镜像步骤
-cd /opt/yakir/kube-eventer-py/ && mkdir APP-META
+cd /app/kube-eventer-py/ && mkdir APP-META
 rm -f APP-META/*.py && cp *.py APP-META/
 
 cd APP-META && build -t kube-eventer-telegrambot:latest .
@@ -411,21 +411,21 @@ cat > kube-eventer-telegrambot.yaml << "EOF"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: yakir-kube-eventer
+  name: kube-eventer
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: yakir-kube-eventer
+      app: kube-eventer
   template:
     metadata:
       labels:
-        app: yakir-kube-eventer
+        app: kube-eventer
     spec:
       containers:
         - image: kube-eventer-telegrambot:latest
-          name: yakir-kube-eventer
+          name: kube-eventer
           env:
           - name: TZ
             value: "Asia/Shanghai"
@@ -441,7 +441,7 @@ EOF
 kubectl apply -f kube-eventer-telegrambot.yaml
 kubectl get pod
 NAME                                  READY   STATUS    RESTARTS        AGE
-yakir-kube-eventer-589bf867bc-tgs5l   1/1     Running   0               27
+kube-eventer-589bf867bc-tgs5l   1/1     Running   0               27
 ```
 
 - 事件消息接收验证

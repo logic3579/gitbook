@@ -5,11 +5,13 @@ description: Vault
 # Vault
 
 ## Introduction
+
 ...
 
-
 ## Deploy With Binary
+
 ### Quick Start
+
 ```bash
 # download and decompress
 mkdir -p /opt/vault/bin /opt/vault/data /opt/vault/tls
@@ -23,7 +25,9 @@ export PATH=$PATH:/opt/vault/bin
 ```
 
 ### Config and Boot
+
 #### Config
+
 ```bash
 # start server
 # option1: start dev
@@ -60,11 +64,12 @@ vault operator unseal
 vault operator unseal
 export VAULT_TOKEN="xxx.xxx"
 
-# verify 
+# verify
 vault status
 ```
 
 ### How To Use
+
 ```bash
 # kv secret
 vault kv put -mount=secret kvpath foo=bar
@@ -77,7 +82,7 @@ vault kv metadata delete -mount=secret kvpath
 
 # secrets engines
 vault secrets list
-vault secrets enable -path=kv -description='yakirtest' kv 
+vault secrets enable -path=kv -description='here is description' kv
 vault kv put -mount=kv mykvpath password="1q@w#E"
 vault kv list -mount=kv
 vault kv get -mount=kv [--field=foo] [-version=1] [-format=json] mykvpath
@@ -91,7 +96,7 @@ vault secrets enable -path=aws aws
 # Authentication
 vault token create
 export VAULT_TOKEN="xxx.xxxx"
-vault token login 
+vault token login
 vault token revoke $VAULT_TOKEN
 # github organization
 vault auth enable github
@@ -121,7 +126,9 @@ vault kv put -mount=secret creds password="my-long-password"
 ```
 
 ## Deploy With Container
+
 ### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add hashicorp https://helm.releases.hashicorp.com
@@ -137,7 +144,7 @@ vim values.yaml
 helm -n provisioning install vault .
 ```
 
-
 > Reference:
+>
 > 1. [Official Website](https://developer.hashicorp.com/vault/docs?product_intent=vault)
 > 2. [Repository](https://github.com/hashicorp/vault)

@@ -108,11 +108,11 @@ ip link set tun0 up
 # select namespace list
 ip netns list
 # add netns(in /var/run/netns/)
-ip netns add net-yakir1
+ip netns add net-test1
 # exec in netns
-ip netns exec net-yakir1 ip addr
-# ip netns exec ns1 /bin/bash --rcfile <(echo "PS1=\"namespace net-yakir1> \"")
-ip netns exec net-yakir1 ip link set lo up
+ip netns exec net-test1 ip addr
+# ip netns exec ns1 /bin/bash --rcfile <(echo "PS1=\"namespace net-test1> \"")
+ip netns exec net-test1 ip link set lo up
 
 # veth pair
 # execute in host

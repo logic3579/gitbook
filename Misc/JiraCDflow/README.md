@@ -94,7 +94,7 @@ tail -f logs/uwsgi.log   # console 输出
 # POST 请求：接收自动发包系统 request data，符合升级数据格式触发升级操作。升级数据格式如下：
 {
     "project": "AC",
-    "summary": "yakir_test",
+    "summary": "Daily task xxx",
     "issue_type": "升级",
     "env": "UAT",
     "upgrade_type": "日常排版需求",
@@ -310,7 +310,7 @@ services:
 # 修改 jira tomcat 配置（解决 nginx 代理 http 访问异常问题）
 vim ./jira/conf/server.xml   # connector 标签中添加配置
         <Connector port="8080"
-                   proxyName="jira.yakir.top"
+                   proxyName="jira.example.com"
                    proxyPort="80"
     />
 
@@ -374,4 +374,4 @@ QC webhook：project = QC and issuetype in (升级) and status in (SQL待执行,
 
 > Reference:
 >
-> 1. [Repository](https://github.com/yakir3/jiracdflow.git)
+> 1. [Repository](https://github.com/logic3579/jiracdflow.git)

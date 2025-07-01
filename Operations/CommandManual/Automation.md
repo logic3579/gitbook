@@ -141,7 +141,7 @@ https://ansible.leops.cn/basic/Variables/#_4
   vars:
     app_path: "{{ base_path }}/22"
 # 2. fact
-- name: yakir test
+- name: example
   hosts: test
   tasks:
     - name: debug test
@@ -434,10 +434,10 @@ nodegroups:
 salt -N FRONTEND test.ping
 
 # compound
-salt -C 'G@roles:apps or I@myname:yakir' test.ping
+salt -C 'G@roles:apps or I@myname:logic' test.ping
 
 # pillar
-salt -I 'myname:yakir' test.ping
+salt -I 'myname:logic' test.ping
 
 # CIDR
 salt -S '192.168.1.0/24' test.ping
@@ -623,9 +623,9 @@ salt '*' pillar.item mysql
 # pillar_roots
 tee > /srv/salt/pillar/mypillar.sls << "EOF"
 {% if grains['fqdn'] == 'node1' %}
-myname: yakir
+myname: xxx
 {% elif grains['fqdn'] == 'node2' %}
-myname: andy
+myname: yyy
 {% endif %}
 port: 80
 EOF
@@ -668,4 +668,3 @@ EOF
 
 salt '*' state.sls tmp.init
 ```
-

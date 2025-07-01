@@ -8,6 +8,7 @@ description: Golang training
 ## 1. Development Environment
 
 ### Install
+
 ```bash
 # Download and Install
 # https://go.dev/doc/install
@@ -20,6 +21,7 @@ description: Golang training
 ```
 
 ### Goland
+
 ```bash
 # active
 cat ./ideaActive/ja-netfilter-all/ja-netfilter/readme.txt
@@ -38,7 +40,6 @@ go mod tidy
 
 go mod vendor
 ```
-
 
 ## 3. Training
 
@@ -70,6 +71,7 @@ func main() {
 ```
 
 #### Constants
+
 ```go
 type ByteSize float64
 
@@ -108,6 +110,7 @@ func (b ByteSize) String() string {
 ```
 
 #### Variables
+
 ```go
 // option1
 var (
@@ -125,6 +128,7 @@ _, _ = call_function()
 ```
 
 #### Operator
+
 ```go
 // arithmetic
 +
@@ -159,7 +163,6 @@ x &= 1
 x ^= 1
 x |= 1
 ```
-
 
 #### Printing and Formatting
 
@@ -203,6 +206,7 @@ fmt.Printf("name:%s age:%d married:%t", name, age, married)
 ```
 
 #### package
+
 ```go
 // import multiple package
 import (
@@ -232,6 +236,7 @@ go mod verify          // add missing and remove unused modules
 ### Data type
 
 #### bool
+
 ```go
 var b1 = true
 var b2 = false
@@ -239,6 +244,7 @@ fmt.Println(reflect.TypeOf(b1), reflect.TypeOf(b2))
 ```
 
 #### float
+
 ```go
 var f1 float32 = 3.1234567890123456789
 f1 = 2e10
@@ -250,8 +256,9 @@ fmt.Println(f2, reflect.TypeOf(f2))
 ```
 
 #### int
+
 ```go
-/*  
+/*
     int8	-128~127
     uint8	0~255
     int16	-32768~32767
@@ -271,8 +278,9 @@ fmt.Printf("%x \n", i)  // a
 ```
 
 #### string
+
 ```go
-/*  
+/*
     \r	回车符（返回行首）
     \n	换行符（直接跳到下一行的同列位置）
     \t	制表符
@@ -332,6 +340,7 @@ fmt.Println(b4, reflect.TypeOf(b4))
 ```
 
 #### pointer
+
 ```go
 /*
     &  address character,return address
@@ -362,8 +371,8 @@ fmt.Println(p)
 fmt.Println(*p)
 ```
 
-
 #### array
+
 ```go
 // example
 var arr = [3]int8{1,2,3}
@@ -389,16 +398,17 @@ for k,v := range names {
 ```
 
 #### slice
+
 ```go
 /*
 type Slice struct {
       Data uintptr   // 指针，指向底层数组中切片指定的开始位置
       Len int        // 长度，即切片的长度
-      Cap int        // 最大长度（容量），也就是切片开始位置到数组的最后位置的长度 
+      Cap int        // 最大长度（容量），也就是切片开始位置到数组的最后位置的长度
 }
 */
 // option1: from array
-var arr = [5]int{10, 11, 12, 13, 14} 
+var arr = [5]int{10, 11, 12, 13, 14}
 sa := arr[1:2]
 
 // option2: declare variable, not allocated memory
@@ -482,21 +492,22 @@ fmt.Println(s4)
 ```
 
 #### map
+
 ```go
 /*
-type hmap struct { 
-    count     int // 当前 map 中元素数量 
-    flags     uint8 
-    B         uint8  // 当前 buckets 数量，2^B 等于 buckets 个数 
-    noverflow uint16 // approximate number of overflow buckets; see incrnoverflow for details 
-    hash0     uint32 // 哈希种子 
+type hmap struct {
+    count     int // 当前 map 中元素数量
+    flags     uint8
+    B         uint8  // 当前 buckets 数量，2^B 等于 buckets 个数
+    noverflow uint16 // approximate number of overflow buckets; see incrnoverflow for details
+    hash0     uint32 // 哈希种子
 
-    buckets    unsafe.Pointer // buckets 数组指针 
-    oldbuckets unsafe.Pointer // 扩容时保存之前 buckets 数据。 
-    nevacuate  uintptr        // progress counter for evacuation (buckets less than this have been evacuated) 
+    buckets    unsafe.Pointer // buckets 数组指针
+    oldbuckets unsafe.Pointer // 扩容时保存之前 buckets 数据。
+    nevacuate  uintptr        // progress counter for evacuation (buckets less than this have been evacuated)
 
-    extra *mapextra // optional fields 
-} 
+    extra *mapextra // optional fields
+}
 */
 // option1: declare
 var m map[string]string
@@ -508,7 +519,7 @@ m := make(map[string]string, 10)
 fmt.Println(m, len(m))
 
 
-// select 
+// select
 for k,v := range m {
     fmt.Println(k,v)
 }
@@ -519,6 +530,7 @@ delete(m, "name")
 ```
 
 #### struct
+
 ```go
 /*  alloc stack memory
 */
@@ -625,7 +637,7 @@ type Stu struct {
 }
 func main() {
 	// serialization
-	var stuStruct = Stu{Name: "yakir", Age: 33, Addr: Addr{Province: "gd", City: "sz"}}
+	var stuStruct = Stu{Name: "myname", Age: 33, Addr: Addr{Province: "gd", City: "sz"}}
 	jsonStuStruct, _ := json.Marshal(stuStruct)
 	fmt.Println(string(jsonStuStruct))
 	// deserialization
@@ -642,6 +654,7 @@ func main() {
 ```
 
 #### interface
+
 ```go
 /* Polymorphism
 type interfaceName interface {
@@ -735,6 +748,7 @@ func (d Dog) run(){}
 ```
 
 #### channel
+
 ```go
 /*  alloc heap memory
 type hchan struct {
@@ -839,7 +853,7 @@ func main() {
     i, ok = <-ch
     fmt.Println(i, ok) // 0 false
 
-    // loop 
+    // loop
     close(ch)
     for c := range ch {
         fmt.Println(c, len(ch))
@@ -998,10 +1012,10 @@ func main() {
 
 ```
 
-
 ### Control structures
 
 #### if
+
 ```go
 // if
 if true {
@@ -1027,6 +1041,7 @@ if score < 10 {
 ```
 
 #### switch
+
 ```go
 choice := "fff"
 switch choice {
@@ -1042,6 +1057,7 @@ switch choice {
 ```
 
 #### for
+
 ```go
 // option1
 count := 0
@@ -1073,6 +1089,7 @@ for k,v := range names {
 ### Functions
 
 #### Example
+
 ```go
 /*
 func FunctionName(p1 paramType, p2 paramType) (returnType, returnType) {
@@ -1105,8 +1122,9 @@ func calc(x, y int) (sum, sub int) {
 ```
 
 #### Pass-by-xxx
+
 ```go
-/* 
+/*
 Pass-by-value
     @int
     @string
@@ -1151,6 +1169,7 @@ func main() {
 ```
 
 #### anonymous function
+
 ```go
 func main() {
     var c = (func(x,y int) int {
@@ -1161,6 +1180,7 @@ func main() {
 ```
 
 #### higher-order function
+
 ```go
 // function parameter
 func add(x,y int) int {
@@ -1192,6 +1212,7 @@ func main() {
 ```
 
 #### closure
+
 ```go
 // example1
 func getCounter(f func()) func() {
@@ -1253,8 +1274,8 @@ func main() {
 }
 ```
 
-
 #### defer
+
 ```go
 // example: close open file socket
 fileObj, err:=os.Open("./t.txt")
@@ -1320,6 +1341,7 @@ func f4() (r int) {
 ```
 
 #### recursive function
+
 ```go
 /*
 递归特性:
@@ -1356,6 +1378,7 @@ func main() {
 ```
 
 #### init function
+
 ```go
 func init() {
     // init log
@@ -1381,6 +1404,7 @@ func main(){
 ### File IO
 
 #### character and byte
+
 ```go
 /*
     ASCII: 1byte = 1character
@@ -1433,6 +1457,7 @@ string(r1)
 ```
 
 #### Read/Write File
+
 ```go
 import (
     "bufio"
@@ -1506,6 +1531,7 @@ func main() {
 ```
 
 ### Network IO
+
 ```go
 /* Socket
 src ip
@@ -1670,6 +1696,7 @@ func main() {
 ```
 
 ### Concurrency
+
 ```go
 // Process
 // Thread
@@ -1681,14 +1708,14 @@ func main() {
 // scheduling and switching
 
 // thread model
-// M:1 
+// M:1
 // multiple user space thread -> one kernel thread
-// 
+//
 // 1:1
-// one user space thread -> one kernel thread 
+// one user space thread -> one kernel thread
 //
 // M:N
-// multiple user space thread -> multiple kernel thread 
+// multiple user space thread -> multiple kernel thread
 
 // goroutine example
 package main
@@ -1866,9 +1893,8 @@ SwapXxx()
 */
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://go.dev)
 > 2. [Repository](https://github.com/golang/go)
 > 3. [Go语言中文网](https://studygolang.com/dl)

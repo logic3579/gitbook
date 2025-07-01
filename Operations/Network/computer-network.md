@@ -32,7 +32,7 @@ description: Computer Network
 处理时延：包含排队时延（路由器存储转发，计算复杂）
 
 - 时延带宽积：传播时延 x 带宽<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/8a41a05d-3122-4a4f-9b0a-df8b28e7bd84)- 往返时间：单次双向信息交互的时间（RTT）
+![image](https://github.com/logic3579/gitbook/assets/30774576/8a41a05d-3122-4a4f-9b0a-df8b28e7bd84)- 往返时间：单次双向信息交互的时间（RTT）
 - 利用率（主干网ISP一般控制信道利用率不超过50%，超过网络时延迅速增大）
 
 信道利用率：表示某信道有百分之机的时间是被利用的（有数据通过）<br />网络利用率：全网络的信道利用率的加权平均
@@ -88,7 +88,7 @@ description: Computer Network
 - 应用层（解决通过应用进程的交互来实现特定网络应用问题）
    - 通过应用进程间交互来完成特定的网络应用
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/5e7b3b9d-962a-4d46-a400-54c6f09dabbf)
+![image](https://github.com/logic3579/gitbook/assets/30774576/5e7b3b9d-962a-4d46-a400-54c6f09dabbf)
 
 #### 专用术语
 
@@ -113,8 +113,8 @@ description: Computer Network
 - 多个SDU可以合成一个PDU；一个SDU也可划分为几个PDU
 
 时延与传播时长习题计算：<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/e62e4510-0689-4b1c-b86b-6873b0cf5f2a)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/3f1798fd-d4ea-4cc5-b460-516bf69c79a8)
+![image](https://github.com/logic3579/gitbook/assets/30774576/e62e4510-0689-4b1c-b86b-6873b0cf5f2a)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/3f1798fd-d4ea-4cc5-b460-516bf69c79a8)
 
 
 ## 二、TCP/IP 体系
@@ -153,35 +153,35 @@ description: Computer Network
 - 半双工：对讲机
 - 全双工：电话
 #### 编码与调制
-![image](https://github.com/yakir3/gitbook/assets/30774576/546a4b1e-84e8-4b8c-90b0-ac39c82e0de2)
+![image](https://github.com/logic3579/gitbook/assets/30774576/546a4b1e-84e8-4b8c-90b0-ac39c82e0de2)
 
 ### 数据链路层
-![image](https://github.com/yakir3/gitbook/assets/30774576/10477e15-8292-45ca-ab4f-46ae9b4d284f)
+![image](https://github.com/logic3579/gitbook/assets/30774576/10477e15-8292-45ca-ab4f-46ae9b4d284f)
 
 #### 封装成帧
 添加帧头与帧尾：MAC帧<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/ba44a080-de9f-4e5c-a2b5-26dbcd6849ce)
+![image](https://github.com/logic3579/gitbook/assets/30774576/ba44a080-de9f-4e5c-a2b5-26dbcd6849ce)
 
 #### 差错检测
 
 - 帧尾检错码
 - 奇偶校验
 - 循环冗余校验CRC
-![image](https://github.com/yakir3/gitbook/assets/30774576/89beee93-70b6-4b34-8901-b8c65ff978ed)
+![image](https://github.com/logic3579/gitbook/assets/30774576/89beee93-70b6-4b34-8901-b8c65ff978ed)
 
 #### 可靠传输
-![image](https://github.com/yakir3/gitbook/assets/30774576/7ad647e7-061c-4cce-b461-d6ec15b6142e)
+![image](https://github.com/logic3579/gitbook/assets/30774576/7ad647e7-061c-4cce-b461-d6ec15b6142e)
 
 - 停止等待协议SW
 - 回退N帧协议GBN
 - 选择重传协议SR
 
 #### 点对点协议PPP
-![image](https://github.com/yakir3/gitbook/assets/30774576/36d62332-24d2-4d71-b742-539fb2c31b37)
+![image](https://github.com/logic3579/gitbook/assets/30774576/36d62332-24d2-4d71-b742-539fb2c31b37)
 
 #### 媒体接入控制
-![image](https://github.com/yakir3/gitbook/assets/30774576/a291367b-8d85-4677-8671-df63444b28b1)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/e7e867c6-81b6-4f83-ad54-9b3b08efb713)
+![image](https://github.com/logic3579/gitbook/assets/30774576/a291367b-8d85-4677-8671-df63444b28b1)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/e7e867c6-81b6-4f83-ad54-9b3b08efb713)
 
 
 #### 随机接入
@@ -190,31 +190,31 @@ description: Computer Network
 - CSMA/CA协议
 
 #### MAC地址、IP地址以及ARP协议
-![image](https://github.com/yakir3/gitbook/assets/30774576/61f6a15f-d422-4834-8eff-9a75a6952ebc)
+![image](https://github.com/logic3579/gitbook/assets/30774576/61f6a15f-d422-4834-8eff-9a75a6952ebc)
 
 #### 集线器与交换机
-![image](https://github.com/yakir3/gitbook/assets/30774576/f68a7c75-b4a6-4bf1-aa85-5896b0c4827f)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/9261b6c1-48cc-4eb1-9e09-9f4f71e7ce35)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/adc06b14-704d-4aa9-83b1-289231b1cba1)
+![image](https://github.com/logic3579/gitbook/assets/30774576/f68a7c75-b4a6-4bf1-aa85-5896b0c4827f)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/9261b6c1-48cc-4eb1-9e09-9f4f71e7ce35)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/adc06b14-704d-4aa9-83b1-289231b1cba1)
 
 #### VLAN技术 
-![image](https://github.com/yakir3/gitbook/assets/30774576/edfb6a2f-3d77-437a-a9c9-6210a9ab0990)
+![image](https://github.com/logic3579/gitbook/assets/30774576/edfb6a2f-3d77-437a-a9c9-6210a9ab0990)
 
 
 ### 网络层
 #### 概述
-![image](https://github.com/yakir3/gitbook/assets/30774576/7f893777-ebf0-4f93-927b-314517bb72c5)
+![image](https://github.com/logic3579/gitbook/assets/30774576/7f893777-ebf0-4f93-927b-314517bb72c5)
 
 #### IPV4地址
 
 - 分类
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/79eef85b-b285-4f27-be93-8e46a9b2ec06)
+![image](https://github.com/logic3579/gitbook/assets/30774576/79eef85b-b285-4f27-be93-8e46a9b2ec06)
 
 - 子网划分（[子网掩码](https://www.bejson.com/convert/subnetmask/)）
 - 无分类编址的IPV4地址：CIDR。 如：192.168.10.1/20 的CIDR块为  -->  192.168.0~192.168.15
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/51b62709-cdf2-44fa-b520-6eb48aaa1a2e)
+![image](https://github.com/logic3579/gitbook/assets/30774576/51b62709-cdf2-44fa-b520-6eb48aaa1a2e)
 
 - 定长子网掩码FLSM和变长的子网掩码VLSM
 - IP数据报的发送和转发过程
@@ -224,55 +224,55 @@ description: Computer Network
 
 <br />
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/921977c6-3b1a-474f-b774-f82ccdcc7dba)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/c79a1e2a-27a7-4f5f-a318-22c768d567c6)
+![image](https://github.com/logic3579/gitbook/assets/30774576/921977c6-3b1a-474f-b774-f82ccdcc7dba)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/c79a1e2a-27a7-4f5f-a318-22c768d567c6)
 
 - 路由信息协议：RIP协议（基于距离向量）
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/4b1f9208-50a1-48e0-b263-26a0f2c21861)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/04c9f6bb-9f1e-4713-a3e5-ba139325302c)
+![image](https://github.com/logic3579/gitbook/assets/30774576/4b1f9208-50a1-48e0-b263-26a0f2c21861)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/04c9f6bb-9f1e-4713-a3e5-ba139325302c)
 
 - 路由信息协议：开放最短路径优先OSPF 基本工作原理（基于链路状态）
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/71ebe717-658c-4435-ba8a-5e068db53c2a)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/73121ecf-cf0c-43af-8bfa-0f14cc7ff7fb)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/568987a0-a9b6-47e5-bacd-6b591eeaa1d5)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/290e7b52-8b55-4f03-a51f-49fa66e576d1)
+![image](https://github.com/logic3579/gitbook/assets/30774576/71ebe717-658c-4435-ba8a-5e068db53c2a)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/73121ecf-cf0c-43af-8bfa-0f14cc7ff7fb)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/568987a0-a9b6-47e5-bacd-6b591eeaa1d5)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/290e7b52-8b55-4f03-a51f-49fa66e576d1)
 
 - 路由信息协议：边界网关协议BGP
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/66e3b7dd-70ba-4019-8e0c-46913df74743)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/670490a6-be77-4710-a691-bf19a26c4627)
+![image](https://github.com/logic3579/gitbook/assets/30774576/66e3b7dd-70ba-4019-8e0c-46913df74743)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/670490a6-be77-4710-a691-bf19a26c4627)
 
 
 - IPV4数据报首部格式
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/629de9ee-5714-40ed-9e25-1bb0843f00bd)
+![image](https://github.com/logic3579/gitbook/assets/30774576/629de9ee-5714-40ed-9e25-1bb0843f00bd)
 
 - 网际控制报文协议ICMP
    - 终点不可达、源点抑制、时间超过、参数问题、改变路由（重定向）
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/eba9619d-49b2-4b42-b4bb-0be497e01967)
+![image](https://github.com/logic3579/gitbook/assets/30774576/eba9619d-49b2-4b42-b4bb-0be497e01967)
 
    - ping、traceroute
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/0acd3c11-9212-4269-8853-122f395d6bb4)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/d50cdc96-a462-4180-ba56-b4ed610b5db9)
+![image](https://github.com/logic3579/gitbook/assets/30774576/0acd3c11-9212-4269-8853-122f395d6bb4)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/d50cdc96-a462-4180-ba56-b4ed610b5db9)
 
 
 - 虚拟专用网VPN与网络地址转换NAT
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/f306247d-08c1-4098-8d9e-5fc5695d7e8a)
+![image](https://github.com/logic3579/gitbook/assets/30774576/f306247d-08c1-4098-8d9e-5fc5695d7e8a)
 
 ### 传输层
 #### TCP 与UDP 对比
-![image](https://github.com/yakir3/gitbook/assets/30774576/3239b70d-f99d-4ad7-821c-cf518fb25350)
+![image](https://github.com/logic3579/gitbook/assets/30774576/3239b70d-f99d-4ad7-821c-cf518fb25350)
 
 #### TCP原理
 
 - 流量控制（滑动窗口）
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/6c6c9224-8d8b-450b-ba41-f26f6f9f878d)
+![image](https://github.com/logic3579/gitbook/assets/30774576/6c6c9224-8d8b-450b-ba41-f26f6f9f878d)
 
 - 拥塞控制
    - Tahoe 版本
@@ -282,23 +282,23 @@ description: Computer Network
       - 快重传（发送方尽快重传，非等待超时计时器）
       - 快恢复
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/74d00c42-8cfc-4a9d-8fc7-fc45f74174ec)<br />
-![image](https://github.com/yakir3/gitbook/assets/30774576/639cc3af-c445-410d-a1b6-28540a38e57f)
+![image](https://github.com/logic3579/gitbook/assets/30774576/74d00c42-8cfc-4a9d-8fc7-fc45f74174ec)<br />
+![image](https://github.com/logic3579/gitbook/assets/30774576/639cc3af-c445-410d-a1b6-28540a38e57f)
 
 
 - 超时重传选择（RTO 重传超时时间取值）
 - 可靠传输实现
 - 三次握手与四次断开
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/34a6973c-a399-45c8-982f-5d299373cd39)
+![image](https://github.com/logic3579/gitbook/assets/30774576/34a6973c-a399-45c8-982f-5d299373cd39)
 
 - 首部格式
 
-![image](https://github.com/yakir3/gitbook/assets/30774576/9661366f-fdee-47c2-aba5-166989aa88e1)
+![image](https://github.com/logic3579/gitbook/assets/30774576/9661366f-fdee-47c2-aba5-166989aa88e1)
 
 ### 应用层
 #### C/S方式与P2P方式
-![image](https://github.com/yakir3/gitbook/assets/30774576/ee7014ce-d516-4330-9521-509d870615d4)
+![image](https://github.com/logic3579/gitbook/assets/30774576/ee7014ce-d516-4330-9521-509d870615d4)
 
 #### DHCP、DNS、FTP、SMTP、HTTP 等协议
 

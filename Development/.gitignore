@@ -38,7 +38,7 @@ Python/**/**/*.py[cod]
 **/**/.cache
 
 
-# Yakir
+# Custom
 tmp/
 **/scripts/*.json
 **/scripts/*.log

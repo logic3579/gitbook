@@ -39,7 +39,7 @@ bin  lib  lib64
 docker run --rm -it --entrypoint sh hashicorp/terraform:latest
 
 # select container ip
-docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' yakir-test
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container
 
 # reverse checking Dockerfile content
 docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin/sh -c \#(nop) *##g" |tac
@@ -48,10 +48,10 @@ docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin
 docker commmit -m 'commit message' container_id repository/xxx/xxx:tag
 
 # build image
-docker build -t yakir/test:latest . -f Dockerfile
+docker build -t example/container:latest . -f Dockerfile
 
 # buildx plugin
-docker buildx build --platform linux/amd64,linux/arm64 -t yakir/test:latest . -f Dockerfile
+docker buildx build --platform linux/amd64,linux/arm64 -t example/container:latest . -f Dockerfile
 
 # compose plugin
 docker compose up -d
@@ -145,7 +145,7 @@ kubectl create secret tls my-secret-tls --dry-run=client \
     -oyaml | kubectl apply -f -
 # create a private image registry secret
 kubectl create secret docker-registry my-harbor \
-    --docker-server=harbor.yakir.top \
+    --docker-server=harbor.example.com \
     --docker-username='username' \
     --docker-password='password'
 # create deployment
@@ -291,7 +291,7 @@ kubectl kustomize ./ |kubectl apply -f -
 kubectl label nodes Node1 node-role.kubernetes.io/control-plane=true
 
 # annotate
-kubectl annotate pods yakir-tools key1=value1
+kubectl annotate pods test-pod key1=value1
 
 # completion
 source <(kubectl completion bash)

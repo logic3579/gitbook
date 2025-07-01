@@ -5,12 +5,15 @@ description: Argo Project
 # Argo Project
 
 ## Argo Workflows
+
 ### Introduction
+
 ...
 
-
 ### Deploy With Container
+
 #### Run by Resource
+
 ```bash
 # version
 ARGO_WORKFLOWS_VERSION=v3.5.10
@@ -21,8 +24,8 @@ kubectl create namespace argo
 kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/${ARGO_WORKFLOWS_VERSION}/install.yaml
 ```
 
-
 #### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add argo https://argoproj.github.io/argo-helm
@@ -41,16 +44,18 @@ helm -n cicd install argo-workflows .
 ```
 
 ### How To Use
+
 #### postinstallation
+
 ```bash
 # install cli latest version
 ARGO_WORKFLOWS_VERSION=v3.5.10
 curl -sLO https://github.com/argoproj/argo-workflows/releases/download/${ARGO_WORKFLOWS_VERSION}/argo-linux-amd64.gz
-gunzip argo-linux-amd64.gz 
+gunzip argo-linux-amd64.gz
 install -m 755 argo-linux-amd64 /usr/local/bin/argo && rm -f argo-linux-amd64
 
 
-# access argo-server 
+# access argo-server
 kubectl -n argo port-forward deployment/argo-server --address=0.0.0.0 2746:2746
 # kubectl -n argo apply -f argo-ingress.yaml
 
@@ -68,8 +73,9 @@ kubectl -n argo create rolebinding argo-cluster-role-default-binding --clusterro
 ```
 
 #### application
+
 ```bash
-# example 
+# example
 argo -n argo submit -w https://raw.githubusercontent.com/argoproj/argo-workflows/master/examples/hello-world.yaml
 argo -n argo list
 argo -n argo get @latest
@@ -77,15 +83,16 @@ argo -n argo get @latest
 # Steps | DAG | Artifacts etc..
 ```
 
-
 ## Argo CD
 
 ### Introduction
+
 ...
 
-
 ### Deploy With Container
+
 #### Run by Resource
+
 ```bash
 # version
 ARGO_CD_VERSION=v2.7.9
@@ -99,6 +106,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${
 ```
 
 #### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add argo https://argoproj.github.io/argo-helm
@@ -114,9 +122,10 @@ vim values.yaml
 helm -n cicd install argocd .
 ```
 
-
 ### How To Use
+
 #### argocd cli
+
 ```bash
 # install argocd cli latest version
 curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
@@ -141,9 +150,10 @@ argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSW
 ```
 
 #### applications in any namespace
+
 ```bash
 # Change workload startup parameters
-kubectl -n argocd patch configmaps argocd-cmd-params-cm --type='json' -p='[{"op": "add", "path": "/data", "value": {}}, {"op": "add", "path": "/data/application.namespaces", "value": "app-team-one, app-team-two"}]' 
+kubectl -n argocd patch configmaps argocd-cmd-params-cm --type='json' -p='[{"op": "add", "path": "/data", "value": {}}, {"op": "add", "path": "/data/application.namespaces", "value": "app-team-one, app-team-two"}]'
 kubectl -n argocd rollout restart deployment argocd-server
 kubectl -n argocd rollout restart statefulset argocd-application-controller
 
@@ -164,17 +174,18 @@ argocd app manifests foo/bar
 ```
 
 #### account management
+
 ```bash
 # create user in configmaps
-kubectl -n argocd patch configmaps argocd-cm --type='json' -p='[{"op": "add", "path": "/data", "value": {}},{"op": "add", "path": "/data/accounts.yakir", "value": "apiKey, login"}]'
+kubectl -n argocd patch configmaps argocd-cm --type='json' -p='[{"op": "add", "path": "/data", "value": {}},{"op": "add", "path": "/data/accounts.myuser", "value": "apiKey, login"}]'
 # create password in secrets
-argocd account update-password --account yakir
+argocd account update-password --account myuser
 
 
 # delete user in configmaps
-kubectl -n argocd patch configmaps argocd-cm --type='json' -p='[{"op": "remove", "path": "/data/accounts.yakir"}]'
+kubectl -n argocd patch configmaps argocd-cm --type='json' -p='[{"op": "remove", "path": "/data/accounts.myuser"}]'
 # delete password in secrets
-kubectl -n argocd patch secrets argocd-secret --type='json' -p='[{"op": "remove", "path": "/data/accounts.yakir.password"}]'
+kubectl -n argocd patch secrets argocd-secret --type='json' -p='[{"op": "remove", "path": "/data/accounts.myuser.password"}]'
 
 
 # get account infomation
@@ -192,20 +203,22 @@ kubectl -n argocd edit configmaps argocd-rbac-cm
 data:
   policy.csv: |
 	# p, somerole, applications, create, <project>/<namespace>/<application>, allow
-    p, yakir, *, *, *, allow
+    p, myuser, *, *, *, allow
 ```
 
 #### cluster management
+
 ```bash
 # get info
 argocd cluster list
 argocd cluster get <cluster_name>
 
 # create a cluster
-argocd cluster add 
+argocd cluster add
 ```
 
 #### appproj management
+
 ```bash
 # get info
 argocd proj list
@@ -233,6 +246,7 @@ EOF
 ```
 
 #### repository management
+
 ```bash
 # get info
 argocd repo list
@@ -249,6 +263,7 @@ argocd repocreds add https://gitlab.com/your_repo/argocd.git --username git --pa
 ```
 
 #### application management
+
 ```bash
 # get infomation
 argocd app list
@@ -299,16 +314,12 @@ argocd app sync <applications_name>
 argocd app set helm-guestbook -p service.type=LoadBalancer
 ```
 
-
 ## Argo Events
-
 
 ## Argo Rollouts
 
-
-
-
 > Reference:
+>
 > 1. [Official Website](https://argoproj.github.io/)
 > 2. [Argo Workflows](https://argoproj.github.io/workflows/)
 > 3. [Argo CD](https://github.com/argoproj/argo-cd/)

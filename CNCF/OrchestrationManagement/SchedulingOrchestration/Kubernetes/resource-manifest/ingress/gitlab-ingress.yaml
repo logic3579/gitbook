@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: gitlab.yakir.top
+  - host: gitlab.example.com
     http:
       paths:
       - backend:

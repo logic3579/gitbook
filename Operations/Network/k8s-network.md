@@ -13,19 +13,19 @@ description: Kubernetes Network
    - linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp/udp 包等
    - linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等
 
-![image](https://github.com/yakir3/knowledge/assets/30774576/f89d9f70-3f49-4e3f-8064-883fe640369e)
+![image](https://github.com/logic3579/knowledge/assets/30774576/f89d9f70-3f49-4e3f-8064-883fe640369e)
 > linux 不仅仅只有 network namespace 用来进行网络隔离，还有 pid namespace 用来隔离进程，user namespace 用来隔离用户，mount namespace 用来隔离挂载点，ipc namespace 用来隔离信号量和共享内存等，uts namespace 用来隔离主机名和域名。
 > 配合 cgroup 控制组，限制 cpu，memory，io 等资源。构成容器的底层实现
 
 - Linux Bridge Device
 
 linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一个内部虚拟二层交换机，可以进行二层数据包广播。但是注意的是linux bridge设备可以有自己的ip地址。也就是说，多个linux网络设备attach到一个bridge上，那么这些网络设备的ip地址将会失效(只有二层功能)，当一个设备收到数据包的时候，bridge会把数据包转发到其它所有attach到bridge上的从设备，从而实现广播的效果。
-![image](https://github.com/yakir3/knowledge/assets/30774576/2b75e484-bee6-40e4-b9ca-03120da295ec)
+![image](https://github.com/logic3579/knowledge/assets/30774576/2b75e484-bee6-40e4-b9ca-03120da295ec)
 
 - Linux Veth Device
 
 总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。
-![image](https://github.com/yakir3/knowledge/assets/30774576/4bcfafbb-f4db-4e31-912f-20a2416b74e9)
+![image](https://github.com/logic3579/knowledge/assets/30774576/4bcfafbb-f4db-4e31-912f-20a2416b74e9)
 
 ### b）k8s 集群容器网络通讯方式
 
@@ -62,20 +62,20 @@ node2 | 10.42.0.0/24
 - bridge 模式（默认）：--net=bridge
 
 宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机）
-![image](https://github.com/yakir3/knowledge/assets/30774576/d2e0e535-d529-41fb-9cc9-15089f832658)
+![image](https://github.com/logic3579/knowledge/assets/30774576/d2e0e535-d529-41fb-9cc9-15089f832658)
 > 自定义 bridge 网络：宿主机范围创建独立的 network namespace
-![image](https://github.com/yakir3/knowledge/assets/30774576/81c1548f-959d-4b7b-8272-4c67b307da23)
+![image](https://github.com/logic3579/knowledge/assets/30774576/81c1548f-959d-4b7b-8272-4c67b307da23)
 
 
 - host 模式：--net=host
 
 共享宿主机网络，容器暴露端口时占用宿主机端口。网络模式简单，性能较好，一般用于单容器服务。
-![image](https://github.com/yakir3/knowledge/assets/30774576/87eaedc3-215b-4eb5-b745-d5569fd8002a)
+![image](https://github.com/logic3579/knowledge/assets/30774576/87eaedc3-215b-4eb5-b745-d5569fd8002a)
 
 - contaniner 模式：--net=container:name or id
 
 指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace）。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信
-![image](https://github.com/yakir3/knowledge/assets/30774576/4c96e68b-3644-4e3e-8126-f354df90919f)
+![image](https://github.com/logic3579/knowledge/assets/30774576/4c96e68b-3644-4e3e-8126-f354df90919f)
 
 - none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络
 
@@ -86,7 +86,7 @@ node2 | 10.42.0.0/24
 - 每一个container对应一个veth pair设备，这个设备的一端在container的network namespace里，另一端attach到宿主networkwork namespace的docker0 linux bridge上。
 - 这样在宿主环境里，就好像有一个二层交换机(docker0 bridge)，把宿主内的所有container连接起来。所以，在宿主内的container都是可以直接相互访问的，而且是直连的方式
 
-![image](https://github.com/yakir3/knowledge/assets/30774576/59264cc0-f9f7-44ca-a448-78460c8370f1)
+![image](https://github.com/logic3579/knowledge/assets/30774576/59264cc0-f9f7-44ca-a448-78460c8370f1)
 
 ```bash
 ## 相关命令

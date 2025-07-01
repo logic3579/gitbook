@@ -5,11 +5,13 @@ description: Harbor
 # Harbor
 
 ## Introduction
+
 ...
 
-
 ## Deploy With Container
+
 ### Run in Docker
+
 ```bash
 # download offline or online installer and verify
 # configure HTTPS Access to Harbor
@@ -20,6 +22,7 @@ https://goharbor.io/docs/2.8.0/install-config/download-installer/
 ```
 
 ### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add harbor https://helm.goharbor.io
@@ -34,9 +37,9 @@ vim values.yaml
 expose:
   ingress:
     hosts:
-      core: harbor-core.yakir.top
-      notary: harbor-notary.yakir.top
-externalURL: https://harbor.yakir.top
+      core: harbor-core.example.com
+      notary: harbor-notary.example.com
+externalURL: https://harbor.example.com
 
 helm -n provisioning install harbor . --create-namespace
 
@@ -48,14 +51,12 @@ kubectl -n provisioning patch ingress harbor-ingress --patch '{"spec":{"ingressC
 kubectl -n provisioning get secrets harbor-core -ogo-template='{{.data.HARBOR_ADMIN_PASSWORD|base64decode}}'
 
 # access by https
-https://harbor-core.yakir.top
+https://harbor-core.example.com
 admin
 Harbor12345
 ```
 
-
-
-
 > Reference:
+>
 > 1. [Official Website](https://goharbor.io/docs/2.8.0/install-config/)
 > 2. [Repository](https://github.com/goharbor/harbor)

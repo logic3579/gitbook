@@ -3,7 +3,9 @@
 ## Install
 
 ### Nix package manager
+
 #### Linux
+
 ```bash
 # Install Nix via the recommended multi-user installation:
 sh <(curl -L https://nixos.org/nix/install) --daemon
@@ -13,6 +15,7 @@ sh <(curl -L https://nixos.org/nix/install) --no-daemon
 ```
 
 #### Docker
+
 ```bash
 # Start a Docker shell with Nix
 docker run -it nixos/nix
@@ -33,17 +36,20 @@ bash-5.2# nix run github:helix-editor/helix/master
 ```
 
 ### NixOS
+
 #### [1. Obtaining NixOS](https://nixos.org/download/#nixos-iso)
 
 #### 2. Manual Installation
+
 ##### Partitioning
+
 ```bash
 # UEFI(GPT)
 # Create a GPT partition table
 parted /dev/sda -- mklabel gpt
 # Add the boot partition.
 parted /dev/sda -- mkpart ESP fat32 1MB 512MB
-# Add the root partition. 
+# Add the root partition.
 parted /dev/sda -- mkpart root ext4 512MB 100%
 # NixOS by default uses the ESP (EFI system partition) as its /boot partition. It uses the initially reserved 512MiB at the start of the disk.
 parted /dev/sda -- set 1 esp on
@@ -60,6 +66,7 @@ parted /dev/sda -- mkpart primary linux-swap -2GB 100%
 ![[/Operations/System/attachements/Pasted image 20240321172907.png]]
 
 ##### Formatting
+
 ```bash
 # Format
 mkfs.fat -F 32 -n boot /dev/sda1
@@ -83,6 +90,7 @@ mkfs.fat -F 32 -n boot /dev/sda3
 ```
 
 ##### Installing
+
 ```bash
 # Mount the target file system on which NixOS should be installed on /mnt, e.g.
 mount /dev/sda2/ /mnt
@@ -110,18 +118,18 @@ cat >> /mnt/etc/nixos/configuration.nix << "EOF"
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "yakir-nixos"; # Define your hostname.
+  networking.hostName = "logic-nixos"; # Define your hostname.
 
   # Set your time zone.
   time.timeZone = "Asia/Shanghai";
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.yakir = {
+  users.users.logic = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     openssh.authorizedKeys.keys = [
       # replace with your own public key
-      "ssh-rsa <public-key> yakir@nixos"
+      "ssh-rsa <public-key> logic@nixos"
     ];
     packages = with pkgs; [
       tree
@@ -130,7 +138,7 @@ cat >> /mnt/etc/nixos/configuration.nix << "EOF"
 
   # Enable experimental-features Flakes and nix-command
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -163,6 +171,7 @@ nixos-install
 ```
 
 #### 3. Upgrading
+
 ```bash
 # switch channel
 nix-channel --list
@@ -176,7 +185,9 @@ nixos-rebuild switch --upgrade
 ```
 
 ## NixCommand
-### nixos-rebuild 
+
+### nixos-rebuild
+
 ```bash
 # build new configuration and try to realise the configuration in the running system
 nixos-rebuild switch
@@ -201,15 +212,17 @@ nixos-rebuild switch --rollback
 ```
 
 ### nix-channel
+
 ```bash
 # list
 nix-channel list
 
-# add new 
+# add new
 nix-channel --add https://channels.nixos.org/channel-name nixos
 ```
 
 ### nix-shell
+
 ```bash
 # nodejs env
 bash-5.2# nix-shell -p nodejs
@@ -220,7 +233,7 @@ cat > /default.nix << "EOF"
 { pkgs ? import <nixpkgs> {}
 }:
 pkgs.mkShell {
-  name = "yakir-test";
+  name = "logic-test";
   buildInputs = [
     pkgs.nodejs
   ];
@@ -234,10 +247,11 @@ bash-5.2# nix-shell
 ```
 
 ### nix-build
+
 ```bash
 # create normal redis nix file
 cat > ./docker-redis.nix << "EOF"
-{ pkgs ? import <nixpkgs> { system = "x86_64-linux";} 
+{ pkgs ? import <nixpkgs> { system = "x86_64-linux";}
 }:
 pkgs.dockerTools.buildLayeredImage {
   name = "nix-redis";
@@ -253,7 +267,7 @@ docker images
 
 # create redis-minimal.nix
 cat > ./redis-minimal.nix << "EOF"
-{ pkgs ? import <nixpkgs> {} 
+{ pkgs ? import <nixpkgs> {}
 }:
 pkgs.redis.overrideAttrs (old: {
   makeFlags = old.makeFlags ++ ["USE_SYSTEMD=no"];
@@ -268,7 +282,7 @@ pkgs.redis.overrideAttrs (old: {
 EOF
 # create minimal redis nix file
 cat > ./docker-redis.nix << "EOF"
-{ pkgs ? import <nixpkgs> { system = "x86_64-linux";} 
+{ pkgs ? import <nixpkgs> { system = "x86_64-linux";}
 }:
 let
   redisMinimal = import ./redis-minimal.nix { inherit pkgs; };
@@ -286,8 +300,11 @@ docker images
 ```
 
 ## Flakes
+
 ### nix flake
+
 #### enable experimental features
+
 ```bash
 cat /etc/nixos/configuration.nix
 { config, pkgs, inputs, ... }:
@@ -305,6 +322,7 @@ cat /etc/nixos/configuration.nix
 ```
 
 #### init flake.nix
+
 ```bash
 # show flakes templates
 nix flake show templates
@@ -326,7 +344,7 @@ cat > /etc/nixos/flake.nix << "EOF"
   };
 
   outputs = { self, nixpkgs, ... }@inputs: {
-    nixosConfigurations.yakir-nixos = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.logic-nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ./configuration.nix
@@ -368,11 +386,12 @@ nix flake update
 # or only update home-manager
 nix flake lock --update-input home-manager
 
-	# 
+	#
 sudo nixos-rebuild switch --flake .
 ```
 
 ### nix-command
+
 ```bash
 # nix-channel
 # no need
@@ -398,6 +417,7 @@ nix repl
 ```
 
 ### home-manager
+
 ```bash
 # init home.nix
 cat > /etc/nixos/home.nix << "EOF"
@@ -405,8 +425,8 @@ cat > /etc/nixos/home.nix << "EOF"
 
 {
   # user infomation
-  home.username = "yakir";
-  home.homeDirectory = "/home/yakir";
+  home.username = "logic";
+  home.homeDirectory = "/home/logic";
 
   # 直接将当前文件夹的配置文件，链接到 Home 目录下的指定位置
   # home.file.".config/i3/wallpaper.jpg".source = ./wallpaper.jpg;
@@ -491,8 +511,8 @@ cat > /etc/nixos/home.nix << "EOF"
   # git 相关配置
   programs.git = {
     enable = true;
-    userName = "Yakir";
-    userEmail = "yakir1995@outlook.com";
+    userName = "Logic";
+    userEmail = "logic3579@duck.com";
   };
 
   # 启用 starship，这是一个漂亮的 shell 提示符
@@ -561,7 +581,7 @@ vim /etc/nixos/flake.nix
 
   outputs = inputs@{ nixpkgs, home-manager, ... }: {
     nixosConfigurations = {
-      yakir-nixos = nixpkgs.lib.nixosSystem {
+      logic-nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
@@ -571,7 +591,7 @@ vim /etc/nixos/flake.nix
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.yakir = import ./home.nix;
+            home-manager.users.logic = import ./home.nix;
           }
         ];
       };
@@ -594,10 +614,11 @@ nixos-rebuild switch
 # 在 flake.nix 中被 home-manager 作为用户的配置导入，包含了用户的所有 Home Manager 配置，负责管理其 Home 文件夹
 /etc/nixos/home.nix
 # hardware configuration
-/etc/nixos/hardware-configuration.nix  
+/etc/nixos/hardware-configuration.nix
 ```
 
 ### module imports
+
 ```bash
 # example
 tree /etc/nixos
@@ -665,9 +686,8 @@ lib.mkBefore
 lib.mkAfter
 ```
 
-
-
 > Reference:
+>
 > 1. [NixOS Official Manual](https://nixos.org/manual/nix/stable/language/)
 > 2. [NixOS 与 Flakes](https://nixos-and-flakes.thiscute.world/)
 > 3. [NixOS 中文文档](https://nixos-cn.org/tutorials/lang/)
