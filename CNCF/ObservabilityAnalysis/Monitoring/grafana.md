@@ -158,19 +158,24 @@ helm -n monitorning install grafana .
 #
 ```
 
-### Middleware
+### Database & Middleware
 
 ```bash
-# kafka
+# Mysql
+7362
+# IOPS metrics
+sum(irate(mysql_global_status_innodb_data_reads[5m])) by instance + sum(irate(mysql_global_status_innodb_data_writes[5m])) by instance
+
+# Kafka
 7589
 
-# redis
+# Redis
 # single
 11835
 # cluster
 763
 
-# rocketmq
+# RocketMQ
 10477
 ```
 
