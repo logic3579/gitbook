@@ -5,6 +5,7 @@ description: Google Computer Engine
 # Computer Engine
 
 ## how to add a storage disk
+
 ```bash
 # 1. add new disk to VM instances
 #operate in console
@@ -25,6 +26,7 @@ mount -a
 ```
 
 ## expand disk capacity
+
 ```bash
 # option1: expand the original disk
 # get original disk name and pvresize
@@ -43,10 +45,14 @@ pvcreate /dev/sdc
 # get vg name and add new pv to vg group
 vgs
 vgextend vg_name /dev/sdc
-# get lv name and extend 
+# get lv name and extend
 lvdisplay
 lvextend -l +100%free /dev/vg_name/lv_name
 # reidentify filesystem size
 resize2fs /dev/vg_name/lv_name
 xfs_growfs /dev/vg_name/lv_name
 ```
+
+> Reference:
+>
+> 1. [Official Website](https://cloud.google.com/compute/docs)

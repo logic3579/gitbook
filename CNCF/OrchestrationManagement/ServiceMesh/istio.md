@@ -9,6 +9,7 @@ description: Istio
 ### Resource
 
 #### ServiceEntry
+
 ```yaml
 # cat serviceentry.yaml
 apiVersion: networking.istio.io/v1
@@ -17,11 +18,11 @@ metadata:
   name: svc-entry
 spec:
   hosts:
-  - ext-svc.example.com
+    - ext-svc.example.com
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
+    - number: 443
+      name: https
+      protocol: HTTPS
   location: MESH_EXTERNAL
   resolution: DNS
 
@@ -40,6 +41,7 @@ spec:
 ```
 
 #### Sidecar
+
 ```yaml
 # cat sidecar.yaml
 apiVersion: networking.istio.io/v1
@@ -49,43 +51,45 @@ metadata:
   namespace: bookinfo
 spec:
   egress:
-  - hosts:
-    - "./*"
-    - "istio-system/*"
+    - hosts:
+        - "./*"
+        - "istio-system/*"
 ```
 
 #### Gateway
+
 ```yaml
 # cat gateway.yaml
 apiVersion: networking.istio.io/v1
 kind: Gateway
 metadata:
-  name: ext-host-gwy
+  name: ext-host-gw
   namespace: istio-system
 spec:
   selector:
     app: my-ingressgateway
   servers:
-  - hosts:
-    - '*.example.com'
-    port:
-      name: http
-      number: 80
-      protocol: HTTP
-    tls:
-      httpsRedirect: false
-  - hosts:
-    - '*.example.com'
-    port:
-      name: https
-      number: 443
-      protocol: HTTPS
-    tls:
-      credentialName: ext-host-cert
-	  mode: SIMPLE
+    - hosts:
+        - "*.example.com"
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+      tls:
+        httpsRedirect: false
+    - hosts:
+        - "*.example.com"
+      port:
+        name: https
+        number: 443
+        protocol: HTTPS
+      tls:
+        credentialName: ext-host-cert
+        mode: SIMPLE
 ```
 
 #### VirtualService
+
 ```yaml
 # cat virtualservice.yaml
 apiVersion: networking.istio.io/v1
@@ -99,9 +103,7 @@ metadata:
 spec:
   # Gateway
   gateways:
-  - istio-system/ext-host-gwy
-
-
+  - istio-system/ext-host-gw
   # TCPRoute
   hosts:
   - mongo.prod.svc.cluster.local
@@ -113,8 +115,6 @@ spec:
         host: mongo.backup.svc.cluster.local
         port:
           number: 5555
-
-
   # HTTPMatchRoute
   hosts:
   - book.example.com
@@ -145,7 +145,9 @@ spec:
   - route:
     - destination:
         host: default-service.istio-system.svc.cluster.local
-        
+        port:
+          number: 8080
+
 
   # HTTPRouteDestination
   hosts:
@@ -165,6 +167,7 @@ spec:
 ```
 
 #### DestinationRule
+
 ```yaml
 # cat destinationrule.yaml
 apiVersion: networking.istio.io/v1
@@ -177,25 +180,26 @@ spec:
     loadBalancer:
       simple: RANDOM
   subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
-    trafficPolicy:
-      loadBalancer:
-        simple: ROUND_ROBIN
-  - name: v3
-    labels:
-      version: v3
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+    - name: v3
+      labels:
+        version: v3
 ```
-
 
 ## Deploy By Container
 
 ### Sidecar Mode
-####  Install by istioctl
+
+#### Install by istioctl
+
 ```bash
 # Download istioctl
 curl -L https://istio.io/downloadIstio | sh -
@@ -227,24 +231,27 @@ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.1.0"
 ```
 
 #### Install by helm
+
 ```bash
-# add and update repo
+# Add and update repo
 helm repo add istio https://istio-release.storage.googleapis.com/charts
 helm repo update
 kubectl create namespace istio-system
 
-# install istio-base CRD
+# Install istio-base CRD
 helm install istio-base istio/base -n istio-system
 
-# install istiod
+# Install istiod
 helm install istiod istio/istiod -n istio-system --wait
 
-# option: install gateway
+# Install gateway
 kubectl create namespace istio-ingress
-helm install istio-ingress istio/gateway -n istio-ingress --wait
+helm install istio-ingress-internal istio/gateway -n istio-ingress --wait -f values-internal.yaml
+helm install istio-ingress-external istio/gateway -n istio-ingress --wait -f values-external.yaml
 ```
 
 #### Deploy application
+
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.23/samples/bookinfo/platform/kube/bookinfo.yaml
 kubectl get pods,services
@@ -252,6 +259,7 @@ kubectl exec "$(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.
 ```
 
 #### Outside traffic and access
+
 ```bash
 # install Gateway
 kubectl apply -f samples/bookinfo/gateway-api/bookinfo-gateway.yaml
@@ -266,11 +274,13 @@ kubectl get virtualservice xxx -oyaml
 ```
 
 ### Ambient Mode
+
 ```bash
+#
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://istio.io/)
 > 2. [Repository](https://github.com/istio/istio)
+> 3. [GKE service-load-balancer-parameters](https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters)

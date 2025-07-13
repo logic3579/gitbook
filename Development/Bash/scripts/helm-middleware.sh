@@ -27,14 +27,14 @@ set -o pipefail
 ###   # Show help infomation
 ###   ./helm-middleware.sh -h
 ###
-###   # List all middleware package in test1 namespace
-###   ./helm-middleware.sh -n test1 list
+###   # List all middleware package in test namespace
+###   ./helm-middleware.sh -n dev list
 ###
-###   # Install kafka to uat1 namespace
-###   ./helm-middleware.sh -n uat1 install kafka
+###   # Install kafka to test namespace
+###   ./helm-middleware.sh -n test install kafka
 ###
-###   # Uninstalled redis-cluster in uat2 namespace
-###   ./helm-middleware.sh -n uat2 uninstall rocketmq
+###   # Uninstalled redis-cluster in uat namespace
+###   ./helm-middleware.sh -n uat uninstall rocketmq
 ###
 function show_help() {
   perl -ne 'print if s/^### ?//' "$0" || \
@@ -60,9 +60,9 @@ function die_exit() {
 
 # global environment
 namespaces=(
-    "test1"
-    "uat1"
-    "uat2"
+    "dev"
+    "test"
+    "uat"
 )
 actions=(
     "list"
