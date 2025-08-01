@@ -131,7 +131,7 @@ helm update
 vim values.yaml
 deploymentMode: SimpleScalable  # single-binary, simple-scalable, distributed(microservices)
 loki:
-  tenants: []
+  auth_enabled: false
   server:
     http_listen_port: 3100
     grpc_listen_port: 9095
@@ -157,16 +157,16 @@ loki:
     retention_period: 30d
   storage:
     bucketNames:
-      chunks: loki-chunks-bucket
-      # ruler: FIXME
-      # admin: FIXME
+      chunks: loki-chunks
+      ruler: loki-ruler
+      admin: loki-admin
     type: s3 # s3, gcs, filesystem etc..
     s3:
       s3: null
       endpoint: "oss-ap-southeast-1.aliyuncs.com"
-      region: "ap-southeast-1"
-      accessKeyId: "xxx"
-      secretAccessKey: "xxx"
+      region: "your_region"
+      accessKeyId: "access_key"
+      secretAccessKey: "secret_key"
       signatureVersion: null
       s3ForcePathStyle: false
       insecure: false
@@ -181,6 +181,8 @@ loki:
     #   chunks_directory: /var/loki/chunks
     #   rules_directory: /var/loki/rules
     #   admin_api_directory: /var/loki/admin
+    object_store:
+      type: s3
   schemaConfig:
     configs:
       - from: 2024-04-01
@@ -238,14 +240,20 @@ networkPolicy:
 gateway:
   enabled: true
   replicas: 3
+  nodeSelector:
+    tier: middleware
 ingress:
   enabled: false
 singleBinary:
   replicas: 0
 write:
   replicas: 3
+  nodeSelector:
+    tier: middleware
 read:
   replicas: 3
+  nodeSelector:
+    tier: middleware
 backend:
   replicas: 3
   resources:
@@ -259,6 +267,8 @@ backend:
       volumeClaimsEnabled: true
       size: 100Gi
       storageClass: premium-rwo
+  nodeSelector:
+    tier: middleware
 ingester:
   replicas: 0
 distributor:
@@ -282,6 +292,8 @@ bloomBuilder:
 ruler:
   enabled: false
   replicas: 0
+memcached:
+  enabled: true
 resultsCache:
   enabled: true
   defaultValidity: 12h
@@ -290,16 +302,20 @@ resultsCache:
   writebackSizeLimit: 500MB
   writebackBuffer: 500000
   writebackParallelism: 5
+  nodeSelector:
+    tier: middleware
 chunksCache:
   enabled: true
   batchSize: 4
   parallelism: 5
   timeout: 2000ms
-  defaultValidity: 12h
+  defaultValidity: 0s
   replicas: 1
   writebackSizeLimit: 500MB
   writebackBuffer: 500000
   writebackParallelism: 5
+  nodeSelector:
+    tier: middleware
 minio:
   enabled: false
 
