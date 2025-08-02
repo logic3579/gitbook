@@ -2,67 +2,89 @@
 description: interview
 ---
 
-# interview
+# Interview
 
-## Network
+## CICD
 
-### CDN
+### Argo
 
-```text
-内容分发网络，其目的是通过限制的 internet 中增加一层新的网络架构。将网站的内容发布到最接近用户的网络边缘，使用户可以就近取得所需的内容，提高用户访问网站的响应速度。
+### Ansible
 
-静态文件加速缓存, 动态请求加速.
-```
-
-### DNS
-
-- 递归查询与迭代查询
+- 常用模块
 
 ```text
-递归查询(本地 DNS 服务器使用的方式)
-如果主机所询问的本地域名服务器不知道被查询的域名的 IP 地址，那么本地 DNS 服务器就以 DNS 客户的身份，向其它根域名服务器继续发出 DNS 请求报文(即替主机继续查询)，而不是让主机自己进行下一步查询。因此，递归查询返回的查询结果或者是所要查询的 IP 地址，或者是报错，表示无法查询到所需的 IP 地址。
-
-迭代查询:
-当根域名服务器收到本地 DNS 服务器发出的迭代 DNS 查询请求报文时，要么给出所要查询的 IP 地址，要么告诉本地 DNS 服务器: “你下一步应当向哪一个域名服务器进行查询”。然后让本地 DNS 服务器进行后续的查询。根域名服务器通常是把自己知道的顶级域名服务器的 IP 地址告诉本地 DNS 服务器，让本地 DNS 服务器再向顶级域名服务器查询。顶级域名服务器在收到本地 DNS 服务器的查询请求后，要么给出所要查询的 IP 地址，要么告诉本地 DNS 服务器下一步应当向哪一个权威域名服务器进行查询。最后，知道了所要解析的 IP 地址或报错，然后把这个结果返回给发起查询的主机.
+面试题: 常见的ansible模块？
+command | shell
+copy
+file
+package
+ping
+service
+template
+unarchive
+user
+group
 ```
 
-- DNS 解析过程
+### Saltstack
 
 ```text
-1. 本地缓存.
-2. 本地 hosts 文件.
-3. 本地设置的 DNS 服务器(/etc/resolve.conf) .
-4. ISPDNS 检查是否有缓存,有则返回, 无则向配置文件设置的13台 root 根服务器随机请求
+server client 结构
+ssh
 
-客户端访问 www.baidu.com 这个域名时，会先查看本地是否有缓存，如无缓存会去查看本地hosts文件是否有相关信息，如果没有，则会去向设置的dns服务器: ISPDNS 如223.6.6.6，ISPDNS会检查是否有缓存，有则返回结果。无则会向配置文件中设置的13台根服务器的其中一台发送请求。根服务器拿到请求后，查看是com.这级域下的，就会返回com.的ns记录。
-ISPDNS向com中的服务器再次发起请求，com域的服务器发现你这请求是baidu.com这个域的，查看到发现了这个域的NS，则会返回给NS记录给ISPDNS
-ISPDNS收到信息后去向baidu.com,查到自己下面有个www的主机，则会返回结果到ISPDNS。
-ISPDNS收到消息后，会在本地保存一份，再将结果返回给客户端。客户端根据结果中解析出来的主机ip再去请求访问。
+zeromq 轻量级队列
 ```
 
-### LVS
-
-- 调度算法
+### Helm
 
 ```text
-静态算法:
-RR: 轮询算法
-WRR: 加权轮询
-SH: 源 IP 地址 hash,将来自同一个 IP 地址的请求发送给第一次选择的 RS。实现会话绑定。
-DH: 目标地址 hash，第一次做轮询调度，后续将访问同一个目标地址的请求，发送给第一次
-挑中的 RS。适用于正向代理缓存中
-
-动态算法:
-LC: least connection 将新的请求发送给当前连接数最小的服务器。
-WLC: 默认调度算法。加权最小连接算法
-SED: 初始连接高权重优先,只检查活动连接,而不考虑非活动连接
-NQ: Never Queue，第一轮均匀分配，后续SED
-LBLC: Locality-Based LC，动态的DH算法
-LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均衡问题，从负载重的复制
-到负载轻的RS,,实现Web Cache等
+helm-charts
 ```
 
-## Database
+### Jenkins
+
+```text
+SSH Plugin
+Kubernetes Plugin
+```
+
+### Terraform
+
+```text
+AWS
+GCP
+```
+
+## Database & Streaming
+
+### Elasticsearch
+
+```text
+
+```
+
+### MySQL
+
+- 主从复制
+
+```text
+1. 主节点必须启用 mysql binlog 二进制日志，记录任何修改了数据库数据的事件。
+2. 从节点开启一个线程(I/O Thread)把自己扮演成 mysql 的客户端，通过 mysql 协议，请求主节点的二进制日志文件中的事件
+3. 主节点启动一个线程(dump Thread)，检查自己二进制日志中的事件，跟对方请求的位置对比，如果不带请求位置参数，则主节点就会从第一个日志文件中的第一个事件一个一个发送给从节点。
+4. 从节点接收到主节点发送过来的数据把它放置到中继日志（Relay log）文件中。并记录该次请求到主节点的具体哪一个二进制日志文件内部的哪一个位置（主节点中的二进制文件会有多个，在后面详细讲解）。
+5. 从节点启动另外一个线程（sql Thread ），把 Relay log 中的事件读取出来，并在本地再执行一次。
+```
+
+- 日志类型
+
+```text
+错误日志: 记录报错或警告信息
+查询日志: 记录所有对数据请求的信息，不论这些请求是否得到正确的执行。
+慢查询日志: 设置阕值，将查询时间超过该值的查询语句。
+二进制日志: 记录对数据库执行更改得所有操作
+中继日志
+事务日志
+```
 
 ### Redis
 
@@ -100,12 +122,12 @@ LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均�
 - 数据淘汰机制
 
 ```text
-1.volatile-lru     从已设置过期时间的数据集中挑选最近最少使用的数据淘汰
-2.volatile-ttl     从已设置过期时间的数据集中挑选将要过期的数据淘汰
-3.volatile-random  从已设置过期时间的数据集中任意选择数据淘汰
-4.allkeys-lru      从所有数据集中挑选最近最少使用的数据淘汰
-5.allkeys-random   从所有数据集中任意选择数据进行淘汰
-6.noeviction       禁止驱逐数据
+1. volatile-lru     从已设置过期时间的数据集中挑选最近最少使用的数据淘汰
+2. volatile-ttl     从已设置过期时间的数据集中挑选将要过期的数据淘汰
+3. volatile-random  从已设置过期时间的数据集中任意选择数据淘汰
+4. allkeys-lru      从所有数据集中挑选最近最少使用的数据淘汰
+5. allkeys-random   从所有数据集中任意选择数据进行淘汰
+6. noeviction       禁止驱逐数据
 ```
 
 - 缓存穿透, 缓存击穿, 缓存雪崩
@@ -136,65 +158,31 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 解决了 rdb 的弊端，但 aof 的持久化会随着时间的推移数量越来越多，会占用很大空间。
 ```
 
-### MySQL
-
-- 主从复制
-
-```text
-1. 主节点必须启用 mysql binlog 二进制日志，记录任何修改了数据库数据的事件。
-2. 从节点开启一个线程(I/O Thread)把自己扮演成 mysql 的客户端，通过 mysql 协议，请求主节点的二进制日志文件中的事件
-3. 主节点启动一个线程(dump Thread)，检查自己二进制日志中的事件，跟对方请求的位置对比，如果不带请求位置参数，则主节点就会从第一个日志文件中的第一个事件一个一个发送给从节点。
-4. 从节点接收到主节点发送过来的数据把它放置到中继日志（Relay log）文件中。并记录该次请求到主节点的具体哪一个二进制日志文件内部的哪一个位置（主节点中的二进制文件会有多个，在后面详细讲解）。
-5. 从节点启动另外一个线程（sql Thread ），把 Relay log 中的事件读取出来，并在本地再执行一次。
-```
-
-- 日志类型
-
-```text
-错误日志: 记录报错或警告信息
-查询日志: 记录所有对数据请求的信息，不论这些请求是否得到正确的执行。
-慢查询日志: 设置阕值，将查询时间超过该值的查询语句。
-二进制日志: 记录对数据库执行更改得所有操作
-中继日志
-事务日志
-```
-
-## CICD
-
-### Ansible
-
-- 常用模块
-
-```text
-面试题: 常见的ansible模块？
-command | shell
-copy
-file
-package
-ping
-service
-template
-unarchive
-user
-group
-```
-
-### Saltstack
-
-```text
-server client 结构
-ssh
-
-zeromq 轻量级队列
-```
-
-### Jenkins
+### Kafka
 
 ```text
 
 ```
 
-## Monitoring
+### RocketMQ
+
+```text
+
+```
+
+## Observability
+
+### Fluentd
+
+```text
+
+```
+
+### Loki
+
+```text
+
+```
 
 ### Grafana
 
@@ -240,43 +228,12 @@ zabbix-proxy
 自定义模板，需要新增图形。
 ```
 
-## Web
+## ServiceProxy
 
-### Tomcat
-
-- 特点
+### HAProxy
 
 ```text
-Tomcat是一个 JSP/Servlet 容器。其作为 Servlet 容器，有三种工作模式: 独立的 Servlet 容器、进程内的 Servlet 容器和进程外的 Servlet 容器。
 
-进入 Tomcat 的请求可以根据 Tomcat 的工作模式分为如下两类:
-1. Tomcat 作为应用程序服务器: 请求来自于前端的 web 服务器，这可能是 Apache, IIS, Nginx 等；
-2. Tomcat 作为独立服务器: 请求来自于 web 浏览器；
-```
-
-- 运行模式
-
-```text
-1. bio tomcat7 以下默认模式
-阻塞式I/O操作，此模式，每一个请求都要创建一个线程，线程开销较大，不能处理高并发的场景。通常最多处理几百个并发，效率低，不常用。
-
-2. nio tomcat8以上默认采用 nio
-niop是内置的模式，是一个基于缓冲区、并能提供非阻塞I/O操作的Java API，它拥有比传统I/O操作(bio)更好的并发运行性能
-
-3. apr 从操作系统级别解决异步 IO 问题，大幅度的提高服务器的处理和响应性能, 也是 Tomcat 运行高并发应用的首选模式。用这种模式稍微麻烦一些，需要安装一些依赖库。
-```
-
-- 优化
-
-```text
-toncat自身优化
-1、connector 方式选择 nio 或者 apr,默认 bio 支持并发性能低
-2、配置文件线程池开启更多线程, 200线程
-
-JVM（java虚拟机）内存优化
-设置最大堆内存
-设置新生代比例参数
-设置新生代与老年代优化参数
 ```
 
 ### Nginx
@@ -316,12 +273,88 @@ redirect :  返回302临时重定向，地址栏会显示跳转后的地址
 permanent :  返回301永久重定向，地址栏会显示跳转后的地址
 ```
 
-## Docker
+## Network & System
 
-- 简述
+### CDN
 
 ```text
-Docker 一个容器化平台，它以容器的方式将应用程序和其所有依赖打包在一起，以确保应用程序在任何环境都能无缝运行。
+内容分发网络，其目的是通过限制的 internet 中增加一层新的网络架构。将网站的内容发布到最接近用户的网络边缘，使用户可以就近取得所需的内容，提高用户访问网站的响应速度。
+
+静态文件加速缓存, 动态请求加速.
+```
+
+### DNS
+
+- 递归查询与迭代查询
+
+```text
+递归查询(通常为客户端)
+1. 客户端向本地 DNS 服务器（通常为 ISP DNS 或8.8.8.8）发起递归 DNS 查询报文请求。
+2. 本地 DNS 服务器有缓存则立即返回，没有缓存则负责代替客户端向根域名服务器、顶级域名服务器（如.com）、权威服务器逐级查询。
+3. 本地 DNS 服务器将最终 IP 或错误信息返回客户端。
+
+迭代查询(通常为本地 DNS 服务器)
+1. DNS 服务器（本地 DNS 服务器）向根域名服务器发起迭代 DNS 查询报文请求。
+2. 根域名服务器返回顶级域名服务器（如.com）的地址。
+3. 本地 DNS 服务器再向顶级域名服务器查询，得到权威域名服务器的地址。
+4. 本地 DNS 服务器继续向权威域名服务器查询，最终获取目标域名的 IP 地址。
+5. 每一步查询都由发起查询的 DNS 服务器自己完成，而不是将任务完全交给其他服务器。
+```
+
+- 访问域名过程
+
+```text
+客户端访问 www.example.com 时
+1. 检查浏览器自身的 DNS 缓存（域名与 IP 映射,有 TTL），没有缓存则下一步。
+2. 调用操作系统 DNS 解析接口，检查本地操作系统 DNS 缓存（ipconfig /displaydns 或 nscd 命令），没有缓存则下一步。
+3. 检查本地 hosts 文件是否存在域名与 IP 映射，没有则下一步。
+4. 客户端向本地 DNS 服务器发起递归 DNS 查询请求（ISP DNS 或公共 DNS），没有缓存则下一步。
+5. 本地 DNS 服务器向根域名服务器、顶级域名服务器、权威 DNS 服务器发起迭代 DNS 查询请求，返回 IP 或错误信息。
+
+> 5.1 查询根域名服务器：向根域名服务器查询 www.example.com 信息，根域名返回顶级域名（.com TLD 服务器）的 IP 地址。
+> 5.2 查询顶级域名服务器：本地 DNS 服务器向 .com TLD 服务器查询，询问 example.com 的权威 DNS 服务器地址（ns1.example.com）的 IP 地址。
+> 5.3 查询权威域名服务器：本地 DNS 服务器向 example.com 的权威 DNS 服务器查询 www.example.com 的记录。权威服务器返回 www.example.com 对应的 A 记录或 CNAME 记录。
+> 5.4 如果返回的是 CNAME 记录（如 www.example.com 指向 cdn.example.com），本地DNS服务器会重复上述过程，解析 CNAME 指向的域名，直到获取最终 IP 地址（A 记录）。
+```
+
+### LVS
+
+- 调度算法
+
+```text
+静态算法:
+RR: 轮询算法
+WRR: 加权轮询
+SH: 源 IP 地址 hash,将来自同一个 IP 地址的请求发送给第一次选择的 RS。实现会话绑定。
+DH: 目标地址 hash，第一次做轮询调度，后续将访问同一个目标地址的请求，发送给第一次
+挑中的 RS。适用于正向代理缓存中
+
+动态算法:
+LC: least connection 将新的请求发送给当前连接数最小的服务器。
+WLC: 默认调度算法。加权最小连接算法
+SED: 初始连接高权重优先,只检查活动连接,而不考虑非活动连接
+NQ: Never Queue，第一轮均匀分配，后续SED
+LBLC: Locality-Based LC，动态的DH算法
+LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均衡问题，从负载重的复制
+到负载轻的RS,,实现Web Cache等
+```
+
+## Docker & Containerd
+
+- Docker 简述
+
+```text
+Docker 是一个完整的容器平台，提供了从容器创建、管理到编排的整套工具链。
+
+核心组件与架构：
+1. Docker CLI 与用户交互
+2. Docker Daemon（dockerd）后台进程，负责管理容器、镜像、网络、存储等，包含 API 服务器。
+3. Containerd：Docker 的默认容器运行时，负责底层容器操作（如创建、启动容器）。
+4. runc：轻量级容器运行时，基于 OCI（Open Container Initiative）标准，containerd 使用 runc 执行实际容器进程。
+5. 其他组件：如 Docker Compose（多容器编排）、Docker Swarm（集群管理）、Docker Hub（镜像仓库）。
+
+与 Kubernetes 关系：
+早期 Kubernetes 使用 Docker 作为默认运行时，但需要 dockershim 适配 CRI。Kubernetes 自 1.20 起弃用 dockershim，推荐 containerd 或 CRI-O
 ```
 
 - 容器隔离实现原理
@@ -333,172 +366,281 @@ Docker 一个容器化平台，它以容器的方式将应用程序和其所有�
 ```text
 Docker Enginer 使用了 namespace 对全区操作系统资源进行了抽象，对于命名空间内的进程来说，他们拥有独立的资源实例，在命名空间内部的进程是可以实现资源可见的。
 
-Dcoker Enginer中使用的 NameSpace:
-1. UTS nameSpace        提供主机名隔离能力
-UTS namespace（UNIX Timesharing System 包含了运行内核的名称、版本、底层体系结构类型等信息）用于系统标识，其中包含了 hostname 和域名  domainname ，它使得一个容器拥有属于自己 hostname 标识，这个主机名标识独立于宿主机系统和其上的其他容器。
-
-1. User nameSpace       提供用户隔离能力
-User Namespace 允许在各个宿主机的各个容器空间内创建相同的用户名以及相同的用户 UID 和 GID，只是会把用户的作用范围限制在每个容器内，即 A 容器和 B 容器可以有相同的用户名称和 ID 的账户，但是此用户的有效范围仅是当前容器内，不能访问另外一个容器内的文件系统，即相互隔离、互不影响、永不相见。
-
-1. Net nameSpace        提供网络隔离能力
-每一个容器都类似于虚拟机一样有自己的网卡、监听端口、TCP/IP 协议栈等, Docker 使用 network namespace 启动一个 vethX 接口，这样你的容器将拥有它自己的桥接 ip 地址，通常是 docker0，而 docker0 实质就是 Linux 的虚拟网桥,网桥是在 OSI 七层模型的数据链路层的网络设备，通过 mac 地址对网络进行划分，并且在不同网络直接传递数据。
-
-1. IPC nameSpace        提供进程间通信的隔离能力
-一个容器内的进程间通信，允许一个容器内的不同进程的(内存、缓存等)数据访问，但是不能跨容器访问其他容器的数据。
-
-1. Mnt nameSpace        提供磁盘挂载点和文件系统的隔离能力
-每个容器都要有独立的根文件系统有独立的用户空间，以实现在容器里面启动服
-务并且使用容器的运行环境，即一个宿主机是 ubuntu 的服务器，可以在里面启
-动一个 centos 运行环境的容器并且在容器里面启动一个 Nginx 服务，此 Nginx 运
-行时使用的运行环境就是 centos 系统目录的运行环境，但是在容器里面是不能
-访问宿主机的资源，宿主机是使用了 chroot 技术把容器锁定到一个指定的运行
-目录里面。
-
-1. Pid nameSpace        提供进程隔离能力
-Linux 系统中，有一个 PID 为 1 的进程(init/systemd)是其他所有进程的父进程，那么在每个容器内也要有一个父进程来管理其下属的子进程，那么多个容器的进程通 PID namespace 进程隔离(比如 PID 编号重复、器内的主进程生成与回收子进程等)。
+Dcoker Enginer 中使用的 NameSpace:
+UTS nameSpace        提供主机名隔离能力
+User nameSpace       提供用户隔离能力
+Net nameSpace        提供网络隔离能力
+IPC nameSpace        提供进程间通信的隔离能力
+Mount nameSpace      提供磁盘挂载点和文件系统的隔离能力
+Pid nameSpace        提供进程隔离能力
 ```
 
-- 网络模型
+- Docker 网络模型
 
 ```text
-1. host
-启动 host 模式，Docker 不会为这个容器分配 NetWork NaneSpace，容器不会虚拟出自己的网卡，而是使用宿主机的 IP 和端口
-
-2. container
-这个模式指定新创建的容器和已经存在的一个容器共享一个 Network Namespace，而不是和宿主机共享。新创建的容器不会创建自己的网卡，配置自己的 IP，而是和一个指定的容器共享 IP、端口范围等。同样，两个容器除了网络方面，其他的如文件系统、进程列表等还是隔离的。两个容器的进程可以通过 lo 网卡设备通信。
-
-3. none
-在这种模式下，Docker容器拥有自己的 Network Namespace，但是，并不为 Docker容器进行任何网络配置。也就是说，这个 Docker 容器没有网卡、IP、路由等信息。需要我们自己为 Docker 容器添加网卡、配置IP等。
-
-4.bridge
-默认模式,此模式会为每一个容器分配 Network Namespace、设置 IP 等，并将一个主机上的 Docker 容器连接到一个虚拟网桥上。下面着重介绍一下此模式。
+1. host：共享主机
+2. container：容器间共享网络（Network Namespace）
+3. none：独立 Network Namespace，但无网络配置
+4.bridge：桥接模式，独立 Network Namespace 设置 IP 并连接到虚拟网桥。
 ```
 
-- Dockerfile
+- Dockershim 工作机制
 
 ```text
-FROM 应用基础镜像
+架构：
+1. Kubernetes 的 Kubelet 通过 CRI 接口与 dockershim 通信。
+2. Dockershim 将 CRI 请求（如创建、启动、停止容器）转换为 Docker API 调用，发送给 dockerd。
+3. Dockerd 再通过 containerd 调用 runc 执行底层容器操作。
+4. 进程链：Kubelet(CRI) → dockershim → dockerd → containerd → containerd-shim → runc → 容器进程。
 
-COPY 将宿主机的文件拷贝到容器内
+流程：
+1. Kubelet 发起 CRI 请求：例如，创建 Pod 中的容器。
+2. Dockershim 转换请求：将 CRI 请求翻译为 Docker API 调用（如 docker create、docker start）。
+3. Dockerd 处理：Docker daemon 调用 containerd 执行容器操作。
+4. Containerd 和 runc：containerd 通过 containerd-shim 调用 runc，创建并运行容器。
+5. 返回结果：容器状态通过相反路径返回给 Kubelet。
+```
 
-ADD 将宿主机的文件拷贝到容器内 具有解压功能
+- Containerd 简述
 
-RUN 执行shell命令
+```text
+Containerd 是一个轻量级的容器运行时（container runtime），专注于管理和运行容器，强调简单、高效和模块化。供上层工具（Docker、Kubernetes 的 kubelet 等）调用。
 
-CMD 运行容器内进程为为1的命令
+核心组件与架构：
+1. Containerd Daemon：核心进程，提供 gRPC API，管理容器生命周期、镜像、快照、网络等。
+2. runc：containerd 调用 runc 执行 OCI 标准规范容器，处理底层容器运行。
+3. Shim：containerd 使用 shim 进程隔离容器进程，确保 containerd 主进程不直接管理容器运行。
+4. Plugins：containerd 采用模块化设计，功能（如存储、网络）通过插件实现，易于扩展。
+
+与 Kubernetes 关系：
+直接支持 CRI（Container Runtime Interface），是 Kubernetes 的首选运行时。
+```
+
+- Containerd-shim 工作机制
+
+```text
+架构：
+1. Containerd 是一个独立的高层容器运行时，负责镜像管理、存储、网络等。
+2. 每个容器对应一个 containerd-shim 进程，containerd-shim 调用 runc（或其他 OCI 运行时）执行容器。
+3. 进程链：containerd → containerd-shim → runc → 容器进程。
+4. 在 Kubernetes 中：Kubelet → CRI (containerd) → containerd-shim → runc → 容器进程。
+
+流程：
+1. Containerd 接收请求：通过 gRPC API（如 CRI 或 Docker 调用）接收容器操作请求。
+2. 启动 Containerd-shim：Containerd 启动一个 containerd-shim 进程，传递 OCI 包（bundle）路径，包含 config.json 和根文件系统。Shim 进程调用 runc 的 create 命令，创建容器进程（runc 初始化后退出）。
+3. 管理容器生命周期：Shim 进程作为容器进程的父进程，保持标准 I/O（stdin/stdout/stderr）打开，处理日志输出（如 docker logs）；Shim 监控容器退出状态，报告给 containerd；支持附加操作（如 docker exec、kubectl attach）和伪终端（PTY）管理。
+4. 隔离与容错：Shim 进程隔离 containerd 主进程，containerd 重启或崩溃不影响运行中的容器。Shim 保持运行直到容器退出，收集退出状态后终止。
+
+验证：
+ctr image pull docker.io/library/nginx:latest
+ctr run -d docker.io/library/nginx:latest nginx
+# containerd 启动 containerd-shim-runc-v2，调用 runc 创建容器
+ps aux | grep containerd-shim
+```
+
+- CRI-O 简述
+
+```text
+CRI-O 是一个轻量级的容器运行时，专为 Kubernetes 开发，用于直接与 Kubernetes 的 CRI 接口交互，管理容器生命周期（创建、启动、停止、删除等）、镜像和存储。它基于 OCI（Open Container Initiative）标准，使用 runc 或其他 OCI 兼容运行时执行容器。
+
+核心组件与架构：
+1. CRI-O Daemon：
+核心进程，运行在主机上，通过 gRPC 提供 CRI 接口，与 Kubernetes 的 Kubelet 交互。负责协调镜像管理、存储、网络和容器生命周期。
+2. OCI 运行时：
+CRI-O 使用 runc（默认）或其他 OCI 兼容运行时（如 Kata Containers）来执行容器。runc 负责创建容器进程，基于 OCI 包（bundle，包含 config.json 和根文件系统）。
+3. CNI 插件：
+CRI-O 使用 CNI 插件（如 flannel、Calico）配置容器网络，支持桥接、overlay 等网络模型。
+4. Storage 驱动：
+支持 overlayfs、devicemapper 等存储驱动，管理容器镜像和文件系统快照。
+5. Conmon：
+CRI-O 的一个轻量级监控工具，类似于 containerd 的 containerd-shim。每个容器对应一个 conmon 进程，负责管理容器进程的生命周期、标准 I/O（stdin/stdout/stderr）、日志收集和退出状态。
+6. Image and Storage Libraries：
+使用 containers/storage 管理镜像和存储层。使用 containers/image 处理镜像拉取和分发，支持 Docker 和 OCI 镜像格式。
+```
+
+- CRI-O 工作机制
+
+```text
+1. Kubelet 发起 CRI 请求：
+Kubernetes 的 Kubelet 根据 Pod 定义（如 YAML 文件）向 CRI-O 发送 CRI 请求（如 RunPodSandbox、CreateContainer）。
+请求通过 gRPC 传递，包含 Pod 和容器的配置信息。
+
+2. Pod 沙箱（Sandbox）创建：
+CRI-O 首先为 Pod 创建一个“沙箱”（Pod Sandbox），即 Pod 的运行环境。
+调用 CNI 插件配置网络（如分配 IP、设置网络命名空间）。
+创建一个 pause 容器（基础设施容器），用于维持 Pod 的网络和命名空间。
+
+3. 镜像拉取：
+CRI-O 使用 containers/image 从镜像仓库（如 Docker Hub、Quay.io）拉取所需镜像。
+镜像存储在本地，使用 containers/storage 管理，支持多层缓存。
+
+4. 容器创建和启动：
+CRI-O 生成 OCI 包（bundle），包含 config.json（OCI 运行时规范）和容器根文件系统。
+调用 runc（或指定 OCI 运行时）创建容器进程。
+为每个容器启动一个 conmon 进程，负责监控容器进程状态、转发标准 I/O（如 kubectl logs）、处理附加操作（如 kubectl exec）、收集退出状态。
+
+5. 容器运行和监控：
+Conmon 作为容器进程的父进程，保持运行以支持日志收集和状态监控。
+CRI-O daemon 通过 gRPC 返回容器状态给 Kubelet（如运行中、已退出）。
+支持动态操作，如停止、删除容器或更新配置。
+
+6. 清理和销毁：
+Pod 或容器删除时，CRI-O 调用 CNI 清理网络，释放资源。
+删除容器文件系统和相关元数据。
+
+进程链：
+Kubelet(CRI) → CRI-O daemon → conmon → runc → 容器进程
+
+验证：
+crictl pull docker.io/library/nginx:latest
+crictl runp pod-config.json # 创建 Pod 沙箱
+crictl create <pod-id> container-config.json pod-config.json
+crictl start <container-id>
+crictl ps
 ```
 
 ## Kubernetes
 
-### 概念
+### 简述
 
 ```text
-Pod是kubernetes创建或部署的最小/最简单的基本单位，一个Pod代表集群上正在运行的一个进程。
+Kubernetes 是一个开源的容器编排平台，用于自动化管理、部署、扩展和运行容器化应用程序。Kubernetes 通过将应用程序打包到容器中（如 Docker 容器），并在集群中协调这些容器的运行，提供高效、弹性的分布式系统管理。
 
-一个 Pod 封装一个应用容器（也可以有多个容器），存储资源、一个独立的网络IP以及管理控制容器运行方式的策略选项。Pod 代表部署的一个单位: kubernetes 中单个应用的实例，它可以由单个容器或多个容器共享组成的资源。
+Kubernetes 的核心功能包括：
+容器编排：自动部署、扩展和管理容器化应用。
+服务发现和负载均衡：内置服务发现机制，自动分配流量到容器。
+自动扩展：根据需求（如 CPU、内存使用率）自动调整容器数量。
+自我修复：自动检测并重启故障容器，替换或重新调度到健康的节点。
+存储编排：支持动态挂载和管理存储系统。
+配置管理：通过 ConfigMaps 和 Secrets 管理应用配置和敏感信息。
+滚动更新与回滚：支持无缝更新应用版本，并能在问题发生时回滚。
 
-Pod 里面有 pause 根容器(创建网络?)和用户业务容器
-
-
-Runtime: docker, containerd, cni-o
-
-Kubernetes 中的 Pod 使用可分两种主要方式:
-1、one-container-per-Pod: Pod 中运行一个容器。可以将 Pod 视为单个封装的容器，但是 Kubernetes 是直接管理 Pod 而不是容器
-
-2、sidecar: Pod 中运行多个需要一起工作的容器。Pod 可以封装紧密耦合的应用，它们需要由多个容器组成，它们之间能够共享资源(IP,网络、cpu、mem、挂载目录等). 网络共享相同的 net namespace 网络堆栈, 挂载目录可共享 volume mount.
+Pod：Kubernetes 的最小调度单位，通常包含一个或多个容器。
 ```
 
 ### 组件
 
-- 核心组件
+- 控制平面（Control Plane）
 
 ```text
-1. kube-apiserver: 提供了资源操作的唯一入口，并提供认证、授权、访问控制、API 注册和发现等机制；
+API Server：Kubernetes 的前端接口，集群的中央管理入口，接受和处理来自用户、客户端或内部组件的 RESTful API 请求。
+1. 提供 Kubernetes API，处理所有管理操作（如创建、更新、删除资源）。
+2. 与 etcd 通信，存储和检索集群状态。
+3. 验证和授权请求，确保安全性。
+4. 控制平面与其他组件交互的枢纽
 
-2. controller manager: 资源对象的自动化控制中心,负责维护集群的状态，比如故障检测、自动扩展、滚动更新等；
+Controller Manager：运行多个控制器进程，监控集群状态并确保其与期望状态一致。
+1. Replication Controller：确保指定数量的 Pod 副本始终运行。
+2. Deployment Controller：管理应用的滚动更新和回滚。
+3. StatefulSet Controller：管理有状态应用的 Pod。
+4. Node Controller：监控节点状态，处理节点故障。
+通过 API Server 读取集群状态，与 etcd 协作，执行必要的调整。
 
-3. scheduler: 负责资源调度的进程，按照预定的调度策略将Pod调度到相应的机器上；
+Scheduler：负责将 Pod 调度到合适的 Worker 节点上。
+1. 根据资源需求（如 CPU、内存）、节点状态、亲和性规则、约束条件等，选择最合适的节点来运行 Pod。
+2. 考虑负载均衡、硬件限制和用户定义的策略（如节点选择器、污点与容忍）。
+3. 监控未调度的 Pending 状态 Pod，并动态分配到节点。
 
-4. kubelet: Node 节点上容器生命周期与容器资源管理的进程
-+ 管理容器生命周期与容器资源管理
-+ 节点管理: 获取 Node 上 Pod 信息，通过 apiserver 监听（watch+list） etcd 列表，同步信息
-+ 读取监听信息并对节点 Pod 创建修改操作: 创建 Pod 数据目录、挂载卷、下载 secret、检查 Pod 容器状态以及 pause 容器启动与网络接管、Pod hash 值计算以及 Pod 的启动或重启
-+ Pod 健康检测: livenessprobe, readnessprobe, startupprobe
-
-5. container runtime: 负责镜像管理以及 Pod 和容器的真正运行,一般有 Docker 与 Containerd
-
-6. kube-proxy: service 的透明代理与 LB
-+ iptables + nat: 监听 apiserver 中 service 与 endpoint 信息，配置 iptables 规则，请求通过 iptables 转发给 Pod（service 与 Pod 过多时，太多 iptables 规则影响性能）
-+ ipvs + ipset: 与 iptables 类似，使用 ipset 方式基于 iptables 高性能负载
-
-7. etcd: 保存了整个集群的状态
-
+Etcd：分布式键值存储数据库，用于存储 Kubernetes 集群的所有状态数据。
+1. 保存集群配置、状态和元数据（如 Pod、Service、Deployment 的定义）。
+2. 提供高可用性和一致性，保证集群数据的持久性和可靠性。
+3. 仅由 API Server 直接访问，其他组件通过 API Server 间接与 etcd 交互。
 ```
 
-- 可选组件
+- 工作节点（Worker Nodes）
 
 ```text
-1. kube-dns: 负责为整个集群提供DNS服务
-2. Ingress Controller: 为服务提供外网入口
-3. Heapster: 提供资源监控
-4. Dashboard: 提供GUI
-5. Federation: 提供跨可用区的集群
-6. fluentd-bit:  日志组件
-```
+Kubelet：运行在每个工作节点上的代理进程，负责与控制平面通信并管理节点上的 Pod。
+1. 通过 API Server 接收 Pod 定义（PodSpec），确保 Pod 中的容器按预期运行。
+2. 监控容器健康状态，报告节点和 Pod 的状态给控制平面。
+3. 与容器运行时交互，启动、停止或重启容器。
+4. 执行节点级别的健康检查（liveness/readiness probes）。
 
-- 高可用与扩容
+Kube-Proxy：运行在每个工作节点上的网络代理进程，管理网络通信和负载均衡。
+1. 实现 Kubernetes Service 的网络功能，通过规则（如 iptables 或 IPVS）将流量转发到正确的 Pod。
+2. 支持服务发现，确保客户端请求到达正确的后端 Pod。
+3. 提供负载均衡，均匀分配流量到多个 Pod 副本。
+4. 处理外部流量（如通过 NodePort 或 LoadBalancer）。
 
-```text
-1. 将 etcd 与 master 节点组件部署一起
-2. 使用独立的 etcd 集群，不与 master 节点混合部署
-
-组件横向与纵向扩容
-节点的资源
+容器运行时：负责在节点上运行容器的软件，如 Docker、containerd 或 CRI-O。
+1. 拉取容器镜像，创建并运行容器。
+2. 管理容器的生命周期（如启动、停止、删除）。
+3. 与 Kubelet 协作，执行容器相关的操作。
+4. 支持 CRI（Container Runtime Interface），确保与 Kubernetes 的兼容性。
 ```
 
 ### Pod 创建过程
 
 ```text
-1. kubectl create Pod
-首先进行认证与权限校验后，kubectl 会调用 apiserver 创建对象的接口，然后向 k8s apiserver 发出创建 Pod 的命令
+第一步：用户通过 kubectl 或直接调用 Kubernetes API 提交 Pod 的资源清单。
+1. 用户客户端（如 kubectl）向 API Server（kube-apiserver）发送 HTTP POST 请求，提交 Pod 资源定义。
+2. 请求路径通常为 /api/v1/namespaces/{namespace}/pods。
+3. Pod 定义包括元数据（metadata，如名称、命名空间）、规格（spec，如容器镜像、资源需求、端口等）。
+API Server 行为：
+1. 验证请求的合法性（认证和授权，基于 RBAC 或其他机制）。
+2. 将 Pod 定义存储到 etcd，更新集群状态。
+3. 创建一个新的 Pod 对象，初始状态为 Pending。
+4. Controller Manager 根据配置信息将要创建的 Pod 资源对象放到等待队列中。
 
-2. k8s apiserver
-apiserver 收到请求后，并非直接创建 Pod，而是先创建一个包含 Pod 创建信息的yaml 文件, 保存 etcd
+第二步：调度器 kube-scheduler 分配节点
+1. 调度器通过 API Server 的 watch 机制，监控到新的 Pending 状态的 Pod。
+2. 调度器根据 Pod 的资源需求（CPU、内存等）、节点状态、亲和性规则、污点与容忍等，选择一个合适的 Worker 节点。
+调度算法包括：
+过滤（Filtering）：筛选出满足条件的节点（节点有足够资源、NodeSelector、节点亲和性、污点冲突等）。
+评分（Scoring）：对候选节点打分，选择最优节点。
+3. 调度器通过 API Server 更新 Pod 对象，将 spec.nodeName 设置为选定的节点名称。
+4。 更新后的 Pod 状态写入 etcd，标记 Pod 为已调度。
 
-3. controller manager
-创建 Pod 的 yaml 信息会交给 controller manager，controller manager 根据配置信息将要创建的 Pod 资源对象放到等待队列中
+第三步：Kubelet 检测并处理 Pod
+1. Kubelet 通过 API Server 的 watch 机制，监控分配到本节点的 Pod（通过 nodeName 字段匹配）。
+2. Kubelet 获取 Pod 的完整定义（PodSpec），包括容器镜像、环境变量、卷挂载等。
+3. Kubelet 调用容器运行时接口（CRI），与容器运行时（如 containerd、CRI-O 或 Docker）交互开始创建 Pod。
 
-4. scheduler
-scheduler 查看 apiserver ，类似于通知机制。首先判断 Pod.spec.Node == null? 若为 null，表示这个 Pod 请求是新来的，需要创建；然后进行预选调度和优选调度计算，找出最 “闲” 的且符合调度条件的 Node。最后将信息在 etcd 数据库中更新分配结果: Pod.spec.NodeX(设置一个具体的节点) 同样上述操作的各种信息也要写到 etcd 数据库中。
-分配过程需要两层调度: 预选调度和优选调度
-(1) 预选调度: 一般根据资源对象的配置信息进行筛选。例如 NodeSelector,  HostSeletor 和节点亲和性等。
-(2) 优选调度: 根据资源对象需要的资源和 Node 节点资源的使用情况，为每个节点打分，然后选出最优的节点创建 Pod 资源对象
+第四步：Kubelet 通过 gRPC 协议与 CRI 通信，CRI 创建 Linux 命名空间、cgroups 和挂载点。创建并初始化 Pod 和容器。
+1. 创建 Pod 沙箱（Sandbox）：
+Pod 沙箱是一个隔离的环境，通常是一个基础容器（如 pause 容器），用于共享网络和存储命名空间。
+CRI 调用容器运行时的 RunPodSandbox 方法，创建沙箱容器。
+沙箱容器启动后，分配一个网络命名空间（network namespace）和 IPC 命名空间（如果需要）。
+2. 拉取镜像：
+Kubelet 通过 CRI 调用 PullImage，从镜像仓库（如 Docker Hub）拉取 Pod 定义中指定的容器镜像。如果镜像已存在本地，则跳过此步骤。
+3. 创建容器：
+Kubelet 调用 CRI 的 CreateContainer 方法，为 Pod 中的每个容器创建实例。容器共享 Pod 沙箱的网络和存储命名空间。
+4. 启动容器：
+Kubelet 调用 CRI 的 StartContainer 方法，启动每个容器。
 
-5. kubelet
-目标 NodeX 上的 kubelet 进程通过 apiserver，查看 etcd 数据库（kubelet通过 apiserver 的 WATCH 接口监听 Pod 信息，如果监听到新的 Pod 副本被调度绑定到本节点）监听到 kube-scheduler 产生的 Pod 绑定事件后获取对应的 Pod清单，然后调用本机中的 container runtime 初始化 volume、分配 IP、下载image 镜像，创建容器并启动应用.
+第五步：CNI（Flannel、Calico、Weave 等）配置网络
+1. 在创建 Pod 沙箱（RunPodSandbox）时，Kubelet 调用 CNI 插件来配置 Pod 的网络。
+2. CNI 插件根据集群的网络配置（如 CNI 配置文件 /etc/cni/net.d/）执行操作：
+a. CNI 插件从网络插件的 IP 池中为 Pod 分配一个唯一的 IP 地址。插件可能与外部服务（如 IPAM，IP 地址管理）交互。
+b. CNI 插件在 Pod 沙箱的网络命名空间中设置网络接口（如 veth 虚拟以太网接口）。将 Pod 的网络接口连接到集群的虚拟网络（如桥接、Overlay 网络）。
+c. 配置 Pod 的路由规则，确保 Pod 可以与集群内其他 Pod 或外部服务通信。配置 DNS（如通过 CoreDNS）以支持服务发现。
+CNI 插件完成后，返回网络配置结果给 Kubelet。
 
-6. controller manager
-controller manmager 通过 apiserver 提供的接口实时监控资源对象的当前状态，当发生各种故障导致系统状态发生变化时，会尝试将其状态修复到 “期望状态”
+第六步：Pod 启动完成
+1. Kubelet 确认所有容器启动成功，Pod 进入 Running 状态。
+2. Kubelet 通过 API Server 的 PATCH 请求更新 Pod 的状态（如 status.phase 设置为 Running），写入 etcd。
+3. 如果 Pod 配置了健康检查（liveness/readiness probes），Kubelet 开始定期执行探针。
 
-### kube exec 原理
-kubectl  -> http request upgrade to SPDY -> kube-apiserver -> kubelet -> dockershim/containerd-shim
+第七步：Kube-Proxy 配置网络规则
+Kube-Proxy 通过 API Server 监控 Pod 的 IP 地址和 Service 的变化，动态更新网络规则。（如 iptables 或 IPVS）。
+
+总结：
+1. 用户通过 kubectl 提交 Pod 定义 → API Server 验证并存储到 etcd（Pod 状态为 Pending）。
+2. 调度器检测到新 Pod，分配到 Worker 节点，更新 Pod 的 nodeName 字段。
+3. Kubelet 检测到分配到本节点的 Pod，调用 CRI 创建 Pod 沙箱。
+4. CRI 调用容器运行时，创建 pause 容器（沙箱）。
+5. Kubelet 调用 CNI 插件，配置 Pod 的网络（分配 IP、设置网络接口）。
+6. Kubelet 通过 CRI 拉取镜像、创建并启动容器。
+7. Kubelet 更新 Pod 状态为 Running，通知 API Server。
+8. Kube-Proxy 更新 Service 相关的网络规则（如果适用）。
 ```
 
-### resources
+### Resources
 
-- yaml
-
-```text
-annotation: 注解和 label 类似, 标记一些特殊信息
-configmap: 修改配置参数
-```
-
-- RC / RS / Deplyment / StatefulSet
+- RS / Deplyment / StatefulSet
 
 ```text
-1、Replication Controller 和 Replica Set 两种资源对象， RC 和 RS 的功能基本上是差不多的，唯⼀的区别就是 RS ⽀持集合的 selector
-
-RC:
+Replication Controller
 (1)确保 Pod 数量: 它会确保 Kubernetes 中有指定数量的 Pod 在运⾏，如果少于指定数量的 Pod ， RC 就会创建新的，反之这会删除多余的，保证 Pod 的副本数量不变。
 (2)确保 Pod 健康: 当 Pod 不健康，比如运⾏出错了，总之无法提供正常服务时， RC 也会杀死不健康的 Pod ，重新创建一个新的Pod。
 (3)弹性伸缩: 在业务⾼峰或者低峰的时候，可以通过 RC 来动态调整 Pod 数量来提供资源的利用率，当然我们也提到过如何使用 HPA 这种资源对象的话可以做到自动伸缩。
@@ -513,9 +655,9 @@ Deployment
 (5)暂停和启动: 对于每⼀次升级都能够随时暂停和启动。
 
 StatefulSet
-每个 Pod 都有稳定唯一的网络标识可以发现集群里的其他成员
+1. 每个 Pod 都有稳定唯一的网络标识可以发现集群里的其他成员
 控制的 Pod 副本的启停顺序是受控的
-Pod 采用稳定的持久化存储卷
+2. Pod 采用稳定的持久化存储卷
 ```
 
 - Service
@@ -524,9 +666,7 @@ Pod 采用稳定的持久化存储卷
 一个 Pod 只是一个运行服务的实例，随时可能在一个节点上停止，在另一个节点以一个新的 IP 启动一个新的 Pod，因此不能以确定的 IP 和端口号提供服务。要稳定地提供服务,需要服务发现和负载均衡能力.
 
 在 k8s 集群中，客户端需要访问的服务就是 Service 对象。每个 Service 会对应一个集群内部有效的虚拟 IP，集群内部通过虚拟 IP 访问一个服务
-
-ingress -> service -> endpoint
-
+Service -> Endpoint -> Pod
 LB -> NodePort -> CNI bridge -> Pod
 ```
 
@@ -537,7 +677,7 @@ volume（存储卷）是 Pod 中能够被多个容器访问的共享目录
 emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 ```
 
-### lifecycle
+### Lifecycle
 
 ```text
 1. livenessProbe
@@ -554,15 +694,10 @@ emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 
 ```text
 1. hpa 指标以 request 为准
-
 2. 主机调度 Pod 以 request 为准
 
 
 request limit 的分级?
+如何通过 Deployments 创建 Pod？
 ```
 
-> Reference:
->
-> 1. [乌云知识库](https: //github.com/SuperKieran/WooyunDrops)
-> 2. [mindoc](https: //github.com/mindoc-org/mindoc)
-> 3. [Docker与Containerd](https://www.qikqiak.com/post/containerd-usage/)
