@@ -15,7 +15,7 @@ inventories/test.host
 inventories/prod.host
 ```
 
-### ansible(ad-hoc modules)
+### ad-hoc modules
 
 ```bash
 # command usage

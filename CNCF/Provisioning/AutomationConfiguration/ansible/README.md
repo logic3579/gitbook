@@ -5,23 +5,26 @@ description: Ansible
 # Ansible
 
 ## Introduction
+
 ...
 
+## Install
 
-## Install 
 ### Before install
+
 ```bash
 # denpend
 ssh protocal
 python2(scp)
 python3(sftp)
 
-# network 
+# network
 firewalld
 
 ```
 
 ### Install on linux
+
 ```bash
 # root dir
 ANSIBLE_ROOT=/opt/ansible
@@ -48,6 +51,7 @@ export ANSIBLE_CONFIG=/opt/ansible
 ```
 
 ### Credentials
+
 ```bash
 # Generate private and public key
 ssh-keygen -t rsa -b 1024 -C 'for ansible key' -f /opt/ansible/keys/ansible -q -N ""
@@ -61,12 +65,14 @@ ssh-add ~/.ssh/id_rsa
 
 # Add public keys to all hosts
 ssh-copy-id -i /opt/ansible/keys/ansible.key root@192.168.1.1
-ssh-copy-id ...
+ssh-copy-id -i /opt/ansible/keys/ansible.key root@192.168.1.2
+ssh-copy-id -i /opt/ansible/keys/ansible.key root@192.168.1.3
 ```
 
+## [How To Use](../../../../Operations/CommandManual/Automation.md#ansible)
 
-## [[Automation#ansible|How To Use]]
 ### inventory
+
 ```bash
 # initial: for initalize the system
 inventories/initial.host
@@ -78,7 +84,7 @@ inventories/test.host
 inventories/prod.host
 ```
 
-### ad-hoc(modules)
+### ad-hoc modules
 
 ### vars fact template
 
@@ -95,12 +101,10 @@ inventories/prod.host
 ### ansible-vault
 
 ### plugins && api
-```bash
-```
-
 
 
 > Reference:
+>
 > 1. [Official Website](https://docs.ansible.com/ansible)
 > 2. [Repository](https://github.com/ansible/ansible)
 > 3. [Ansible 中文文档](https://ansible-tran.readthedocs.io/en/latest/docs/intro.html)

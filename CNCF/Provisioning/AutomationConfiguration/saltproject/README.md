@@ -5,11 +5,13 @@ description: Salt Project(saltstack)
 # Salt Project
 
 ## Introduction
+
 ...
 
+## Install
 
-## Install 
 ### Before Install
+
 ```bash
 # Check your network ports
 4505  # Event Publisher/Subscriber port
@@ -22,6 +24,7 @@ description: Salt Project(saltstack)
 ```
 
 ### Install On Ubuntu
+
 ```bash
 # install repository key and create the apt sources list file
 curl -fsSL -o /etc/apt/keyrings/salt-archive-keyring-2023.gpg https://repo.saltproject.io/salt/py3/ubuntu/22.04/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg
@@ -33,12 +36,14 @@ apt install salt-master salt-minion [salt-api...]
 
 ```
 
-
 ### Config and Boot
+
 #### Config
+
 [[sc-saltstack|Salt Config]]
 
 #### Boot(systemd)
+
 ```bash
 # boot
 cat > /lib/systemd/system/salt-master.service << "EOF"
@@ -84,8 +89,8 @@ salt-call pip.list
 salt-pip install <package name>
 ```
 
+## [How To Use](../../../../Operations/CommandManual/Automation.md#saltstack)
 
-## [[Automation#saltstack|How To Use]]
 ### minion keys
 
 ### match minion and groups
@@ -98,11 +103,12 @@ salt-pip install <package name>
 
 ### pillar
 
-
 ## Salt Rosters
+
 ### salt-ssh
+
 ```bash
-# install 
+# install
 apt install salt-ssh
 pip install --upgrade salt-ssh
 
@@ -125,11 +131,10 @@ node2:
 salt-ssh '*' test.ping
 ```
 
-
-
->Reference:
->1. [Official Website](https://docs.saltproject.io/salt/user-guide/en/latest/topics/overview.html)
->2. [Repository](https://github.com/saltstack/salt)
->3. [saltstack 中文文档](https://docs.saltstack.cn/topics/tutorials/starting_states.html)
->4. [saltstack 中文手册](https://github.com/watermelonbig/SaltStack-Chinese-ManualBook/blob/master/chapter05/05-11.Salt-Best-Practices.md)
->5. [saltstack-formulas](https://github.com/saltstack-formulas)
+> Reference:
+>
+> 1.  [Official Website](https://docs.saltproject.io/salt/user-guide/en/latest/topics/overview.html)
+> 2.  [Repository](https://github.com/saltstack/salt)
+> 3.  [saltstack 中文文档](https://docs.saltstack.cn/topics/tutorials/starting_states.html)
+> 4.  [saltstack 中文手册](https://github.com/watermelonbig/SaltStack-Chinese-ManualBook/blob/master/chapter05/05-11.Salt-Best-Practices.md)
+> 5.  [saltstack-formulas](https://github.com/saltstack-formulas)
