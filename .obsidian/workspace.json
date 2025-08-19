@@ -171,9 +171,11 @@
   "active": "e5df82f93e8db1b9",
   "lastOpenFiles": [
     "Operations/CommandManual/Automation.md",
+    "Misc/interview.md",
+    "CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/jenkins.md",
+    "CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/cc-docker.md",
     "CNCF/Provisioning/AutomationConfiguration/saltproject/README.md",
     "CNCF/Provisioning/AutomationConfiguration/ansible/README.md",
-    "Misc/interview.md",
     "SUMMARY.md",
     "README.md"
   ]
