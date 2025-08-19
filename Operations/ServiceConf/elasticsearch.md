@@ -1,3 +1,7 @@
+# Elasticsearch
+
+/opt/elasticsearch/conf/elasticsearch.conf
+
 ```bash
 # single node mode
 path.data: /opt/elasticsearch/data/
@@ -8,7 +12,6 @@ http.port: 9200
 discovery.type: single-node
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: false
-
 
 # cluster node mode
 # 数据与日志目录
@@ -45,6 +48,4 @@ cluster.initial_master_nodes: ["node-1", "node-2", "node-3"]
 # 集群角色
 # node.master: true
 # node.data: true
-
 ```
-

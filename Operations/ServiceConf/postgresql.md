@@ -1,4 +1,7 @@
+# PostgreSQL
+
 /opt/pgsql/data/postgresql.conf
+
 ```bash
 # PostgreSQL configuration file
 # DB Version: 15
@@ -34,5 +37,5 @@ data_directory = '/opt/pgsql/data'
 hba_file = '/opt/pgsql/data/pg_hba.conf'
 # Ident file
 ident_file = '/opt/pgsql/data/pg_ident.conf'
-
 ```
+

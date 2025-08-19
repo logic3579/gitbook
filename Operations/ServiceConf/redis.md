@@ -1,4 +1,7 @@
+# Redis
+
 **/opt/redis/redis.conf**
+
 ```bash
 ################################## MODULES #####################################
 # loadmodule /path/to/my_module.so
@@ -160,3 +163,4 @@ rdb-save-incremental-fsync yes
 ########################### ACTIVE DEFRAGMENTATION #######################
 jemalloc-bg-thread yes
 ```
+

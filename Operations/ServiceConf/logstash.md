@@ -1,5 +1,8 @@
+# Logstash
+
+/opt/logstash/logstash.conf
+
 ```bash
-# logstash.conf
 # input config
 input {
     # filebeat plugin
@@ -63,7 +66,7 @@ output {
             }
         }
     }
-    
+
     # send to elasticsearch
     if [host_ip] == "xxx" and [namespace_name] == "default" {
       elasticsearch {
@@ -72,7 +75,7 @@ output {
         password => "es123"
         index => "logstash-uat_%{index_name}-%{local_time}"
       }
-    
+
     }
     else if [host_ip] == "xxx" and [namespace_name] == "default"  {
      elasticsearch {
@@ -81,7 +84,7 @@ output {
        password => "es123"
        index => "logstash-%{index_name}-%{local_time}"
      }
-   } 
+   }
 }
-
 ```
+

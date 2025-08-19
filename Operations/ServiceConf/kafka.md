@@ -1,7 +1,9 @@
-```bash
-# 官方配置：https://kafka.apache.org/documentation/#configuration
+# Kafka
 
-##### producer 参数
+/opt/kafka/server.conf
+
+```bash
+##### producer
 # 发送消息收到多少确认信号数量才算写入成功（0:无需等待写入成功，1:只需leader写入成功，-1/all:所有ISR副本）
 acks=1
 # 发送消息重试次数与间隔
@@ -16,8 +18,7 @@ batch.size=16384
 # producer 可以缓存数据的内存大小
 buffer.memory=33554432
 
-
-##### consumer 参数
+##### consumer
 # fetch 的消息 offset 会同步到 zookeeper，false 为先消费再手动提交
 auto.commit.enable=true
 auto.commit.interval.ms=5000
@@ -26,8 +27,7 @@ auto.offset.reset=latest
 # 空连接超时时长
 connections.max.idle.ms=540000
 
-
-##### kafka server 配置参数
+##### kafka server
 # leader 自动选举平衡
 auto.leader.rebalance.enable=true
 # 默认线程数
@@ -85,7 +85,6 @@ offsets.topic.num.partitions=50
 offsets.topic.replication.factor=3
 # offset 段大小
 offsets.topic.segment.bytes=104857600
-
 # 阻塞网络线程前，数据平面允许等待排队的请求数
 queued.max.requests=500
 # 副本复制线程请求等待时间
@@ -110,12 +109,11 @@ zookeeper.connect=1.1.1.1:2181,2.2.2.2:2181,3.3.3.3:2181
 zookeeper.max.in.flight.requests=10
 # zookeeper 会话超时时间
 zookeeper.session.timeout.ms=18000
-
 # 空连接超时时间
 connections.max.idle.ms=600000
 # 延迟初始消费组重新平衡时间，生产环境建议为3s
 group.initial.rebalance.delay.ms=3000
-# socket 连接队列，取决于操作系统 somaxconn、tcp_max_syn_backlog 
+# socket 连接队列，取决于操作系统 somaxconn、tcp_max_syn_backlog
 #socket.listen.backlog.size
-
 ```
+

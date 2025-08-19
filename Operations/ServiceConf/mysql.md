@@ -1,8 +1,11 @@
+# Mysql
+
 /etc/my.cnf
 /opt/mysql/sysconfig/my.cnf
+
 ```bash
-[client]    
-port=3306    
+[client]
+port=3306
 socket=/opt/mysql/mysql.sock
 
 [mysql]
@@ -12,7 +15,7 @@ socket=/opt/mysql/mysql.sock
 character-set-server=utf8mb4
 collation-server=utf8mb4_general_ci
 init_connect='SET NAMES utf8mb4'
-# 
+#
 skip-external-locking
 skip-name-resolve
 
@@ -91,5 +94,5 @@ max_allowed_packet=128M
 [mysqld_safe]
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
-
 ```
+

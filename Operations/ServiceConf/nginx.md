@@ -1,4 +1,8 @@
-### nginx.conf
+# Nginx
+
+## main config
+
+/opt/nginx/conf/nginx.conf
 
 ```bash
 user  nobody nobody;
@@ -159,7 +163,7 @@ include modules.conf;
 
 ```
 
-#### modules.conf
+## modules.conf
 
 ```bash
 cat > /opt/nginx/conf/modules.conf << EOF
@@ -175,15 +179,15 @@ load_module modules/ngx_stream_geoip2_module.so;
 EOF
 ```
 
-### third iplib
+## third iplib
 
 [[IPV6-COUNTRY-REGION-CITY.BIN.gz|ip2location]]
 
 [[GeoLite2-City.mmdb.gz|Geoip2]]
 
-### vhosts/\*.conf
+## virtual host conf
 
-#### default.conf
+/opt/nginx/conf/vhosts/default.conf
 
 ```bash
 server {
@@ -220,7 +224,7 @@ ssl_session_cache shared:SSL:30m;
 ssl_session_tickets off;
 ```
 
-#### real_ip.conf
+/opt/nginx/conf/vhosts/real_ip.conf
 
 ```bash
 real_ip_header X-Forwarded-For;
@@ -230,7 +234,7 @@ set_real_ip_from 192.168.1.1/32;
 set_real_ip_from 192.168.1.2/32;
 ```
 
-#### template.conf
+/opt/nginx/conf/vhosts/template.conf
 
 ```bash
 upstream backend_server {
@@ -334,6 +338,5 @@ server {
             "blocked_country": "$blocked_country"
             }';
     }
-
 }
 ```

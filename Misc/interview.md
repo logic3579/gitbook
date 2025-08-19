@@ -73,6 +73,7 @@ helm-charts
 ### Jenkins
 
 ```console
+- Job 
 SSH Plugin
 Kubernetes Plugin
 ```

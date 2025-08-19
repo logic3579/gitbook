@@ -1,4 +1,9 @@
+# Saltstack
+
+## master
+
 /etc/salt/master
+
 ```bash
 default_include: master.d/*.conf
 gather_job_timeout: 10  # salt job
@@ -32,8 +37,10 @@ log_level: info
 log_level_logfile: info
 ```
 
+## minion
 
 /etc/salt/minion
+
 ```bash
 id: minion_hostname
 user: root
@@ -49,4 +56,3 @@ random_reauth_delay: 60
 hash_type: sha256
 environment: base
 ```
-

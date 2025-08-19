@@ -1,11 +1,14 @@
+# Fluentd
+
 /etc/td-agent/td-agent.conf
+
 ```bash
 <system>
   workers 4
 </system>
 
 # for filebeat logs of opt,var,etc..
-# /opt/td-agent/bin/gem install fluent-plugin-beats --no-document 
+# /opt/td-agent/bin/gem install fluent-plugin-beats --no-document
 <worker 0>
   <source>
     @type beats
@@ -130,7 +133,7 @@
     path /opt/backup_logs/prod/%Y-%m-%d/${$.log_path}/${$.kubernetes_container_name}
     append true
     compress gzip
-    
+
     <buffer time,$.log_path,$.kubernetes_container_name>
       @type file
       timekey 1d
@@ -142,5 +145,5 @@
     </buffer>
   </match>
 </label>
-
 ```
+
