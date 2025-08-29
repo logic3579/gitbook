@@ -9,6 +9,7 @@ description: interview
 ### Argo
 
 ```console
+
 ```
 
 ### Ansible
@@ -73,7 +74,7 @@ helm-charts
 ### Jenkins
 
 ```console
-- Job 
+- Job
 SSH Plugin
 Kubernetes Plugin
 ```
@@ -90,7 +91,15 @@ GCP
 ### Elasticsearch
 
 ```console
+主节点与数据节点
 
+分片与副本数
+
+索引模板
+
+索引生命周期管理
+
+长期日志压缩保存云存储
 ```
 
 ### MySQL
@@ -201,6 +210,138 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 ```
 
 ## Observability
+
+### 方法论
+
+监控分层方法论
+
+```console
+- 基础设施层
+设备：VM、网络设备、存储
+指标：CPU、Memory、磁盘 I/O、网络流量
+工具：Prometheus、Zabbix
+
+应用层：
+指标：应用存活状态、响应时间、HTTP 错误率、吞吐量
+工具：APM 工具、Prometheus
+
+服务层：
+指标：SLA（可用性）、SLO（延迟目标）
+方法：合成监控（Synthetic Monitoring，模拟用户请求）
+
+日志层：
+工具：ELK Stack、EFK Stack、Grafana Loki
+```
+
+监控数据分类方法论
+
+```console
+- 指标（Metrics）
+时间序列数据（如 CPU 使用率），适合实时告警和趋势分析
+
+- 日志（Logs）
+非结构化事件记录（如错误日志、K8S events），需聚合和索引
+工具：Fluentd 收集、Splunk 分析
+
+- 追踪（Traces）
+分布式请求链路追踪（如微服务调用链）
+工具：Jaeger、Zipkin、Skywalking
+
+- 事件（Events）
+离散的、有状态变化的事件（如服务器重启）
+处理：Event Sourcing 模式
+```
+
+Google 黄金指标（适用定义 SLO 服务等级目标和告警阈值）
+
+```console
+- 延迟（Latency）
+请求处理时间、区分成功/失败请求的延迟
+
+- 流量（Traffic）
+系统负载（如 QPS、并发连接数）
+
+- 错误（Errors）
+显式错误（HTTP 500）和隐式错误（如返回空结果）
+
+- 饱和度（Saturation）
+资源过载程度（如磁盘剩余空间、队列长度）
+```
+
+RED 方法（适用微服务）
+
+```console
+- Rate（速率）
+每秒请求数
+
+- Errors（错误）
+失败请求数
+
+- Duration（持续时间）
+请求耗时分布（P90/P99）
+
+工具：Grafana + Prometheus，通过 PromQL 计算 RED 指标
+```
+
+USE 方法（资源性能分析）
+
+```console
+- Utilization（利用率）
+资源使用百分比（如 CPU 70%）
+
+- Saturation（饱和度）
+资源过载程度（如 CPU 队列长度）
+
+- Errors（错误）
+硬件错误（如磁盘坏块）
+
+适用场景：快速定位瓶颈节点（如网络带宽饱和）
+```
+
+告警设计方法论
+
+```console
+- 告警分级
+Critical
+Error
+Waring
+
+- 告警收敛
+使用抑制规则避免告警风暴
+关联拓扑依赖分析根因（如下游服务故障触发上游告警）
+
+- 告警疲劳管理
+静默（Mute）：计划内维护时段屏蔽告警
+动态阈值：基于历史数据自动调整（如季节性流量波动）
+
+- 告警通知
+```
+
+SLI、SLO、SLA 概念
+
+```console
+- SLI（Service Level Indicator，服务等级指标）
+量化服务健康状态的具体指标，用于客观衡量服务的某个关键维度（如可用性、延迟等）。必须是可测量、明确的数值
+常见 SLI 示例：
+可用性：成功请求数 / 总请求数 * 100%
+延迟：请求响应时间的 P99
+吞吐量：每秒处理的请求数（QPS）
+持久性（存储服务）：数据不丢失的概率
+如 HTTP 服务的 SLI：过去5分钟内，成功响应（HTTP 200）的请求占比 ≥ 99.5%
+
+- SLO（Service Level Objective，服务等级目标）
+团队对 SLI 的目标阈值，服务应该在 SLI 应达到的预期水平。通常比 SLA 严格
+常见 SLO 示例：
+可用性：99.9%的请求成功率
+延迟：95%的请求响应时间 < 200ms
+如 API 服务的 SLO：过去7天内，99% 的请求延迟 < 300ms
+
+- SLA（Service Level Agreement，服务等级协议）
+向客户（或上下游团队）承诺的服务质量。
+常见 SLA 示例：
+可用性：99.5% uptime
+故障恢复：4小时内恢复严重问题
+```
 
 ### Fluentd
 
