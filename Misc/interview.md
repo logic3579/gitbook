@@ -37,7 +37,7 @@ service
 template
 unarchive
 user
-group
+	group
 ```
 
 ### Saltstack
@@ -221,27 +221,33 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 指标：CPU、Memory、磁盘 I/O、网络流量
 工具：Prometheus、Zabbix
 
-应用层：
+- 应用层
 指标：应用存活状态、响应时间、HTTP 错误率、吞吐量
 工具：APM 工具、Prometheus
 
-服务层：
+- 服务层
 指标：SLA（可用性）、SLO（延迟目标）
 方法：合成监控（Synthetic Monitoring，模拟用户请求）
 
-日志层：
+- 日志层
 工具：ELK Stack、EFK Stack、Grafana Loki
 ```
 
 监控数据分类方法论
 
 ```console
-- 指标（Metrics）
-时间序列数据（如 CPU 使用率），适合实时告警和趋势分析
+- 指标（Metrics）：轻量级、聚合性、适合描绘整体状态
+时间序列数据，通常是聚合后数据，适合实时告警和趋势分析。例如：QPS、错误率、CPU 利用率
+工具：
+Exporter 收集
+Prometheus 时序库存储
 
-- 日志（Logs）
-非结构化事件记录（如错误日志、K8S events），需聚合和索引
-工具：Fluentd 收集、Splunk 分析
+- 日志（Logs）：基于事件、富含上下文、数据量大
+非结构化事件文本记录，包含丰富的上下文信息（时间戳、级别、消息、来源等），需聚合和索引
+工具：
+收集 = filebeat / fluentd / fluent-bit / promtail
+存储 = Elasticsearch / Disk / OSS
+查询/分析 = Kibana / Splunk
 
 - 追踪（Traces）
 分布式请求链路追踪（如微服务调用链）
@@ -315,6 +321,7 @@ Waring
 动态阈值：基于历史数据自动调整（如季节性流量波动）
 
 - 告警通知
+通知渠道
 ```
 
 SLI、SLO、SLA 概念
@@ -322,6 +329,7 @@ SLI、SLO、SLA 概念
 ```console
 - SLI（Service Level Indicator，服务等级指标）
 量化服务健康状态的具体指标，用于客观衡量服务的某个关键维度（如可用性、延迟等）。必须是可测量、明确的数值
+
 常见 SLI 示例：
 可用性：成功请求数 / 总请求数 * 100%
 延迟：请求响应时间的 P99
@@ -331,6 +339,7 @@ SLI、SLO、SLA 概念
 
 - SLO（Service Level Objective，服务等级目标）
 团队对 SLI 的目标阈值，服务应该在 SLI 应达到的预期水平。通常比 SLA 严格
+
 常见 SLO 示例：
 可用性：99.9%的请求成功率
 延迟：95%的请求响应时间 < 200ms
@@ -338,6 +347,7 @@ SLI、SLO、SLA 概念
 
 - SLA（Service Level Agreement，服务等级协议）
 向客户（或上下游团队）承诺的服务质量。
+
 常见 SLA 示例：
 可用性：99.5% uptime
 故障恢复：4小时内恢复严重问题
@@ -394,7 +404,7 @@ zabbix-proxy
 
 ```console
 编写 shell 脚本非交互式取值，如 mysql 主从复制，监控从节点的 slave 的IO，show slave status\G;
-取出 slave 的俩个线程 Slave_IO_Running 和 Slave_SQL_Running 的值都为yes 则输出一个0，如不同步则输出1，在 zabbix agent  的配置文件中，可以设置执行本地脚本 在zabbix server 的web端上上配置监控项配 mysql_slave_check，在触发器中判断取到的监控值，如1则报警，如0则输出正常。
+取出 slave 的俩个线程 Slave_IO_Running 和 Slave_SQL_Running 的值都为yes 则输出一个0，如不同步则输出1，在 zabbix agent 的配置文件中，可以设置执行本地脚本 在zabbix server 的web端上上配置监控项配 mysql_slave_check，在触发器中判断取到的监控值，如1则报警，如0则输出正常。
 
 自定义模板，需要新增图形。
 ```
