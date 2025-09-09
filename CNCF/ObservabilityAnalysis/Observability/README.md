@@ -1,5 +1,5 @@
 ---
-description: Tracing
+description: Observability
 ---
 
-# Tracing
+# Observability

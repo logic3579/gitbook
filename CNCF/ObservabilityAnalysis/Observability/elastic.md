@@ -5,10 +5,13 @@ description: ElasticSearch
 # ElasticSearch
 
 ## Introduction
-...
+
+Elasticsearch is an open source, distributed search and analytics engine built for speed, scale, and AI applications. As a retrieval platform, it stores structured, unstructured, and vector data in real time — delivering fast hybrid and vector search, powering observability and security analytics, and enabling AI-driven applications with high performance, accuracy, and relevance.
 
 ## Deploy With Binary
+
 ### Quick Start
+
 ```bash
 # download and decompression
 cd /opt && wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.7.1-linux-x86_64.tar.gz
@@ -35,7 +38,9 @@ curl 127.0.0.1:9200 -u 'elastic:elastic_password'
 ```
 
 ### [[sc-elasticsearch|Config]] and Boot
+
 #### Config
+
 ```bash
 echo > config/elasticsearch.yml << "EOF"
 path.data: /opt/elasticsearch/data/
@@ -50,6 +55,7 @@ EOF
 ```
 
 #### Boot(systemd)
+
 ```bash
 cat > /etc/systemd/system/elasticsearch.service << "EOF"
 [Unit]
@@ -99,7 +105,7 @@ else
 fi
 EOF
 
-chmod +x /opt/elasticsearch/bin/systemd-entrypoint 
+chmod +x /opt/elasticsearch/bin/systemd-entrypoint
 chown elasticsearch:elasticsearch /opt/elasticsearch -R
 
 systemctl daemon-reload
@@ -108,7 +114,9 @@ systemctl enable elasticsearch.service
 ```
 
 ## Deploy With Container
+
 ### Run on Helm
+
 ```bash
 # add and update repo
 helm repo add elastic https://helm.elastic.co
@@ -134,12 +142,13 @@ helm -n logging install elasticsearch .
 ```
 
 ### Run on ECK Operator
+
 ```bash
+
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://www.elastic.co/docs)
 > 2. [Repository](https://github.com/elastic/elasticsearch)
 > 3. [Official elastic-cloud-kubernetes](https://www.elastic.co/downloads/elastic-cloud-kubernetes)

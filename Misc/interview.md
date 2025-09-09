@@ -6,13 +6,13 @@ description: interview
 
 ## CICD
 
-### Argo
+### ArgoCD
 
 ```console
 
 ```
 
-### Ansible
+### Ansible & Saltstack
 
 ```console
 - 特点
@@ -37,7 +37,7 @@ service
 template
 unarchive
 user
-	group
+group
 ```
 
 ### Saltstack
@@ -87,20 +87,6 @@ GCP
 ```
 
 ## Database & Streaming
-
-### Elasticsearch
-
-```console
-主节点与数据节点
-
-分片与副本数
-
-索引模板
-
-索引生命周期管理
-
-长期日志压缩保存云存储
-```
 
 ### MySQL
 
@@ -211,9 +197,33 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 
 ## Observability
 
-### 方法论
+### 什么是可观测性以及三大支柱？与传统的监控区别是什么？
 
-监控分层方法论
+```console
+可观测性：指通过系统输出的数据（Metrics、Logs、Traces）理解系统内部状态的能力，适用于复杂分布式系统。
+
+三大支柱（Metrics、Logs、Traces）：
+- Metrics（指标）：系统性能的量化数据，通常是聚合后数据，适合实时告警和趋势分析。例如：QPS、错误率、CPU 利用率。
+工具：
+Prometheus + Exporter
+OpenTelemetry
+- Logs（日志）：系统事件的文本记录，包含丰富的上下文信息（时间戳、级别、消息、来源等），需聚合和索引。
+工具：
+收集 = filebeat / fluentd / fluent-bit / promtail
+存储 = Elasticsearch / Loki
+查询/分析 = Kibana / Grafana / Splunk
+- Traces（追踪）：记录请求在分布式系统中流转的完整路径，将分散的日志和指标通过 TraceID 串联。例如：微服务分布式请求链路追踪。
+工具：
+Jaeger / Zipkin / OpenTelemetry
+- 事件（Events）：离散的、有状态变化的事件（如服务器重启）
+
+
+区别：传统监控关注预定义指标和告警，侧重已知问题（如 CPU 使用率超阈值）；可观测性更主动，允许探索未知问题，通过关联指标、日志和追踪定位更应。（如传统监控告知服务器宕机，可观测性帮助分析为何宕机）
+```
+
+### 可观测性领域都有哪些方法论？
+
+#### 监控分层方法论
 
 ```console
 - 基础设施层
@@ -233,78 +243,7 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 工具：ELK Stack、EFK Stack、Grafana Loki
 ```
 
-监控数据分类方法论
-
-```console
-- 指标（Metrics）：轻量级、聚合性、适合描绘整体状态
-时间序列数据，通常是聚合后数据，适合实时告警和趋势分析。例如：QPS、错误率、CPU 利用率
-工具：
-Exporter 收集
-Prometheus 时序库存储
-
-- 日志（Logs）：基于事件、富含上下文、数据量大
-非结构化事件文本记录，包含丰富的上下文信息（时间戳、级别、消息、来源等），需聚合和索引
-工具：
-收集 = filebeat / fluentd / fluent-bit / promtail
-存储 = Elasticsearch / Disk / OSS
-查询/分析 = Kibana / Splunk
-
-- 追踪（Traces）
-分布式请求链路追踪（如微服务调用链）
-工具：Jaeger、Zipkin、Skywalking
-
-- 事件（Events）
-离散的、有状态变化的事件（如服务器重启）
-处理：Event Sourcing 模式
-```
-
-Google 黄金指标（适用定义 SLO 服务等级目标和告警阈值）
-
-```console
-- 延迟（Latency）
-请求处理时间、区分成功/失败请求的延迟
-
-- 流量（Traffic）
-系统负载（如 QPS、并发连接数）
-
-- 错误（Errors）
-显式错误（HTTP 500）和隐式错误（如返回空结果）
-
-- 饱和度（Saturation）
-资源过载程度（如磁盘剩余空间、队列长度）
-```
-
-RED 方法（适用微服务）
-
-```console
-- Rate（速率）
-每秒请求数
-
-- Errors（错误）
-失败请求数
-
-- Duration（持续时间）
-请求耗时分布（P90/P99）
-
-工具：Grafana + Prometheus，通过 PromQL 计算 RED 指标
-```
-
-USE 方法（资源性能分析）
-
-```console
-- Utilization（利用率）
-资源使用百分比（如 CPU 70%）
-
-- Saturation（饱和度）
-资源过载程度（如 CPU 队列长度）
-
-- Errors（错误）
-硬件错误（如磁盘坏块）
-
-适用场景：快速定位瓶颈节点（如网络带宽饱和）
-```
-
-告警设计方法论
+#### 告警设计方法论
 
 ```console
 - 告警分级
@@ -324,10 +263,12 @@ Waring
 通知渠道
 ```
 
-SLI、SLO、SLA 概念
+#### SLI、SLO、SLA 概念
+
+- SLI（Service Level Indicator，服务等级指标）
 
 ```console
-- SLI（Service Level Indicator，服务等级指标）
+描述：
 量化服务健康状态的具体指标，用于客观衡量服务的某个关键维度（如可用性、延迟等）。必须是可测量、明确的数值
 
 常见 SLI 示例：
@@ -336,77 +277,372 @@ SLI、SLO、SLA 概念
 吞吐量：每秒处理的请求数（QPS）
 持久性（存储服务）：数据不丢失的概率
 如 HTTP 服务的 SLI：过去5分钟内，成功响应（HTTP 200）的请求占比 ≥ 99.5%
+```
 
 - SLO（Service Level Objective，服务等级目标）
-团队对 SLI 的目标阈值，服务应该在 SLI 应达到的预期水平。通常比 SLA 严格
+
+```console
+描述：
+团队对 SLI 的目标阈值，服务应该在 SLI 应达到的预期水平。
 
 常见 SLO 示例：
 可用性：99.9%的请求成功率
 延迟：95%的请求响应时间 < 200ms
 如 API 服务的 SLO：过去7天内，99% 的请求延迟 < 300ms
+```
 
 - SLA（Service Level Agreement，服务等级协议）
-向客户（或上下游团队）承诺的服务质量。
+
+```console
+描述：
+向客户（或上下游团队）承诺的服务质量，包含 SLO 和违约后果。
 
 常见 SLA 示例：
-可用性：99.5% uptime
+可用性：每月保证最少 99.5% uptime
 故障恢复：4小时内恢复严重问题
 ```
 
-### Fluentd
+#### 什么是Google 黄金指标（适用定义 SLO）？
 
 ```console
+- 延迟（Latency）
+请求处理时间、区分成功/失败请求的延迟
 
+- 流量（Traffic）
+系统负载（如 QPS、并发连接数）
+
+- 错误（Errors）
+显式错误（HTTP 500）和隐式错误（如返回空结果）
+
+- 饱和度（Saturation）
+资源过载程度（如磁盘剩余空间、队列长度）
 ```
 
-### Loki
+#### RED 方法（适用微服务）
 
 ```console
+- Rate（速率）
+每秒请求数
 
+- Errors（错误）
+失败请求数
+
+- Duration（持续时间）
+请求耗时分布（P90/P99）
+
+工具：Grafana + Prometheus，通过 PromQL 计算 RED 指标
 ```
 
-### Grafana
+#### USE 方法（资源性能分析）
 
 ```console
+- Utilization（利用率）
+资源使用百分比（如 CPU 70%）
 
+- Saturation（饱和度）
+资源过载程度（如 CPU 队列长度）
+
+- Errors（错误）
+硬件错误（如磁盘坏块）
+
+适用场景：快速定位瓶颈节点（如网络带宽饱和）
 ```
 
-### Prometheus
+### 如何使用 Alertmanager 触发告警，配置告警规则与通知规则？
 
 ```console
+1. 触发告警：
+在 vmalert / Alertmanager 中定义告警规则（如 up == 0）以及告警持续时间，持续时间内达到指定告警阈值则触发告警。
 
+2. 设置告警规则：
+在 Alertmanager 中接收告警，进行分组、抑制、去重。配置 route 和 receiver，发送到 Slack / Email / Webhook 等。
+
+3. 设置告警通知规则：
+接收告警后，将告警进行分组、抑制、去重，发送到指定 receiver 中。
+
+**Nightingale**：开源监控项目，侧重告警引擎、告警事件的处理和分发。
+将 Prometheus / VictoriaMetrics 数据源接入夜莺，统一管理告警规则以及通知规则。
 ```
 
-### Zabbix
+### 什么是 Prometheus ？ 工作原理是什么？
 
-- 主动模式与被动模式原理
+- Prometheus 核心组件工作原理
 
 ```console
+- Prometheus Server
+通过 pull 模型定期（scrape_interval）主动从配置的 targets 的 HTTP Endpoint（通常是 /metrics）上拉取监控指标数据，并存储数据提供 PromQL 查询。
+
+- Exporter
+暴露应用/系统指标（如 node-exporter）。
+
+- Pushgateway
+工作流程：程序或脚本通过 HTTP Post 请求形式推送到 Pushgateway，Prometheus 定期从 Pushgateway 抓取暂存的指标。
+使用场景：生命周期短的任务、无法暴露指标接口的服务、定时任务或批处理作业
+
+- Alertmanager
+管理警报，分组、抑制、发送通知。
+```
+
+- 数据模型
+
+```console
+http_requests_total{method="POST", handler="/api/users", status="200"} 1024 @1756886000
+```
+
+- rate() 与 irate() 函数区别
+
+```console
+rate() 计算时间范围内每秒的平均增长率，适合长时间趋势分析与告警。
+irate() 计算时间范围内最后两个样本点的瞬时增长率，瞬时波动适合调试与快速定位问题。
+```
+
+### 什么是 Prometheus 联邦集群？如何实现高可用？
+
+```console
+联邦集群：全局的 Prometheus Server 从多个下层的 Prometheus Server 聚合特定的时间序列数据，适用于跨数据中心或大规模集群的场景。
+实现：
+1. 子 Prometheus 配置 scrape_config 暴露聚合指标
+2. 全局主 Prometheus 通过 /federate 接口拉取数据
+3. 使用 Thanos 扩展存储和查询。用例：跨数据中心监控，降低单实例压力
+
+双活多数据部署
+- 实现：部署两个完全相同的 Prometheus 实例，配置相同的抓取任务。
+- 架构：
+   Grafana -> HA / Nginx -> Prometheus A / Prometheus B -> Targets
+
+远程写入（Remote Write）+ 对象存储
+- 实现：部署多个 Prometheus 实例，配置相同的抓取任务。配置 remote_write 接口将数据写入到一个共享高可用的后端存储中，保证数据持久型和全局性。（比如 thanos 写入到 oss）
+- 架构：
+   Grafana -> Thanos Query -> Thanos Receiver -> OSS
+                                  ⬆️ remote_write
+                          Prometheus A / Prometheus B
+```
+
+### Prometheus 的缺点是什么？如何与 Thanos 或 VictoriaMetrics 扩展支持？
+
+```console
+缺点：
+- 单机实例，数据持久化依赖本地磁盘
+- 高基数标签容易导致性能问题
+- 不适合日志或追踪。
+
+持久化存储与高可用扩展：
+- 通过 remote_write 接口与 Thanos / VictoriaMetrics 集成，数据持久化存储到分布式存储（S3/OSS）
+
+查询分离：
+将查询组件接入 Grafana 数据源，将查询需求分离。
+```
+
+### 什么是 Zabbix ？常用的监控项是什么？
+
+```console
+数据模型：基于监控项（item）+ 触发器（Trigger）
+
 主动模式: zabbix-agent 会主动开启一个随机端口去向 zabbix-server 的10051端口发送 tcp 连接。zabbix-server 收到请求后，会将检查间隔时间和检查项发送给 zabbix-agent，agent 采集到数据以后发送给 server.
 
 被动模式: zabbix-server 会根据数据采集间隔时间和检查项，周期性生成随机端口去向 zabbix-agent 的10050发起连接。然后发送检查项给 agent，agent 采集后，在发送给 server。如 server 未主动发送给 agent，agent 就不会去采集数据。
 
-zabbix-proxy
-主动模式: agent 请求的是 proxy，由 proxy 向 server 去获取 agent 的采集间隔时间和采集项。再由 proxy 将数据发送给 agent,agent采集完数据后，再由 proxy 中转发送给 server.
-被动模式:
-```
+zabbix-proxy：agent 请求的是 proxy，由 proxy 向 server 去获取 agent 的采集间隔时间和采集项。再由 proxy 将数据发送给 agent,agent采集完数据后，再由 proxy 中转发送给 server.
 
-- 常用监控项
-
-```console
+常用监控项：
 1. 硬件监控: 交换机、防火墙、路由器
 2. 系统监控: CPU、内存、磁盘、进程、TCP 等
 3. 服务监控: Nginx、Mysql、Redis、Tomcat 等
 4. web 监控: 响应时间、加载时间、状态码
 ```
 
-- 自定义监控
+### 什么是 Grafana ？常用的 Dashboard 都有哪些？
 
 ```console
-编写 shell 脚本非交互式取值，如 mysql 主从复制，监控从节点的 slave 的IO，show slave status\G;
-取出 slave 的俩个线程 Slave_IO_Running 和 Slave_SQL_Running 的值都为yes 则输出一个0，如不同步则输出1，在 zabbix agent 的配置文件中，可以设置执行本地脚本 在zabbix server 的web端上上配置监控项配 mysql_slave_check，在触发器中判断取到的监控值，如1则报警，如0则输出正常。
+Grafana：开源可视化平台，用于创建仪表盘。展示 Metrics、Logs、Traces。
 
-自定义模板，需要新增图形。
+常用的 Dashboard：
+- 基础设施大盘（VM/网络设备）
+CPU
+Memory
+磁盘容量与 I/O
+网络流量（in/out）
+SLA 展示
+- 传统应用或容器应用大盘（按应用/模块）
+应用存活状态
+响应时间
+HTTP 状态/错误率
+QPS/吞吐量
+域名/证书过期状态
+- 中间件 Exporter 大盘
+Mysql
+PostgreSQL
+RocektMQ
+Redis
+Kafka
+- 容器层（按 NameSpace 与 Environment）
+CPU
+Memory
+磁盘 I/O
+网络流量（in/out）
+- 日志层
+Error 级别关键字
+```
+
+### 如何在 Grafana 中配置告警功能？与 Prometheus Alertmanager 有何区别？
+
+```console
+配置 Grafana 告警：
+1. Edit Panel，添加 Alert rule（如 avg(rate(http_requests_total[5m])) < 100 ）。
+2. 设置条件（如触发阈值）和通知渠道（Slack、Email）。
+3. 配置评估频率和时间范围。
+
+与 Alertmanager 的区别：
+基于 Panel 配置可视化的告警，配置较简单。Alertmanager 支持对于告警的分组、抑制等功能。
+```
+
+### 什么是 Fluentd / Fluentd Bit ？
+
+```console
+Fluentd：功能强大的统一日志数据收集器，丰富的插件生态，可以处理复杂的路由、解析、缓存和输出逻辑。功能全面但 CPU 和内存消耗也较高。定位是日志聚合和转发的中枢。
+
+Fluent Bit：超轻量级的日志和指标收集器和转发器。专为性能设计，CPU 和内存占用较低（约 Fluentd 的十分之一），插件相对较少。定位是嵌入式 Linux、容器、以及资源敏感环境的边缘数据收集器
+
+典型架构：在 Kubernetes 环境中，通过 DaemonSet 方式部署 fluent-bit，用于高效收集日志。然后有 fluent-bit 转发给 fluentd 实例，有 fluentd 进行更复杂的过滤、转化和分发到其他目的地（如 ES、Kafka、S3 等）
+```
+
+### Fluentd / Fluentd Bit 的缓冲机制什么？有哪些类型？ 配置结构是什么？
+
+```console
+缓冲机制：缓冲区是 Fluentd 实现至少一次（At Least Once）投递和抗后端故障的核心机制。但输出目标（如 ES）不可用时，数据会暂存在缓冲区中，待目标恢复后继续重试发送，防止数据丢失。
+
+缓冲类型：
+- 内存缓冲区（memory）：速度快，但进程重启或崩溃时数据丢失。
+- 文件缓冲区（file）：速度慢于内存，但进程重启或崩溃时数据不会丢失，可靠性更高。生产环境通常使用文件缓冲区或内存+文件混合模式。
+
+配置结构：
+- source：定义输入来源（监听端口、tail 读取日志方式、HTTP 接口接收消息方式）
+- filter：定义过滤规则，用于修改或丰富日志事件（如 grep、parse、record_transformer）。
+- match：定义输出目的地和匹配规则（如输出到 ES、S3、fluentd），匹配规则使用标签模式。
+- system：设置 fluentd 本身的系统级配置（如日志级别、工作进程数）。
+```
+
+### 什么是 Elasticsearch？Elasticsearch 的索引、分片、副本概念是什么？如何管理索引的生命周期？
+
+```console
+Elasticsearch：接收、存储和索引来自日志收集组件（如 Logstash、Filebeat、Fluentd）的日志，对日志全文分词索引，并提供 RESTful API 进行快速搜索和分析。
+优势：
+- 基于倒排索引，支持复杂的查询、过滤和聚合。
+- 天然的分布式架构，可通过节点实现水平扩展，通过分片副本实现高可用。
+- 丰富的生态和工具。
+
+
+索引（Index）：是一类文档（Document）的集合，相当于 RDS 中的 database。比如为不同的应用创建不同的索引（user-logs-2025.01.01， gateway-logs-2025.01.01）。
+
+分片（Shard）：索引可以被切割为多个部分，每个部分就是一个分片。分片允许水平切割你的数据量，并行跨分片操作，提高性能和吞吐量。分片分为主分片（Primary）和副本分片（Replica）。
+
+副本（Replica）：主分片的拷贝。副本提供高可用性（防止节点故障导致数据丢失）和更好的性能（读请求可以由主分片或副本分片处理，提高吞吐量）。
+
+生命周期管理：
+- 基于时间的索引命名写入不同日志。
+- 使用 ILM（Index Lifecycle Management）：定义 ILM 规则，在索引满足条件（如大小、时间）时，将索引转化为 hot、warm、cold 层索引，最终删除过期索引。
+```
+
+### 如何部署 Elasticsearch 集群模式，规划节点与角色？
+
+```console
+节点规划与角色分离：
+- 专用主节点
+- 专用数据节点
+- 专用协调/预处理节点
+
+网络与硬件：
+- 所有节点需要位于同一内网中。
+- 主节点：对 CPU 和磁盘要求不高，内存应足够存储集群元数据。
+- 数据节点：资源消耗主力，需要较高配置的 CPU、内存和磁盘 IO（SSD），内存与磁盘容量大概 1:10~1:30。
+- 协调节点：需要良好的 CPU 和内存，负责处理客户端请求、聚合结果等。
+
+
+```
+
+### 什么是 ELK / EFK ？
+
+```console
+Elasticsearch：接收、存储和索引来自 Logstash / Filebeat 的日志。
+Logstash：日志收集，过滤、定制等处理日志管道。
+Filebeat：轻量级日志收集，过滤、定制等处理日志管道。
+Kibana：可视化查询日志。
+
+ELK Stack：节点部署日志收集器 Logstash，过滤、转化日志内容并转发到 ES / Logstash 中枢，最终从 Kibana 进行可视化查询。
+
+EFK Stack：与 ELK 类似，将节点日志收集器替换为更轻量级的 Filebeat。
+
+中枢 Logstash / Filebeat 写入：
+- Elasticsearch：写入 ES 并接入 Kibana 用于日志搜索查询。
+- 本地文件：写入本地文件并压缩，上传 S3 / OSS 持久化存储归档日志。
+```
+
+### 什么是 Loki，与传统的 ELK / EFK Stack 的区别是什么？
+
+```console
+Loki：水平可扩展、高可用、多租户的日志聚合系统，仅索引标签（如 job，pod，namespace 等）不索引日志内容，通常日志存储在 S3 / OSS 等分布式存储中。直接可与 Grafana 集成。查询时先通过标签筛选出小的日志流，再对流进行关键字（Grep）搜索。
+ps: 避免高基数（如 trace_id）值作为标签，导致标签爆炸（High Cardinality）。
+
+与 ELK / EFK 的区别：
+- Loki：更加轻量，存储成本更低。不全文索引，查询依赖标签。更适合云原生（Kubernetes）环境。
+- ELK / EKF：功能全面，支持全文搜索，但存储成本较高且资源消耗较大。更适合复杂的日志分析与传统环境。
+```
+
+### Loki 的架构组件有哪些？做过哪些优化？
+
+```console
+架构组件：
+- distributor：日志数据写入的入口点，接收来自 Promtail 等客户端等 HTTP/gRPC 请求。
+- ingester：接收来自 distributor 的日志流，并负责在内存中构建压缩的日志块，定期将日志块写入后端存储（如 S3）。
+- querier：处理 LogQL 查询请求，向索引存储发起查询，并从后端存储和 ingester（内存中）读取日志并合并去重后返回 query-frontend。
+- query-frontend(optional)：将大的时间查询拆分为多个子查询，分发给下游的 querier 并行执行。
+- ruler(optional)：持续、定期地执行 LogQL 查询，生成警报；预先计算开销大的查询，保存为新的日志流。
+- backend storage：将索引存储（单机使用 BoltDB 本地文件、集群使用 TSDB）与块数据（S3、GCS、Minio）分离存储。
+- compactor: 定期（如每周）将后端存储（如 S3），将过去多天（如7天）的小索引文件合并为一个大索引文件。
+
+部署方式：
+- single-binary: 单点部署所有组件，用于测试。
+- simple-scalable：拆分 read 和 write，可用于中小型集群。（每天 TB 级、每秒百万行的日志摄入量）
+read：gateway、query-frontend、querier
+write：gateway、distributor、ingester
+- distributed(microservices)：微服务模式部署所有组件，用于大型集群。
+
+优化：
+- 部署 simple-scalable 模式，拆分读写请求。
+```
+
+### 日志的量有多少？部署是否有查询瓶颈？
+
+```console
+一天约
+```
+
+### 什么是分布式追踪？如何使用 Jaeger / Zipkin / OpenTelemetry 实现？
+
+```console
+分布式追踪：跟踪请求在微服务之间的传播，记录每个服务的延迟和依赖。
+
+Jaeger 实现：
+1. 部署 Jaeger（All-in-One / 生产模式）。
+2. 应用集成 Jaeger / OpenTelemetry SDK，发送追踪到 Jaeger Collector。
+3. 在 Jaeger UI 查看调用链，分析瓶颈。
+
+Zipkin：类似 Jaeger，支持 OpenTelemetry
+
+```
+
+### 描述一个通过可观测性组件排查相关故障的案例。
+
+```console
+问题发现：收到告警，查看 Grafana 仪表盘 http 接口响应时间超过 5s。
+
+日志分析：Grafana 中查询 Loki 或 Kibana 查询 Elasticsearch，分析日志，定位超时接口与日志。
+
+追踪分析：查看日志定位或查看链路，显示请求卡在数据库查询步骤。
+
+解决：优化数据库索引或回滚代码。
+
+改进：
 ```
 
 ## ServiceProxy
@@ -456,7 +692,43 @@ permanent :  返回301永久重定向，地址栏会显示跳转后的地址
 
 ## Network & System
 
-### CDN
+### 如何使用 tcpdump & Wireshark 抓包分析网络问题？
+
+- 前置分析
+
+```console
+1. 明确问题：清晰定义问题。例如：“访问 xxx.com 慢“，”与服务器 10.0.0.1 的 443 端口连接失败“，“视频卡顿”
+2. 选择抓包点：客户端、服务端、中间网络设备（如网关）
+3. 过滤器：使用过滤器缩小范围，如 host 1.2.3.4 and tcp and port 443
+4. 问题复现，抓包并分析
+- 宏观异常流量统计（是否某些 IP/端口流量较大，是否有异常连接）；IO Graph（流量速率是否骤降、高峰或中断）
+- 微观协议层定位
+物理链路层：CRC 错误或帧过短
+网络层：Destination unreachable、Time to live exceed 等错误保温
+传输层：TCP 三次握手和四次断开是否正常；Seq/Ack 是否连续，是否有重传（Tcp Retransmission）或乱序（Tcp Out-of-Order）；Flags 是否有连接重置（RST）或连接终止（FIN）；是否存在零窗口（zero window，表示接收方处理不过来）
+应用层：HTTP/TLS/DNS 协议分析
+```
+
+- 典型案例
+
+```console
+连接建立失败：无法建立 TCP 连接
+- 服务器端口未开放：客户端发送 SYN，服务器回复 RST，ACK
+- 防火墙阻断（客户端出口限制或中间网络设备阻断）：客户端发送 SYN，但没有收到回复。
+
+连接速度慢 / 应用响应延迟：可以建立 TCP 连接，但数据传输速度慢，应用响应时间长
+- TCP 重复确认与重传（Dup Ack & Retransmission）：数据包被多次 DAck，表明网络中存在丢包，导致 TCP 拥塞算法触发，降低发送速率。需结合 ping / mtr 工具排查网络链路丢包率。
+- TCP 零窗口（Zero Window）：src 向 dst 通告一个 win=0 的接收窗口，表明接收方可能由于负载高导致处理不了数据。需优化接收方服务器性能或排查应用代码性能瓶颈。
+- DNS 查询慢：排查 local DNS 或更换公共 DNS。
+
+TLS / SSL 握手失败：HTTPS、FTPS 等加密连接无法建立
+- 证书问题或协议不匹配：protocol_version（TLS 版本不匹配，需要调整配置）；unsupported_certificate（可能为证书链不完整、证书过期或自签名证书未被客户端信任）
+
+应用层问题（HTTP）：TCP 与 TLS 连接正常，应用返回错误
+- HTTP 协议响应500异常：排查应用程序内部异常
+```
+
+### 什么是 CDN？
 
 ```console
 内容分发网络，其目的是通过限制的 internet 中增加一层新的网络架构。将网站的内容发布到最接近用户的网络边缘，使用户可以就近取得所需的内容，提高用户访问网站的响应速度。
@@ -464,9 +736,7 @@ permanent :  返回301永久重定向，地址栏会显示跳转后的地址
 静态文件加速缓存, 动态请求加速.
 ```
 
-### DNS
-
-- 递归查询与迭代查询
+### 什么是递归查询与迭代查询？
 
 ```console
 递归查询(通常为客户端)
@@ -482,7 +752,7 @@ permanent :  返回301永久重定向，地址栏会显示跳转后的地址
 5. 每一步查询都由发起查询的 DNS 服务器自己完成，而不是将任务完全交给其他服务器。
 ```
 
-- 访问域名过程
+### 描述一次访问域名的过程。
 
 ```console
 客户端访问 www.example.com 时
@@ -498,7 +768,7 @@ permanent :  返回301永久重定向，地址栏会显示跳转后的地址
 > 5.4 如果返回的是 CNAME 记录（如 www.example.com 指向 cdn.example.com），本地DNS服务器会重复上述过程，解析 CNAME 指向的域名，直到获取最终 IP 地址（A 记录）。
 ```
 
-### LVS
+### 什么是 LVS ？
 
 - 调度算法
 

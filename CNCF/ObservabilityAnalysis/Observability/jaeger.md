@@ -6,10 +6,12 @@ description: Jaeger
 
 ## Introduction
 
-
 ## Deploy With Container
+
 ### Run in Docker
+
 all-in-one 部署，用于测试环境
+
 ```bash
 docker run -d --name jaeger \
   -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
@@ -27,18 +29,19 @@ docker run -d --name jaeger \
   jaegertracing/all-in-one:1.45
 ```
 
-
 ### Run in Kubernetes
->Must be installed: ingress & cert-manager
+
+> Must be installed: ingress & cert-manager
 
 **deploy by kubenertes manifest**
+
 ```bash
 # install operator
 kubectl create namespace observability
 kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.45.0/jaeger-operator.yaml -n observability
 
 
-# deploying allinone 
+# deploying allinone
 cat > simpletest.yaml << "EOF"
 apiVersion: jaegertracing.io/v1
 kind: Jaeger
@@ -50,7 +53,7 @@ kubectl -n observability get jaegers
 ```
 
 **deploy by helm**
-[[cc-helm|helm常用命令]]
+
 ```bash
 # add and update repo
 helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
@@ -73,9 +76,8 @@ EOF
 kubectl -n observability get jaegers
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://www.jaegertracing.io/)
 > 2. [Repository](https://github.com/jaegertracing/jaeger)
 > 3. [jaeger-operator](https://github.com/jaegertracing/jaeger-operator)

@@ -5,10 +5,13 @@ description: Logstash
 # Logstash
 
 ## Introduction
+
 ...
 
 ## Deploy With Binary
+
 ### Quick Start
+
 ```bash
 # 1.download and decompression
 https://www.elastic.co/downloads/logstash
@@ -21,12 +24,12 @@ vim config/logstash.conf
 bin/logstash -f logstash.conf
 ```
 
-
 ### Config and Boot
-[[sc-logstash|Logstash config]]
+
+[Logstash config](/Operations/ServiceConf/logstash.md)
 
 ```bash
-# boot 
+# boot
 cat > /usr/lib/systemd/system/logstash.service << "EOF"
 [Unit]
 Description=logstash
@@ -58,14 +61,16 @@ systemctl start .service
 systemctl enable .service
 ```
 
-
 ## Deploy With Container
+
 ### Run by Resource
+
 ```bash
 # https://docs.fluentd.org/container-deployment/kubernetes
 ```
 
 ### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add elastic https://helm.elastic.co
@@ -92,6 +97,7 @@ helm -n logging install logstash .
 ```
 
 > Reference:
+>
 > 1. [Official Website](https://www.elastic.co/guide/en/logstash/current/introduction.html)
 > 2. [Repository](https://github.com/elastic/logstash)
 > 3. [apt installing](https://www.elastic.co/guide/en/logstash/current/installing-logstash.html)

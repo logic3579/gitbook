@@ -2,7 +2,7 @@
 
 ## main config
 
-/opt/prometheus/prometheus.yml
+/opt/observability/prometheus/prometheus.yml
 
 ```bash
 # Global config
@@ -37,10 +37,21 @@ scrape_configs:
         labels:
           group: 'canary'
 
-# remote_write:
-#   - url: "http://localhost:9094/api/v1/read"
-# remote_read:
-#   - url: "http://localhost:9094/api/v1/read"
+remote_read:
+  # Thanos
+  - url: "http://thanos-query:10902/api/v1/read"
+    basic_auth:
+      username: "user"
+      password: "password"
+	tls_config:
+	  insecure_skip_verify: true
+  # VictoriaMetrics
+  - url: "http://vmselect:8481/select/0/prometheus/api/v1/read"
+remote_write:
+  # Thanos
+  - url: "http://thanos-receive:10908/api/v1/receive"
+  # VictoriaMetrics
+  - url: "http://vminsert:8480/insert/0/prometheus"
 
 # tls_server_config:
 #   cert_file: <filename>
@@ -49,7 +60,7 @@ scrape_configs:
 
 ## rule files
 
-/opt/prometheus/alerting.rules.yaml
+/opt/observability/prometheus/alerting.rules.yaml
 
 ```bash
 # alerting rules file
@@ -75,7 +86,7 @@ groups:
       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 ```
 
-/opt/prometheus/recording.rules.yaml
+/opt/observability/prometheus/recording.rules.yaml
 
 ```bash
 # recoding rules file

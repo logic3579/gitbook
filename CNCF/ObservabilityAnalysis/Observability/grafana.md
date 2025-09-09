@@ -6,7 +6,9 @@ description: Grafana
 
 ## Introduction
 
-grafana 是一个可视化面板，有着非常漂亮的图表和布局展示，功能齐全的度量仪表盘和图形编辑器，支持 Graphite、zabbix、InfluxDB、Prometheus、OpenTSDB、Elasticsearch 等作为数据源，比 Prometheus 自带的图表展示功能强大太多，更加灵活，有丰富的插件，功能更加强大。
+Grafana Open Source Software (OSS) enables you to query, visualize, alert on, and explore your metrics, logs, and traces wherever they’re stored. Grafana data source plugins enable you to query data sources including time series databases like Prometheus and CloudWatch, logging tools like Loki and Elasticsearch, NoSQL/SQL databases like Postgres, CI/CD tooling like GitHub, and many more. Grafana OSS provides you with tools to display that data on live dashboards with insightful graphs and visualizations.
+
+Grafana Enterprise is a commercial edition of Grafana that includes exclusive data source plugins and additional features not found in the open source version. You also get 24x7x365 support and training from the core Grafana team. To learn more about these features, refer to Enterprise features.
 
 ## Deploy With Binary
 
@@ -30,7 +32,7 @@ cd grafana-10.0.3
 
 ### Config and Boot
 
-#### [[sc-monitoring#Grafana|Grafana Config]]
+[Grafana Config](/Operations/ServiceConf/grafana.md)
 
 #### Boot(systemd)
 
@@ -264,6 +266,5 @@ $alert.Labels.instance }} 当前数值: {{ $alert.Values.B }} 静默告警: {{
 >
 > 1. [Official Website](https://grafana.com/docs/)
 > 2. [Repository](https://github.com/grafana/grafana)
-> 3. [Grafana CN Doc](https://www.qikqiak.com/k8s-book/docs/56.Grafana%E7%9A%84%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8.html)
-> 4. [Grafana Alert](https://grafana.com/docs/grafana/latest/alerting/fundamentals/)
-> 5. [Telegram Api SDK](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API)
+> 3. [Grafana Alert](https://grafana.com/docs/grafana/latest/alerting/fundamentals/)
+> 4. [Telegram Api SDK](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API)

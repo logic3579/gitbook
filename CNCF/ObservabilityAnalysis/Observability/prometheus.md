@@ -5,17 +5,85 @@ description: Prometheus
 # Prometheus
 
 ## Introduction
-...
 
+### What is Prometheus?
+
+Prometheus is an open-source systems monitoring and alerting toolkit originally built at SoundCloud. Since its inception in 2012, many companies and organizations have adopted Prometheus, and the project has a very active developer and user community. It is now a standalone open source project and maintained independently of any company. To emphasize this, and to clarify the project's governance structure, Prometheus joined the Cloud Native Computing Foundation in 2016 as the second hosted project, after Kubernetes.
+
+Prometheus collects and stores its metrics as time series data, i.e. metrics information is stored with the timestamp at which it was recorded, alongside optional key-value pairs called labels.
+
+For more elaborate overviews of Prometheus, see the resources linked from the media section.
+
+#### Features
+
+Prometheus's main features are:
+
+- a multi-dimensional data model with time series data identified by metric name and key/value pairs
+- PromQL, a flexible query language to leverage this dimensionality
+- no reliance on distributed storage; single server nodes are autonomous
+- time series collection happens via a pull model over HTTP
+- pushing time series is supported via an intermediary gateway
+- targets are discovered via service discovery or static configuration
+- multiple modes of graphing and dashboarding support
+
+#### Components
+
+- the main Prometheus server which scrapes and stores time series data
+
+````console
+Proactively pull monitoring metric data from the HTTP endpoints(usually is /metrics) of configured targets through a pull model on a regular basis(scrape_intervals), and store the data for PromQL queries.
+
+- client libraries for instrumenting application code
+- a push gateway for supporting short-lived jobs
+```console
+Programs or scripts are pushed to Pushgateway via HTTP Post requests, and Prometheus periodically retrieves temporarily stored metrics from Pushgateway.
+````
+
+- special-purpose exporters for services like HAProxy, StatsD, Graphite, etc.
+
+```console
+Expose application/server metrics, like node-exporter, mysql-exporter.
+```
+
+- an alertmanager to handle alerts
+
+```console
+Manage alerts, group, suppress, and send notifications.
+```
+
+- various support tools
+
+### Concepts
+
+#### Data model
+
+Metric names and labels
+
+```console
+api_http_requests_total{method="POST", handler="/messages"}
+```
+
+#### Metric types
+
+Counter
+
+Gauge
+
+Historam
+
+Summary
+
+#### Jobs and instances
 
 ## Deploy With Binary
 
 ### Quick Start
+
 ```bash
 # download source and decompress
 wget https://github.com/prometheus/prometheus/releases/download/v2.45.0/prometheus-2.45.0.linux-amd64.tar.gz
 tar xf prometheus-2.45.0.linux-amd64.tar.gz && rm -f prometheus-2.45.0.linux-amd64.tar.gz
-mv prometheus-2.45.0.linux-amd64 /opt/prometheus 
+mv prometheus-2.45.0.linux-amd64 /opt/prometheus
 cd /opt/prometheus
 
 # postinstallation
@@ -23,7 +91,7 @@ groupadd prometheus
 useradd -r -g prometheus -s /bin/false prometheus
 chown prometheus:prometheus /opt/prometheus -R
 
-# startup 
+# startup
 ./prometheus --config.file=prometheus.yml [--web.enable-lifecycle]
 # prometheus metris
 curl 127.0.0.1:9090/metrics
@@ -34,9 +102,10 @@ curl 127.0.0.1:9090/-/reload -X POST
 
 ### Config and Boot
 
-#### [[sc-monitoring|Prometheus Config]]
+[Prometheus Config](/Operations/ServiceConf/prometheus.md)
 
 #### Boot(systemd)
+
 ```bash
 # boot
 cat > /etc/systemd/system/prometheus.service << "EOF"
@@ -78,10 +147,10 @@ job_service:rpc_durations_seconds_count:avg_rate5m
 
 ```
 
-
 ## Deploy With Container
 
 ### Run in Docker
+
 ```bash
 mkdir /opt/prometheus
 cat > /opt/prometheus/prometheus.yml << "EOF"
@@ -96,6 +165,7 @@ docker run --name prometheus --rm -p 9090:9090 -v /opt/prometheus/prometheus.yml
 ```
 
 ### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -136,17 +206,14 @@ helm -n monitoring install prometheus .
 
 ```
 
-
 ## Visualization
 
-### [[grafana|Grafana]]
-
 ### [console template](https://prometheus.io/docs/visualization/consoles/)
-
 
 ## AlertManager
 
 ### Quick Start
+
 ```bash
 # baniry
 cd /opt/prometheus
@@ -159,6 +226,7 @@ mv alertmanager-0.25.0.linux-amd64 alertmanager
 ```
 
 ### [[sc-monitoring#Alertmanager|Alert Config]]
+
 ```bash
 cat > /opt/prometheus/alertmanager/alertmanager.yml << "EOF"
 ...
@@ -168,17 +236,18 @@ cd /opt/prometheus/alertmanager/
 ./alertmanager --config.file=alertmanager.yml
 ```
 
-
 ## Metrics exporter
 
 ### node_exporter
+
 Download and Install
+
 ```bash
 # baniry
 cd /opt/prometheus
 wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.24.0/blackbox_exporter-0.24.0.linux-amd64.tar.gz
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
-tar xf blackbox_exporter-0.24.0.linux-amd64.tar.gz && rm -f blackbox_exporter-0.24.0.linux-amd64.tar.gz 
+tar xf blackbox_exporter-0.24.0.linux-amd64.tar.gz && rm -f blackbox_exporter-0.24.0.linux-amd64.tar.gz
 tar xf node_exporter-1.6.1.linux-amd64.tar.gz && rm -f node_exporter-1.6.1.linux-amd64.tar.gz
 ./blackbox_exporter-0.24.0.linux-amd64/blackbox_exporter
 ./node_exporter-1.6.1.linux-amd64/node_exporter
@@ -189,15 +258,14 @@ tar xf node_exporter-1.6.1.linux-amd64.tar.gz && rm -f node_exporter-1.6.1.linux
 helm pull --untar prometheus-community/prometheus-blackbox-exporter
 ```
 
-
 ### middleware exporter
+
 ```bash
 ### template
 # 1.install exporter
 # 2.modify exporter config and check exporter
 # 3.modify prometheus.yml
 # 4.add grafana dashboard
-
 
 # custom monitor endpoints
 kubectl -n monitoring get service prometheus-kube-state-metrics -oyaml
@@ -238,6 +306,7 @@ metadata:
 ```
 
 redis-exporter
+
 ```bash
 # helm values
 no need
@@ -266,6 +335,7 @@ no need
 ```
 
 kafka-exporter
+
 ```bash
 # helm values
 kafkaServer:
@@ -286,6 +356,7 @@ kafkaServer:
 ```
 
 rocketmq-exporter
+
 ```bash
 # modify config and build jar
 rocketmq:
@@ -310,8 +381,8 @@ metadata:
      - targets: ['rocketmq-exporter:5557']
 ```
 
-
 > Reference:
+>
 > 1. [Official Website](https://prometheus.io/docs/introduction/overview/)
 > 2. [Repository](https://github.com/prometheus/prometheus)
 > 3. [Download](https://prometheus.io/download/)

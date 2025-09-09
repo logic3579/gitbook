@@ -5,11 +5,15 @@ description: Fluentd and Fluent Bit
 # Fluentd & Fluent Bit
 
 ## Fluentd
+
 ### Introduction
+
 ...
 
 ### Deploy With Binary
+
 #### Quick Start
+
 ```bash
 # Ubuntu Package install
 # https://docs.fluentd.org/installation/install-by-deb
@@ -17,7 +21,8 @@ description: Fluentd and Fluent Bit
 ```
 
 #### Config and Boot
-[[sc-fluentd|Fluentd Config]]
+
+[Fluentd Config](/Operations/ServiceConf/fluentd.md)
 
 ```bash
 # change storage permission
@@ -26,13 +31,14 @@ chown td-agent.td-agent /opt/log_path/ -R
 # fluentd
 chown _fluentd:_fluentd /opt/log_path/ -R
 
-# boot 
+# boot
 systemctl daemon-reload
 systemctl start td-agent.service
 systemctl enable td-agent.service
 ```
 
 #### Verify
+
 ```bash
 # syntax check
 # td-agent
@@ -42,18 +48,21 @@ fluentd -c fluentd.conf --dry-run
 ```
 
 #### Troubleshooting
+
 ```bash
-# 
+#
 ```
 
-
 ### Deploy With Container
+
 #### Run by Resource
+
 ```bash
 # https://docs.fluentd.org/container-deployment/kubernetes
 ```
 
 #### Run in Kubernetes
+
 ```bash
 # add and update repo
 helm repo add fluent https://fluent.github.io/helm-charts
@@ -70,25 +79,26 @@ helm -n logging install fluentd .
 
 ```
 
-
 ## Fluent Bit
 
 ### Introduction
+
 **Fluent Bit** 是一个开源的多平台日志处理器工具，它旨在成为用于日志处理和分发的通用利器。
 如今，系统中信息源数量正在不断增加。处理大规模数据非常复杂，收集和汇总各种数据需要一种专门的工具，该工具可以解决如下问题:
+
 - 不同的数据源
 - 不同的数据格式
 - 数据可靠性
 - 安全性
 - 灵活的路由
 - 多目的地
-Fluent Bit 在设计时就考虑了高性能和低资源消耗。
-
+  Fluent Bit 在设计时就考虑了高性能和低资源消耗。
 
 **Fluent Bit & Fluentd 区别**
 Fluentd 和 Fluent Bit 都可以充当聚合器或转发器，它们可以互补使用或单独用作为解决方案。[详情](https://hulining.gitbook.io/fluentbit/about/fluentd-and-fluent-bit)
 
 ### Deploy With Binary
+
 ```bash
 # source code download
 https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit
@@ -112,15 +122,18 @@ apt install td-agent-bit
 cat /etc/td-agent-bit/td-agent-bit.conf
 
 # start service
-systemctl start td-agent-bit.service 
-systemctl enable td-agent-bit.service 
+systemctl start td-agent-bit.service
+systemctl enable td-agent-bit.service
 
 ```
 
 ### Deploy With Container
+
 #### 相关概念
+
 Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每个节点上运行以从每个 POD 收集日志，因此Fluent Bit 被部署为 DaemonSet(在集群的每个 node 上运行的 POD)。
 当 Fluent Bit 运行时，它将读取，解析和过滤每个 POD 的日志，并将使用以下信息(元数据)丰富每条数据:
+
 - Pod Name
 - Pod ID
 - Container Name
@@ -129,12 +142,14 @@ Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每�
 - Annotations
 
 #### 日志输出方式
+
 当前集群环境容器日志都为 console 输出，分为两部分：
-+ 输出到 Elasticsearch，用于 CMDB / Kibana 前台搜索日志
-+ 输出到 forward 接口，接口由 fluentd 服务提供并持久化日志，本地存储15天，归档日志到谷歌云 Cloud Storage 存储桶备份
+
+- 输出到 Elasticsearch，用于 CMDB / Kibana 前台搜索日志
+- 输出到 forward 接口，接口由 fluentd 服务提供并持久化日志，本地存储15天，归档日志到谷歌云 Cloud Storage 存储桶备份
 
 #### helm 下载 charts 包
-[[cc-helm|helm常用命令]]
+
 ```bash
 # 创建可观测性 chart 包目录
 mkdir /opt/helm-charts/logging
@@ -219,7 +234,7 @@ vim values.yaml
         Logstash_DateFormat %Y-%m-%d
         Suppress_Type_Name On
         Retry_Limit False
-        
+
   customParsers: |
     [PARSER]
         Name docker_no_time
@@ -234,7 +249,7 @@ vim values.yaml
         rule "start_state"      "/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.*/" "exception_name"
         rule "exception_name"   "/(\w+\.)+\w+: .*/"                        "cont"
         rule "cont"             "/^\s+at.*/"                               "cont"
-        
+
   extraFiles:
       # 自定义 lua 文件
       fluentbit.lua: |
@@ -251,6 +266,7 @@ vim values.yaml
 ```
 
 #### 配置启动
+
 ```bash
 # config
 cat > values.yaml << "EOF"
@@ -279,7 +295,7 @@ config:
         Buffer_Chunk_Size 1M
         # 每个文件的最大buffer size
         Buffer_Max_Size 5M
-        # 跳过长度大于 Buffer_Max_Size 的行，Skip_Long_Lines 若设为Off遇到超过长度的行会停止采集        
+        # 跳过长度大于 Buffer_Max_Size 的行，Skip_Long_Lines 若设为Off遇到超过长度的行会停止采集
         Skip_Long_Lines On
         # 跳过空行
         Skip_Empty_Lines On
@@ -386,7 +402,7 @@ config:
         type regex
         flush_timeout 1000
         rule "start_state"      "/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.*/" "exception_name"
-        rule "exception_name"   "/(\w+\.)+\w+: .*/"                        "cont" 
+        rule "exception_name"   "/(\w+\.)+\w+: .*/"                        "cont"
         rule "cont"             "/^\s+at.*/"                               "cont"
   extraFiles:
       fluentbit.lua: |
@@ -416,19 +432,23 @@ config:
 logLevel: info
 EOF
 
-# start 
+# start
 helm -n logging install fluent-bit-uat .
 ```
 
 **快速部署 fluent-bit & es 服务（仅用于测试环境）**
+
 ```bash
 kubectl create -f https://raw.githubusercontent.com/fluent/fluent-bit-kubernetes-logging/master/output/elasticsearch/fluent-bit-ds.yaml
 ```
 
 ### OUTPUT 插件服务相关配置
+
 #### Elasticsearch 配置
+
 [[cc-elasticsearch|ES 常用命令]]
 [[sc-elasticsearch|ES 常用配置]]
+
 ```bash
 # elasticsearch 部署配置：略
 
@@ -519,7 +539,9 @@ curl -X PUT 'http://172.30.2.218:9200/_template/logstash_template' \
 ```
 
 #### Logstash 配置
+
 [[sc-logstash|logstash 常用配置]]
+
 ```bash
 # 下载解压
 cd /opt
@@ -573,7 +595,7 @@ filter {
     }
 }
 output {
-    #stdout { codec => rubydebug } 
+    #stdout { codec => rubydebug }
 
     # fluent-bit backup
     if [user_agent][original] == "Fluent-Bit" {
@@ -599,14 +621,15 @@ output {
 ```
 
 #### 谷歌云存储桶服务配置
+
 ```bash
 # 1、创建存储桶：xxx_logs_store
 # 2、创建存储桶日志目录（非必需）：backup_logs
 # 3、将 logstash 备份日志目录使用 gcloud 工具定时任务上传谷歌云存储桶服务
 ```
 
-
 > Reference:
+>
 > 1. [Official Website](https://www.fluentd.org/)
 > 2. [Repository](https://github.com/fluent/fluentd)
 > 3. [fluentd-beat plugin](https://github.com/repeatedly/fluent-plugin-beats)

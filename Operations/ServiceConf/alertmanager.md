@@ -2,15 +2,15 @@
 
 ## main config
 
-/opt/prometheus/alertmanager/alertmanager.yml
+/opt/observability/alertmanager/alertmanager.yml
 
 ```bash
 global:
   resolve_timeout: 5m
   smtp_smarthost: 'smtp.163.com:465'
-  smtp_from: 'xxx@163.com'
-  smtp_auth_username: 'xxx@163.com'
-  smtp_auth_password: 'xxxxxx'
+  smtp_from: 'example@163.com'
+  smtp_auth_username: 'user@163.com'
+  smtp_auth_password: 'password'
   smtp_hello: '163.com'
   smtp_require_tls: false
 route:
@@ -39,7 +39,7 @@ templates:
 
 ## template config
 
-/opt/prometheus/alertmanager/email.tmpl
+/opt/observability/alertmanager/email.tmpl
 
 ```html
 {{ define "email.html" }} {{ range .Alerts }}
