@@ -131,7 +131,7 @@ systemctl enable td-agent-bit.service
 
 #### 相关概念
 
-Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每个节点上运行以从每个 POD 收集日志，因此Fluent Bit 被部署为 DaemonSet(在集群的每个 node 上运行的 POD)。
+Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每个节点上运行以从每个 POD 收集日志，因此 Fluent Bit 被部署为 DaemonSet(在集群的每个 node 上运行的 POD)。
 当 Fluent Bit 运行时，它将读取，解析和过滤每个 POD 的日志，并将使用以下信息(元数据)丰富每条数据:
 
 - Pod Name
@@ -145,8 +145,8 @@ Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每�
 
 当前集群环境容器日志都为 console 输出，分为两部分：
 
-- 输出到 Elasticsearch，用于 CMDB / Kibana 前台搜索日志
-- 输出到 forward 接口，接口由 fluentd 服务提供并持久化日志，本地存储15天，归档日志到谷歌云 Cloud Storage 存储桶备份
+- 输出到 Elasticsearch，用于 Kibana 前台搜索日志。
+- 输出到 forward 接口，接口由 fluentd 服务提供并持久化日志，本地存储15天，归档3个月日志到云存储（如 S3、GCS、OSS 等）。
 
 #### helm 下载 charts 包
 
@@ -223,13 +223,12 @@ vim values.yaml
     [OUTPUT]
         Name es
         Match kube.*
-        #Host 172.30.2.218
-        Host 172.30.2.236
+        Host 1.1.1.1
         Port 9200
         HTTP_User elastic
         HTTP_Passwd elastic123
         Logstash_Format On
-        #Logstash_Prefix logstash-uat_
+        #Logstash_Prefix logstash-
         Logstash_Prefix_Key $es_index
         Logstash_DateFormat %Y-%m-%d
         Suppress_Type_Name On
@@ -365,7 +364,7 @@ config:
     [OUTPUT]
         Name es
         Match kube.*
-        Host 172.30.2.218
+        Host 1.1.1.1
         Port 9200
         HTTP_User elastic
         HTTP_Passwd es123
@@ -378,13 +377,13 @@ config:
     [OUTPUT]
         Name forward
         Match kube.*
-        Host 172.30.2.54
+        Host 1.1.1.1
         Port 24224
         Compress gzip
     [OUTPUT]
         Name http
         Match kube.*
-        Host 172.30.2.54
+        Host 1.1.1.1
         Port 5999
         Format json_lines
     #[OUTPUT]
@@ -446,9 +445,6 @@ kubectl create -f https://raw.githubusercontent.com/fluent/fluent-bit-kubernetes
 
 #### Elasticsearch 配置
 
-[[cc-elasticsearch|ES 常用命令]]
-[[sc-elasticsearch|ES 常用配置]]
-
 ```bash
 # elasticsearch 部署配置：略
 
@@ -458,7 +454,7 @@ kubectl create -f https://raw.githubusercontent.com/fluent/fluent-bit-kubernetes
 # 2、分词器安装
 ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v8.4.3/elasticsearch-analysis-ik-8.4.3.zip
 # 3、索引模板创建：副本数、分片、生命周期策略设置
-curl -X PUT 'http://172.30.2.218:9200/_template/logstash_template' \
+curl -X PUT 'http://elasticsearch:9200/_template/logstash_template' \
 -H 'Content-Type: application/json' \
 -d '{
         "order": 100,
@@ -540,8 +536,6 @@ curl -X PUT 'http://172.30.2.218:9200/_template/logstash_template' \
 
 #### Logstash 配置
 
-[[sc-logstash|logstash 常用配置]]
-
 ```bash
 # 下载解压
 cd /opt
@@ -617,15 +611,6 @@ output {
       }
     }
 }
-
-```
-
-#### 谷歌云存储桶服务配置
-
-```bash
-# 1、创建存储桶：xxx_logs_store
-# 2、创建存储桶日志目录（非必需）：backup_logs
-# 3、将 logstash 备份日志目录使用 gcloud 工具定时任务上传谷歌云存储桶服务
 ```
 
 > Reference:
