@@ -4,174 +4,182 @@ description: interview
 
 # Interview
 
-## CICD
+## AppDefinition and Development
 
-### ArgoCD
+### Application Definition & Image Build
+
+#### 什么是 Helm？为什么在 Kubernetes 中使用？
+
+```console
+Helm 是 Kubernetes 中的包管理器，允许定义、安装和升级复杂的 Kubernetes 程序。
+
+核心概念：
+- Chart：Helm 软件包，包含一个应用在 Kubernetes 上运行所需的所有资源定义的文件集合。
+- Release：在 Kubernetes 中运行的一个 Chart 实例。安装或更新 Chart 时，会生成一个新的 release。
+- Repository：HTTP 服务器，用于存放和共享 Charts。
+
+为什么使用：
+- 简化部署：将复杂的 Kubernetes YAML 文件打包成统一的一个 Chart，实现一键部署。
+- 管理复杂度：对于由多个 Deployment、Service、ConfigMap 等资源组成的应用，Helm 提供了生命周期的能力。
+- 参数化配置：通过 values.yaml 文件，可以将配置与 Chart 模板分离，使得一套 Chart 可以在不同环境（开发、测试、生产）中复用。
+- 易于共享和开发：Chart 可以打包并上传到仓库（如 Harbor、GitLab），方便团队内部或社区共享。
+```
+
+#### Helm 都有哪些内置对象？helm upgrade 和 helm rollback 是如何工作的？
+
+```console
+内置对象：
+- {{ .Values }}：访问传入 Chart 的 values.yaml 文件中的值。如：{{ .Values.image.tag }}。
+- {{ .Release }}：访问当前 Release 的信息。如：{{ .Release.Name }}。
+- {{ .Chart }}：访问 Chart.yaml 文件中的元数据。如：{{ .Chart.Name }}。
+- {{ .Capabilities }}：访问关于 Kubernetes 集群的信息。如：{{ .Capabilities.KubeVersion }}。
+
+helm upgrade：
+- Helm 获取最新的 Chart 和 Values。
+- 使用上面的输入渲染生成新的 Kubernetes 资源清单。
+- 将新生成的清单与当前集群中实际运行的资源状态进行对比（三路战略合并补丁）。
+- 仅发送必要的更改到 Kubernetes API Server 以将应用更新到期望状态。
+- 每次成功的升级都会创建一个新的 Revision（版本号递增）。
+
+helm rollback：
+- 从历史版本（Revision）中查找指定版本的 Chart 和 Values。
+- 使用这些旧的配置渲染模板。
+- 将重新渲染的模板与当前状态对比，计算出如何将应用恢复到旧版本状态。
+- 执行更改，并将这次回滚操作也记录为一个新的 Revison。
+```
+
+#### 编写一个生产可用的 Helm Chart 有哪些最佳实践？
+
+```console
+- 为资源使用正确的标签：确保所有模板化的资源都有标准标签，如 app.kubernetes.io/name, app.kubernetes.io/instance, app.kubernetes.io/version, helm.sh/chart。
+
+- 定义 values.schema.json：为 values.yaml 提供一个 JSON Schema，可以在安装/升级时验证用户提供的 values 是否有效，避免因配置错误导致部署失败。
+
+- 谨慎使用 Helm Hooks：明确 Hooks 的权重（helm.sh/hook-weight）以确保执行顺序，并为其设置删除策略（"helm.sh/hook-delete-policy": hook-succeeded）。
+
+- 使用 helm lint：在打包 Chart 前，始终使用 helm lint 命令来检查 Chart 的语法和可能的问题。
+
+- 使用 include 函数代替 template：在模板中，使用 include 函数可以更好地处理缩进和上下文，template 函数已弃用。
+
+- 版本化：遵循语义化版本控制（SemVer）为 Chart 编号。
+```
+
+### CICD
+
+#### 什么是 ArgoCD？
 
 ```console
 
 ```
 
-### Ansible & Saltstack
+#### 什么是 Jenkins？主要功能是什么？什么是 Jenkins 的 Master/Agent 架构？
 
 ```console
-- 特点
-轻量级，无代理结构（基于 SSH）
-模块化设计，yaml 语法编写 playbook 模板
-幂等性
+Jenkins 是一个开源的、可扩展的 CI/CD 工具，用于自动化开发过程中的构建、测试、部署等任务。
 
-- 核心组件
-Inventory：定义管理主机
-Playbook：自动化任务 yaml 文件
-Module：执行特定任务的代码单元
-Role：组织 Playbook 和文件的目录结构
-Task：Playbook 中的单个执行步骤
+主要功能：
+- 持续集成（CI）：自动触发代码编译、单元测试、代码质量检查等。
+- 持续交付/部署（CD）：自动化地将应用部署到各种环境（测试、预生产、生产）。
+- 任务调度：执行定时任务（如 nightly build）。
+- 丰富的生态系统：超过1800个插件与几乎所有开发、测试、部署工具集成。
 
-- 常用 Module
-command | shell
-copy
-file
-package
-ping
-service
-template
-unarchive
-user
-group
+Master/Agent 架构：
+- Master 主节点：负责管理中心、配置 Job、调度构建任务、管理 Agent。
+- Agent（Worker）代理节点：负责具体执行 Master 分配的任务，一台 Master 可以连接和管理多个 Agent。
+- 好处：环境隔离（如不同项目使用不同的构建环境）；可以横向扩展，增加 Agent 提高并行构建能力；可以将 Agent 放在哪玩提高安全性。
 ```
 
-### Saltstack
+#### 什么是 Jenkinsfile？好处是什么？
 
 ```console
-- 特点
-支持主从架构（salt-minion）和无主架构（SSH）
-基于轻量级队列快速通信（zeromq）
-使用声明式状态系统
+Jenkinsfile 是一个文本文件，使用 Groovy DSL 语法来定义整个 CICD 流水线（Pipeline），通常放在项目的源代码仓库根目录下。
 
-- 核心组件
-Master：控制服务端
-Minio：管理节点客户端
-ZeroMQ：消息传输轻量级队列
-Salt SSH：无代理模式
-Syndic：分级管理节点
-Grains：静态 Minion 信息（OS、IP 等），由 Minion 收集
-Pillars：Master 定义的敏感数据或 Minion 特定数据，由 Master 分发
-
-- 常用模块
-cmd.run
-cp.get_file
-cp.get_dir
-file.managed
-pkg.install
+好处：
+- 流水线即代码（Pipeline as Code）：将流水线的配置像代码一样进行版本控制、评审和迭代。
+- 单一可信源：每个分支都可以有自己的流水线定义，便于实现不同分支的不同构建策略。
+- 可复用性：可以编写共享库（Shared Libraries），抽象通用逻辑，供多个项目的 Jenkinsfile 调用。
+- 更强的功能：相比传统自由风格项目，声明式流水线提供更强大的结构、错误处理和并行执行能力。
 ```
 
-### Helm
+### Database & Streaming & Messaging
 
-```console
-helm-charts
-```
-
-### Jenkins
-
-```console
-- Job
-SSH Plugin
-Kubernetes Plugin
-```
-
-### Terraform
-
-```console
-AWS
-GCP
-```
-
-## Database & Streaming
-
-### MySQL
+#### 什么是 MySQL？常用的架构有哪些？
 
 - 主从复制
 
 ```console
-1. 主节点必须启用 mysql binlog 二进制日志，记录任何修改了数据库数据的事件。
-2. 从节点开启一个线程(I/O Thread)把自己扮演成 mysql 的客户端，通过 mysql 协议，请求主节点的二进制日志文件中的事件
-3. 主节点启动一个线程(dump Thread)，检查自己二进制日志中的事件，跟对方请求的位置对比，如果不带请求位置参数，则主节点就会从第一个日志文件中的第一个事件一个一个发送给从节点。
-4. 从节点接收到主节点发送过来的数据把它放置到中继日志（Relay log）文件中。并记录该次请求到主节点的具体哪一个二进制日志文件内部的哪一个位置（主节点中的二进制文件会有多个，在后面详细讲解）。
-5. 从节点启动另外一个线程（sql Thread ），把 Relay log 中的事件读取出来，并在本地再执行一次。
+
+主从架构：
+- 主节点必须启用 mysql binlog 二进制日志，记录任何修改了数据库数据的事件。
+- 从节点开启一个线程(I/O Thread)把自己扮演成 mysql 的客户端，通过 mysql 协议，请求主节点的二进制日志文件中的事件
+- 主节点启动一个线程(dump Thread)，检查自己二进制日志中的事件，跟对方请求的位置对比，如果不带请求位置参数，则主节点就会从第一个日志文件中的第一个事件一个一个发送给从节点。
+- 从节点接收到主节点发送过来的数据把它放置到中继日志（Relay log）文件中。并记录该次请求到主节点的具体哪一个二进制日志文件内部的哪一个位置（主节点中的二进制文件会有多个，在后面详细讲解）。
+- 从节点启动另外一个线程（sql Thread ），把 Relay log 中的事件读取出来，并在本地再执行一次。
+
+日志类型：
+- 错误日志：记录报错或警告信息
+- 查询日志：记录所有对数据请求的信息，不论这些请求是否得到正确的执行。
+- 慢查询日志：设置阕值，将查询时间超过该值的查询语句。
+- 二进制日志：记录对数据库执行更改得所有操作
+- 中继日志
+- 事务日志
 ```
 
-- 日志类型
-
-```console
-错误日志: 记录报错或警告信息
-查询日志: 记录所有对数据请求的信息，不论这些请求是否得到正确的执行。
-慢查询日志: 设置阕值，将查询时间超过该值的查询语句。
-二进制日志: 记录对数据库执行更改得所有操作
-中继日志
-事务日志
-```
-
-### Redis
+#### 什么是 Redis？主要特点和数据类型是什么？使用场景是什么？
 
 - 特点
 
 ```console
-1. redis 采用多路复用机制
-2. 数据结构简单
-3. 纯内存操作 运行在内存缓存区中，数据存储在内存中，读取时无需进行磁盘IO
-4. 单线程无锁竞争损耗
+Redis 特点：
+- redis 采用多路复用机制
+- 数据结构简单
+- 纯内存操作：运行在内存缓存区中，数据存储在内存中，读取时无需进行磁盘IO
+- 单线程无锁竞争损耗
 
-频繁被访问的数据，经常被访问的数据如果放在关系型数据库，每次查询的开销都会很大，而放在 redis 中，因为 redis 是放在内存中的可以很高效的访问。
+数据类型：
+- String 整数，浮点整数或者字符串
+- Set 集合
+- Zset 有序集合
+- Hash 散列
+- List 列表
+
+使用场景：
+- 缓存
+- 排行榜，常用有序集合实现。
+- 好友关系，利用集合 如交集、差集、并集等。
+- 简单的消息队列。
+- Session 共享。
+
+数据淘汰机制：
+- volatile-lru     从已设置过期时间的数据集中挑选最近最少使用的数据淘汰
+- volatile-ttl     从已设置过期时间的数据集中挑选将要过期的数据淘汰
+- volatile-random  从已设置过期时间的数据集中任意选择数据淘汰
+- allkeys-lru      从所有数据集中挑选最近最少使用的数据淘汰
+- allkeys-random   从所有数据集中任意选择数据进行淘汰
+- noeviction       禁止驱逐数据
 ```
 
-- 数据类型
+#### 什么是 Redis 的缓存穿透、缓存击穿以及缓存雪崩？如何解决？
 
 ```console
-1. String 整数，浮点整数或者字符串
-2. Set 集合
-3. Zset 有序集合
-4. Hash 散列
-5. List 列表
-```
+缓存穿透：客户持续向服务器发起对不存在服务器中数据的请求。客户先在 Redis 中查询，查询不到后去数据库中查询。
 
-- 使用场景
+缓存穿透解决方案：
+- 接口层增加校验，对传参进行个校验，比如说我们的 id 是从1开始的，那么 id<=0的直接拦截；
+- 缓存中取不到的数据，在数据库中也没有取到，这时可以将 key-value 对写为 key-null，这样可以防止攻击用户反复用同一个 id 暴力攻击。
 
-```console
-1. 缓存
-2. 排行榜 常用实现数据类型: 有序集合实现
-3. 好友关系 利用集合 如交集、差集、并集等
-4. 简单的消息队列
-5. Session 共享: 默认 Session 是保存在服务器的文件中，如果是集群服务，同一个用户过来可能落在不同机器上，这就会导致用户频繁登陆；采用 Redis  保存 Session后，无论用户落在那台机器上都能够获取到对应的 Session 信息。
-```
 
-- 数据淘汰机制
+缓存击穿：一个很热门的数据，突然失效，大量请求到服务器数据库中。
 
-```console
-1. volatile-lru     从已设置过期时间的数据集中挑选最近最少使用的数据淘汰
-2. volatile-ttl     从已设置过期时间的数据集中挑选将要过期的数据淘汰
-3. volatile-random  从已设置过期时间的数据集中任意选择数据淘汰
-4. allkeys-lru      从所有数据集中挑选最近最少使用的数据淘汰
-5. allkeys-random   从所有数据集中任意选择数据进行淘汰
-6. noeviction       禁止驱逐数据
-```
+缓存击穿解决方案：
+- 最好的办法就是设置热点数据永不过期。
 
-- 缓存穿透, 缓存击穿, 缓存雪崩
 
-```console
-1. 缓存穿透: 就是客户持续向服务器发起对不存在服务器中数据的请求。客户先在Redis 中查询，查询不到后去数据库中查询。
-2. 缓存击穿: 就是一个很热门的数据，突然失效，大量请求到服务器数据库中
-3. 缓存雪崩: 就是大量数据同一时间失效。
+缓存雪崩：大量数据同一时间失效。
 
-缓存穿透:
-1. 接口层增加校验，对传参进行个校验，比如说我们的id是从1开始的，那么id<=0的直接拦截；
-2. 缓存中取不到的数据，在数据库中也没有取到，这时可以将key-value对写为key-null，这样可以防止攻击用户反复用同一个id暴力攻击
-
-缓存击穿:
-最好的办法就是设置热点数据永不过期
-
-缓存雪崩:
-1. 缓存数据的过期时间设置随机，防止同一时间大量数据过期现象发生。
-2. 如果缓存数据库是分布式部署，将热点数据均匀分布在不同的缓存数据库中。
+缓存雪崩解决方案：
+- 缓存数据的过期时间设置随机，防止同一时间大量数据过期现象发生。
+- 如果缓存数据库是分布式部署，将热点数据均匀分布在不同的缓存数据库中。
 ```
 
 - 数据持久化实现
@@ -183,13 +191,13 @@ aof 持久化: 记录用户的操作过程（用户每执行一次命令，就�
 解决了 rdb 的弊端，但 aof 的持久化会随着时间的推移数量越来越多，会占用很大空间。
 ```
 
-### Kafka
+#### Kafka
 
 ```console
 
 ```
 
-### RocketMQ
+#### RocketMQ
 
 ```console
 
@@ -223,42 +231,32 @@ Jaeger / Zipkin / OpenTelemetry
 
 ### 可观测性领域都有哪些方法论？
 
-#### 监控分层方法论
+#### 监控分层方法论与告警设计方法论
 
 ```console
+监控分层：
 - 基础设施层
 设备：VM、网络设备、存储
 指标：CPU、Memory、磁盘 I/O、网络流量
 工具：Prometheus、Zabbix
-
 - 应用层
 指标：应用存活状态、响应时间、HTTP 错误率、吞吐量
 工具：APM 工具、Prometheus
-
 - 服务层
 指标：SLA（可用性）、SLO（延迟目标）
 方法：合成监控（Synthetic Monitoring，模拟用户请求）
-
 - 日志层
 工具：ELK Stack、EFK Stack、Grafana Loki
-```
 
-#### 告警设计方法论
 
-```console
-- 告警分级
-Critical
-Error
-Waring
-
+告警设计：
+- 告警分级：Critical、Error、Waring
 - 告警收敛
 使用抑制规则避免告警风暴
 关联拓扑依赖分析根因（如下游服务故障触发上游告警）
-
 - 告警疲劳管理
 静默（Mute）：计划内维护时段屏蔽告警
 动态阈值：基于历史数据自动调整（如季节性流量波动）
-
 - 告警通知
 通知渠道
 ```
@@ -302,53 +300,33 @@ Waring
 故障恢复：4小时内恢复严重问题
 ```
 
-#### 什么是Google 黄金指标（适用定义 SLO）？
+#### 什么是 Google 黄金指标（适用定义 SLO）、RED 方法（适用微服务）、 USE 方法？
 
 ```console
-- 延迟（Latency）
-请求处理时间、区分成功/失败请求的延迟
+Google 黄金指标：
+- 延迟（Latency）：请求处理时间、区分成功/失败请求的延迟
+- 流量（Traffic）：系统负载（如 QPS、并发连接数）
+- 错误（Errors）：显式错误（HTTP 500）和隐式错误（如返回空结果）
+- 饱和度（Saturation）：资源过载程度（如磁盘剩余空间、队列长度）
 
-- 流量（Traffic）
-系统负载（如 QPS、并发连接数）
 
-- 错误（Errors）
-显式错误（HTTP 500）和隐式错误（如返回空结果）
-
-- 饱和度（Saturation）
-资源过载程度（如磁盘剩余空间、队列长度）
-```
-
-#### RED 方法（适用微服务）
-
-```console
-- Rate（速率）
-每秒请求数
-
-- Errors（错误）
-失败请求数
-
-- Duration（持续时间）
-请求耗时分布（P90/P99）
-
+RED 方法：
+- Rate（速率）：每秒请求数
+- Errors（错误）：失败请求数
+- Duration（持续时间）：请求耗时分布（P90/P99）
 工具：Grafana + Prometheus，通过 PromQL 计算 RED 指标
-```
 
-#### USE 方法（资源性能分析）
 
-```console
-- Utilization（利用率）
-资源使用百分比（如 CPU 70%）
-
-- Saturation（饱和度）
-资源过载程度（如 CPU 队列长度）
-
-- Errors（错误）
-硬件错误（如磁盘坏块）
-
+USE 方法：
+- Utilization（利用率）：资源使用百分比（如 CPU 70%）
+- Saturation（饱和度）：资源过载程度（如 CPU 队列长度）
+- Errors（错误）：硬件错误（如磁盘坏块）
 适用场景：快速定位瓶颈节点（如网络带宽饱和）
 ```
 
-### 如何使用 Alertmanager 触发告警，配置告警规则与通知规则？
+### Monitoring
+
+#### 如何使用 Alertmanager 触发告警，配置告警规则与通知规则？
 
 ```console
 1. 触发告警：
@@ -364,7 +342,7 @@ Waring
 将 Prometheus / VictoriaMetrics 数据源接入夜莺，统一管理告警规则以及通知规则。
 ```
 
-### 什么是 Prometheus ？ 工作原理是什么？
+#### 什么是 Prometheus ？ 工作原理是什么？
 
 - Prometheus 核心组件工作原理
 
@@ -396,7 +374,7 @@ rate() 计算时间范围内每秒的平均增长率，适合长时间趋势分�
 irate() 计算时间范围内最后两个样本点的瞬时增长率，瞬时波动适合调试与快速定位问题。
 ```
 
-### 什么是 Prometheus 联邦集群？如何实现高可用？
+#### 什么是 Prometheus 联邦集群？如何实现高可用？
 
 ```console
 联邦集群：全局的 Prometheus Server 从多个下层的 Prometheus Server 聚合特定的时间序列数据，适用于跨数据中心或大规模集群的场景。
@@ -418,7 +396,7 @@ irate() 计算时间范围内最后两个样本点的瞬时增长率，瞬时波
                           Prometheus A / Prometheus B
 ```
 
-### Prometheus 的缺点是什么？如何与 Thanos 或 VictoriaMetrics 扩展支持？
+#### Prometheus 的缺点是什么？如何与 Thanos 或 VictoriaMetrics 扩展支持？
 
 ```console
 缺点：
@@ -433,7 +411,7 @@ irate() 计算时间范围内最后两个样本点的瞬时增长率，瞬时波
 将查询组件接入 Grafana 数据源，将查询需求分离。
 ```
 
-### 什么是 Zabbix ？常用的监控项是什么？
+#### 什么是 Zabbix ？常用的监控项是什么？
 
 ```console
 数据模型：基于监控项（item）+ 触发器（Trigger）
@@ -451,7 +429,7 @@ zabbix-proxy：agent 请求的是 proxy，由 proxy 向 server 去获取 agent �
 4. web 监控: 响应时间、加载时间、状态码
 ```
 
-### 什么是 Grafana ？常用的 Dashboard 都有哪些？
+#### 什么是 Grafana ？常用的 Dashboard 都有哪些？
 
 ```console
 Grafana：开源可视化平台，用于创建仪表盘。展示 Metrics、Logs、Traces。
@@ -484,7 +462,7 @@ Memory
 Error 级别关键字
 ```
 
-### 如何在 Grafana 中配置告警功能？与 Prometheus Alertmanager 有何区别？
+#### 如何在 Grafana 中配置告警功能？与 Prometheus Alertmanager 有何区别？
 
 ```console
 配置 Grafana 告警：
@@ -496,7 +474,9 @@ Error 级别关键字
 基于 Panel 配置可视化的告警，配置较简单。Alertmanager 支持对于告警的分组、抑制等功能。
 ```
 
-### 什么是 Fluentd / Fluentd Bit ？
+### Logging
+
+#### 什么是 Fluentd / Fluentd Bit ？
 
 ```console
 Fluentd：功能强大的统一日志数据收集器，丰富的插件生态，可以处理复杂的路由、解析、缓存和输出逻辑。功能全面但 CPU 和内存消耗也较高。定位是日志聚合和转发的中枢。
@@ -506,7 +486,7 @@ Fluent Bit：超轻量级的日志和指标收集器和转发器。专为性能�
 典型架构：在 Kubernetes 环境中，通过 DaemonSet 方式部署 fluent-bit，用于高效收集日志。然后有 fluent-bit 转发给 fluentd 实例，有 fluentd 进行更复杂的过滤、转化和分发到其他目的地（如 ES、Kafka、S3 等）
 ```
 
-### Fluentd / Fluentd Bit 的缓冲机制什么？有哪些类型？ 配置结构是什么？
+#### Fluentd / Fluentd Bit 的缓冲机制什么？有哪些类型？ 配置结构是什么？
 
 ```console
 缓冲机制：缓冲区是 Fluentd 实现至少一次（At Least Once）投递和抗后端故障的核心机制。但输出目标（如 ES）不可用时，数据会暂存在缓冲区中，待目标恢复后继续重试发送，防止数据丢失。
@@ -522,7 +502,7 @@ Fluent Bit：超轻量级的日志和指标收集器和转发器。专为性能�
 - system：设置 fluentd 本身的系统级配置（如日志级别、工作进程数）。
 ```
 
-### 什么是 Elasticsearch？Elasticsearch 的索引、分片、副本概念是什么？如何管理索引的生命周期？
+#### 什么是 Elasticsearch？Elasticsearch 的索引、分片、副本概念是什么？如何管理索引的生命周期？
 
 ```console
 Elasticsearch：接收、存储和索引来自日志收集组件（如 Logstash、Filebeat、Fluentd）的日志，对日志全文分词索引，并提供 RESTful API 进行快速搜索和分析。
@@ -543,7 +523,7 @@ Elasticsearch：接收、存储和索引来自日志收集组件（如 Logstash�
 - 使用 ILM（Index Lifecycle Management）：定义 ILM 规则，在索引满足条件（如大小、时间）时，将索引转化为 hot、warm、cold 层索引，最终删除过期索引。
 ```
 
-### 如何部署 Elasticsearch 集群模式，规划节点与角色？如何合理的设置分片和副本？
+#### 如何部署 Elasticsearch 集群模式，规划节点与角色？如何合理的设置分片和副本？
 
 ```console
 节点规划与角色分离：
@@ -590,7 +570,7 @@ Elasticsearch：接收、存储和索引来自日志收集组件（如 Logstash�
 5. 持续监控集群数据，通过负载情况调整分片大小（重建索引）。
 ```
 
-### 什么是 ELK / EFK ？
+#### 什么是 ELK / EFK ？
 
 ```console
 Elasticsearch：接收、存储和索引来自 Logstash / Filebeat 的日志。
@@ -607,7 +587,7 @@ EFK Stack：与 ELK 类似，将节点日志收集器替换为更轻量级的 Fi
 - 本地文件：写入本地文件并压缩，上传 S3 / OSS 持久化存储归档日志。
 ```
 
-### 什么是 Loki，与传统的 ELK / EFK Stack 的区别是什么？
+#### 什么是 Loki，与传统的 ELK / EFK Stack 的区别是什么？
 
 ```console
 Loki：水平可扩展、高可用、多租户的日志聚合系统，仅索引标签（如 job，pod，namespace 等）不索引日志内容，通常日志存储在 S3 / OSS 等分布式存储中。直接可与 Grafana 集成。查询时先通过标签筛选出小的日志流，再对流进行关键字（Grep）搜索。
@@ -620,7 +600,7 @@ Loki 技术栈：Promtail + Loki + Grafana
 - ELK / EKF：功能全面，支持全文搜索，但存储成本较高且资源消耗较大。更适合复杂的日志分析与传统环境。
 ```
 
-### Loki 的架构组件有哪些？做过哪些优化？
+#### Loki 的架构组件有哪些？做过哪些优化？
 
 ```console
 架构组件：
@@ -643,7 +623,17 @@ write：gateway、distributor、ingester
 - 部署 simple-scalable 模式，拆分读写请求。
 ```
 
-### 什么是分布式追踪？如何使用 Jaeger / Zipkin / OpenTelemetry 实现？
+#### 如何做针对日志内容错误的告警？
+
+```console
+阿里云 SLS：获取告警关键字，定时任务，如有对应错误关键字则告警。
+
+fluent-bit：自定义 lua 从日志流从获取错误日志关键字，添加日志级别字段，定时任务根据日志流日志级别字段进行告警。
+```
+
+### Tracing
+
+#### 什么是分布式追踪？如何使用 Jaeger / Zipkin / OpenTelemetry 实现？
 
 ```console
 分布式追踪：跟踪请求在微服务之间的传播，记录每个服务的延迟和依赖。
@@ -671,56 +661,151 @@ Zipkin：类似 Jaeger，支持 OpenTelemetry
 改进：
 ```
 
-## ServiceMesh & ServiceProxy
+## Orchestration Management
 
-### Istio
+### ServiceMesh & ServiceProxy
 
-### HAProxy
+#### 什么是 Istio？
 
 ```console
 
 ```
 
-### Nginx 的特点？
+#### 什么是 HAProxy？
+
+```console
+
+```
+
+#### Nginx 的特点是什么？常用的模块与参数是什么？
 
 - 特点
 
 ```console
-1. 支持高并发，官方测试连接数支持5万，生产可支持2~4万。
-2. 内存消耗成本低
-3. 配置文件简单，支持 rewrite 重写规则等
-4. 节省带宽，支持 gzip 压缩。
-5. 稳定性高
-6. 支持热部署
-```
+特点：
+- 支持高并发，官方测试连接数支持5万，生产可支持2~4万。
+- 内存消耗成本低
+- 配置文件简单，支持 rewrite 重写规则等
+- 节省带宽，支持 gzip 压缩。
+- 稳定性高
+- 支持热部署
 
-- 常用的模块与参数
-
-```console
+常用的模块与参数：
+- 模块
 负载均衡 upstream
 反向代理 proxy_pass
 路由匹配 location
 重定向规则 rewrite
-
-proxy 参数:
+- Proxy 参数
 proxy_sent_header
 proxy_connent_timeout
 proxy_read_timeout
 proxy_send_timeout
+- rewrite flag 参数
+last：表示完成当前的 rewrite 规则
+break：停止执行当前虚拟主机的后续 rewrite
+redirect：返回302临时重定向，地址栏会显示跳转后的地址
+permanent：返回301永久重定向，地址栏会显示跳转后的地址
 ```
 
-- rewrite flag
+## Provisioning
+
+### Automation & Configuration
+
+#### Ansible 和 Saltstack 的架构和工作原理有什么不同？
 
 ```console
-last: 表示完成当前的 rewrite 规则
-break: 停止执行当前虚拟主机的后续 rewrite
-redirect :  返回302临时重定向，地址栏会显示跳转后的地址
-permanent :  返回301永久重定向，地址栏会显示跳转后的地址
+Ansible：
+- 架构：无代理（Agentless，基于 SSH）+ 推送式（Push Mode）
+- 工作原理：Ansible 控制机通过 SSH 或 WinRM（Windows）协议直接连接到目标节点执行任务。执行时控制机将模块代码推送到目标节点，临时运行执行完毕后返回结果断开连接。
+- 优点：部署简单，无需在节点上安装和维护代理，安全（利用现有 SSH 通道）。
+- 缺点：大规模节点并发执行时，SSH 连接可能成为性能和网络瓶颈。
+
+Ansible 核心组件：
+- Inventory：定义管理主机。
+- Playbook：自动化任务 yaml 文件。
+- Module：执行特定任务的代码单元。
+- Role：组织 Playbook 和文件的目录结构。
+- Task：Playbook 中的单个执行步骤。
+
+Ansible 常用 Ad-hoc 模块：
+- commmand/shell
+- copy
+- file
+- package
+- service
+- template
+- archive
+- user
+- group
+
+
+Saltstack：
+- 架构：通常为有代理（Agent-Based）+ 拉取/事件驱动（Pull/Event-Driven），但也支持无代理模式（SSH）。
+- 工作原理：核心是 Master-Minion 架构。Master 是服务端，Minion 是安装目标节点的代理。Master 和 Minion 之间通过 ZeroMQ 进行通信，Master 向 Minion 发送命令，Minion 执行后返回结果。
+
+Saltstack 核心组件：
+- Master：控制服务端。
+- Minio：管理节点客户端。
+- ZeroMQ：消息传输轻量级队列。
+- Salt SSH：无代理模式。
+- Syndic：分级管理节点。
+- Grains：静态 Minion 信息（OS、IP 等），由 Minion 收集。
+- Pillars：Master 定义的敏感数据或 Minion 特定数据，由 Master 分发。
+
+Saltstack 常用模块：
+- cmd.run
+- cp.get_file
+- cp.get_dir
+- file.managed
+- pkg.install
 ```
 
-## Network & System
+#### 在什么场景下选择 Ansible 或 Saltstack？
 
-### 如何使用 tcpdump & Wireshark 抓包分析网络问题？
+```console
+选择 Ansible 的场景：
+- 中小环境规模：节点数量在千台以内。
+- 快速开发，简单需求：无需复杂状态管理，主要是临时性命令执行、配置分发和应用部署。
+- 安全限制环境：无法在节点安装 Agent，或直接适配 SSH 环境。
+- 更适用于 YAML 语法熟悉的团队。
+
+选择 Saltstack 的场景：
+- 超大规模数据中心：数万甚至数十万服务器。
+- 需要高性能和实时性：如需要实时收集资产信息，执行高速的状态管理。
+- 需要强大的扩展性和 API
+```
+
+#### Ansible Playbook 中的 roles 和 include_tasks / import_tasks 有什么区别？
+
+```console
+Roles：是一种完整的、自包含的代码组织方式。一个 Role 包含了 tasks、handlers、files、templates、vars 等所有相关的组件。用于封装一个完整的功能（如配置 Nginx、配置数据库等）。Roles 是结构化的，易于分享和重用（Ansible Galaxy）。
+
+include_tasks / import_tasks：用于在 Playbook 中动态（include）或静态（import）地插入另一个任务文件。更适用于分解一个很长的 Playbook，或者在特定条件下才引入某些任务。include_* 是运行时动态包含，import_* 是预处理时静态导入。
+```
+
+#### Saltstack 的 Grains 和 Pillar 有什么区别？
+
+```console
+Grains：
+- Minion 端的静态数据。存储的是 Minion 本身的属性信息，如操作系统、CPU架构、内存、主机名等。在 Minion 启动时加载，相对静态。
+- 一般用于目标定位。如：salt -G 'os:CentOS' cmd.run 'yum update'
+
+Pillar：
+- Master 端的动态数据。存储的是配置信息、秘密数据（如密码、密钥）或任何需要动态分配给特定 Minion 或一组 Minion 的数据。
+- 用于安全地分发配置和秘密。Pillar 数据在 Master 上编译，然后只发送给授权的 Minion。通过与状态文件（State SLS）配合使用，将变量注入到配置模板中。
+```
+
+#### Terraform
+
+```console
+AWS
+GCP
+```
+
+### Network & System
+
+#### 如何使用 tcpdump & Wireshark 抓包分析网络问题？
 
 - 前置分析
 
@@ -756,15 +841,7 @@ TLS / SSL 握手失败：HTTPS、FTPS 等加密连接无法建立
 - HTTP 协议响应500异常：排查应用程序内部异常
 ```
 
-### 什么是 CDN？
-
-```console
-内容分发网络，其目的是通过限制的 internet 中增加一层新的网络架构。将网站的内容发布到最接近用户的网络边缘，使用户可以就近取得所需的内容，提高用户访问网站的响应速度。
-
-静态文件加速缓存, 动态请求加速.
-```
-
-### 什么是递归查询与迭代查询？
+#### 什么是递归查询与迭代查询？
 
 ```console
 递归查询(通常为客户端)
@@ -780,7 +857,7 @@ TLS / SSL 握手失败：HTTPS、FTPS 等加密连接无法建立
 5. 每一步查询都由发起查询的 DNS 服务器自己完成，而不是将任务完全交给其他服务器。
 ```
 
-### 描述一次访问域名的过程。
+#### 描述一次访问域名的过程。
 
 ```console
 客户端访问 www.example.com 时
@@ -796,31 +873,40 @@ TLS / SSL 握手失败：HTTPS、FTPS 等加密连接无法建立
 > 5.4 如果返回的是 CNAME 记录（如 www.example.com 指向 cdn.example.com），本地DNS服务器会重复上述过程，解析 CNAME 指向的域名，直到获取最终 IP 地址（A 记录）。
 ```
 
-### 什么是 LVS ？
-
-- 调度算法
+#### 什么是 LVS？核心组件和工作模式是什么？常用的调度算法是什么？
 
 ```console
-静态算法:
-RR: 轮询算法
-WRR: 加权轮询
-SH: 源 IP 地址 hash,将来自同一个 IP 地址的请求发送给第一次选择的 RS。实现会话绑定。
-DH: 目标地址 hash，第一次做轮询调度，后续将访问同一个目标地址的请求，发送给第一次
-挑中的 RS。适用于正向代理缓存中
+LVS 是运行在 Linux 操作系统内核上，基于四层的负载均衡软件。可以将来自客户端的网络请求，智能均衡地分发到后端多台服务器集群上，让服务器共同承担高并发的网络流量，从而扩展网络应用的服务能力，提高性能和可靠性。
 
-动态算法:
-LC: least connection 将新的请求发送给当前连接数最小的服务器。
-WLC: 默认调度算法。加权最小连接算法
-SED: 初始连接高权重优先,只检查活动连接,而不考虑非活动连接
-NQ: Never Queue，第一轮均匀分配，后续SED
-LBLC: Locality-Based LC，动态的DH算法
-LBLCR: LBLC with Replication，带复制功能的LBLC，解决LBLC负载不均衡问题，从负载重的复制
-到负载轻的RS,,实现Web Cache等
+核心组件：
+- 负载均衡器（Load Balancer / Director）：LVS 核心，运行 LVS 软件（如 ipvsadm），配置虚拟 VIP，接收所有客户端请求，并根据预设算法，将请求转发后端服务器。
+- 服务器池（Server Pool / Real Servers）：后端真实服务器集群（如 Web 服务器、应用服务器、数据库服务器等），共享同一个 VIP，通常为无状态和共享存储的方式保持一致性。
+- 共享存储（Shared Storage）：可选组件，有状态的 RS 需要使用共享存储保持一致性。
+
+工作模式：
+- NAT 模式（网络地址转换）：
+LB 修改数据包的目标 IP 和端口（转发时），以及源 IP 和端口（返回时）。进出流量都经过 LB。
+- TUN 模式（IP 隧道）：
+LB 讲收到的请求数据包封装到新的 IP 包中（IP-in-IP），转发给 RS。RS 解包后直接响应客户端，响应不经过 LB。
+- DR 模式（直接路由）：
+LB 只修改数据帧的 MAC 地址，将其转发给 RS。RS 直接使用 VIP 响应客户端，响应不经过 LB。
+
+调度算法:
+- 轮询算法（Round Robin）：将请求一次轮流分配给后端服务器。
+- 加权轮询算法（Weighted Round Robin）：根据服务器的处理能力分配权重，性能更好的获得更多请求。
+- 最少连接（Least Connections）：将新的请求分配给连接数最少的服务器。
+- 加权最少连接（Weighted Least Connections）：在最少连接的基础上，考虑了服务器的权重。
+- 源地址哈希（Source Hashing）：根据请求的源 IP 地址哈希计算，将同一个客户端的请求发往同一台服务器，可用于实现会话保持。
+- 目标地址哈希（Destination Hashing）：第一次做轮询调度，后续将访问同一个目标地址的请求，发送给第一次挑中的 RS，适用于正向代理缓存中。
+- LBLC: Locality-Based LC，动态的 DH 算法。
+- LBLCR: LBLC with Replication，带复制功能的 LBLC，解决 LBLC 负载不均衡问题，从负载重的复制到负载轻的 RS，实现 Web Cache 等。
 ```
 
-## Docker & Containerd
+## Container
 
-- Docker 简述
+### Docker & Containerd
+
+#### 什么是 Docker ？核心组件和 docker-shim 工作机制是什么？
 
 ```console
 Docker 是一个完整的容器平台，提供了从容器创建、管理到编排的整套工具链。
@@ -834,17 +920,29 @@ Docker 是一个完整的容器平台，提供了从容器创建、管理到编�
 
 与 Kubernetes 关系：
 早期 Kubernetes 使用 Docker 作为默认运行时，但需要 dockershim 适配 CRI。Kubernetes 自 1.20 起弃用 dockershim，推荐 containerd 或 CRI-O
+
+
+docker-shim 工作机制：
+- 架构：
+1. Kubernetes 的 Kubelet 通过 CRI 接口与 dockershim 通信。
+2. Dockershim 将 CRI 请求（如创建、启动、停止容器）转换为 Docker API 调用，发送给 dockerd。
+3. Dockerd 再通过 containerd 调用 runc 执行底层容器操作。
+4. 进程链：Kubelet(CRI) → dockershim → dockerd → containerd → containerd-shim → runc → 容器进程。
+- 流程：
+1. Kubelet 发起 CRI 请求：例如，创建 Pod 中的容器。
+2. Dockershim 转换请求：将 CRI 请求翻译为 Docker API 调用（如 docker create、docker start）。
+3. Dockerd 处理：Docker daemon 调用 containerd 执行容器操作。
+4. Containerd 和 runc：containerd 通过 containerd-shim 调用 runc，创建并运行容器。
+5. 返回结果：容器状态通过相反路径返回给 Kubelet。
 ```
 
-- 容器隔离实现原理
-
-**Cgroups**
-
-**Namespace**
+#### Docker 容器隔离实现原理是什么？
 
 ```console
-Docker Enginer 使用了 namespace 对全区操作系统资源进行了抽象，对于命名空间内的进程来说，他们拥有独立的资源实例，在命名空间内部的进程是可以实现资源可见的。
+- Cgroups
 
+- Namespace
+Docker Enginer 使用了 namespace 对全区操作系统资源进行了抽象，对于命名空间内的进程来说，他们拥有独立的资源实例，在命名空间内部的进程是可以实现资源可见的。
 Dcoker Enginer 中使用的 NameSpace:
 UTS nameSpace        提供主机名隔离能力
 User nameSpace       提供用户隔离能力
@@ -854,33 +952,19 @@ Mount nameSpace      提供磁盘挂载点和文件系统的隔离能力
 Pid nameSpace        提供进程隔离能力
 ```
 
-- Docker 网络模型
+#### Docker 的网络模型都有哪些？
 
 ```console
-1. host：共享主机
-2. container：容器间共享网络（Network Namespace）
-3. none：独立 Network Namespace，但无网络配置
-4.bridge：桥接模式，独立 Network Namespace 设置 IP 并连接到虚拟网桥。
+- host：共享主机
+
+- container：容器间共享网络（Network Namespace）
+
+- None：独立 Network Namespace，但无网络配置
+
+- bridge：桥接模式，独立 Network Namespace 设置 IP 并连接到虚拟网桥。
 ```
 
-- Dockershim 工作机制
-
-```console
-架构：
-1. Kubernetes 的 Kubelet 通过 CRI 接口与 dockershim 通信。
-2. Dockershim 将 CRI 请求（如创建、启动、停止容器）转换为 Docker API 调用，发送给 dockerd。
-3. Dockerd 再通过 containerd 调用 runc 执行底层容器操作。
-4. 进程链：Kubelet(CRI) → dockershim → dockerd → containerd → containerd-shim → runc → 容器进程。
-
-流程：
-1. Kubelet 发起 CRI 请求：例如，创建 Pod 中的容器。
-2. Dockershim 转换请求：将 CRI 请求翻译为 Docker API 调用（如 docker create、docker start）。
-3. Dockerd 处理：Docker daemon 调用 containerd 执行容器操作。
-4. Containerd 和 runc：containerd 通过 containerd-shim 调用 runc，创建并运行容器。
-5. 返回结果：容器状态通过相反路径返回给 Kubelet。
-```
-
-- Containerd 简述
+#### 什么是 Containerd？核心组件和 containerd-shim 工作机制是什么？
 
 ```console
 Containerd 是一个轻量级的容器运行时（container runtime），专注于管理和运行容器，强调简单、高效和模块化。供上层工具（Docker、Kubernetes 的 kubelet 等）调用。
@@ -893,34 +977,31 @@ Containerd 是一个轻量级的容器运行时（container runtime），专注�
 
 与 Kubernetes 关系：
 直接支持 CRI（Container Runtime Interface），是 Kubernetes 的首选运行时。
-```
 
-- Containerd-shim 工作机制
 
-```console
-架构：
+docker-shim 工作机制：
+- 架构：
 1. Containerd 是一个独立的高层容器运行时，负责镜像管理、存储、网络等。
 2. 每个容器对应一个 containerd-shim 进程，containerd-shim 调用 runc（或其他 OCI 运行时）执行容器。
 3. 进程链：containerd → containerd-shim → runc → 容器进程。
 4. 在 Kubernetes 中：Kubelet → CRI (containerd) → containerd-shim → runc → 容器进程。
-
-流程：
+- 流程：
 1. Containerd 接收请求：通过 gRPC API（如 CRI 或 Docker 调用）接收容器操作请求。
 2. 启动 Containerd-shim：Containerd 启动一个 containerd-shim 进程，传递 OCI 包（bundle）路径，包含 config.json 和根文件系统。Shim 进程调用 runc 的 create 命令，创建容器进程（runc 初始化后退出）。
 3. 管理容器生命周期：Shim 进程作为容器进程的父进程，保持标准 I/O（stdin/stdout/stderr）打开，处理日志输出（如 docker logs）；Shim 监控容器退出状态，报告给 containerd；支持附加操作（如 docker exec、kubectl attach）和伪终端（PTY）管理。
 4. 隔离与容错：Shim 进程隔离 containerd 主进程，containerd 重启或崩溃不影响运行中的容器。Shim 保持运行直到容器退出，收集退出状态后终止。
-
-验证：
+- 验证：
 ctr image pull docker.io/library/nginx:latest
 ctr run -d docker.io/library/nginx:latest nginx
 # containerd 启动 containerd-shim-runc-v2，调用 runc 创建容器
 ps aux | grep containerd-shim
 ```
 
-- CRI-O 简述
+#### 什么是 CRI-O？核心组件和工作机制是什么？
 
 ```console
 CRI-O 是一个轻量级的容器运行时，专为 Kubernetes 开发，用于直接与 Kubernetes 的 CRI 接口交互，管理容器生命周期（创建、启动、停止、删除等）、镜像和存储。它基于 OCI（Open Container Initiative）标准，使用 runc 或其他 OCI 兼容运行时执行容器。
+
 
 核心组件与架构：
 1. CRI-O Daemon：
@@ -935,41 +1016,33 @@ CRI-O 使用 CNI 插件（如 flannel、Calico）配置容器网络，支持桥�
 CRI-O 的一个轻量级监控工具，类似于 containerd 的 containerd-shim。每个容器对应一个 conmon 进程，负责管理容器进程的生命周期、标准 I/O（stdin/stdout/stderr）、日志收集和退出状态。
 6. Image and Storage Libraries：
 使用 containers/storage 管理镜像和存储层。使用 containers/image 处理镜像拉取和分发，支持 Docker 和 OCI 镜像格式。
-```
 
-- CRI-O 工作机制
 
-```console
+工作机制：
 1. Kubelet 发起 CRI 请求：
 Kubernetes 的 Kubelet 根据 Pod 定义（如 YAML 文件）向 CRI-O 发送 CRI 请求（如 RunPodSandbox、CreateContainer）。
 请求通过 gRPC 传递，包含 Pod 和容器的配置信息。
-
 2. Pod 沙箱（Sandbox）创建：
 CRI-O 首先为 Pod 创建一个“沙箱”（Pod Sandbox），即 Pod 的运行环境。
 调用 CNI 插件配置网络（如分配 IP、设置网络命名空间）。
 创建一个 pause 容器（基础设施容器），用于维持 Pod 的网络和命名空间。
-
 3. 镜像拉取：
 CRI-O 使用 containers/image 从镜像仓库（如 Docker Hub、Quay.io）拉取所需镜像。
 镜像存储在本地，使用 containers/storage 管理，支持多层缓存。
-
 4. 容器创建和启动：
 CRI-O 生成 OCI 包（bundle），包含 config.json（OCI 运行时规范）和容器根文件系统。
 调用 runc（或指定 OCI 运行时）创建容器进程。
 为每个容器启动一个 conmon 进程，负责监控容器进程状态、转发标准 I/O（如 kubectl logs）、处理附加操作（如 kubectl exec）、收集退出状态。
-
 5. 容器运行和监控：
 Conmon 作为容器进程的父进程，保持运行以支持日志收集和状态监控。
 CRI-O daemon 通过 gRPC 返回容器状态给 Kubelet（如运行中、已退出）。
 支持动态操作，如停止、删除容器或更新配置。
-
 6. 清理和销毁：
 Pod 或容器删除时，CRI-O 调用 CNI 清理网络，释放资源。
 删除容器文件系统和相关元数据。
 
 进程链：
 Kubelet(CRI) → CRI-O daemon → conmon → runc → 容器进程
-
 验证：
 crictl pull docker.io/library/nginx:latest
 crictl runp pod-config.json # 创建 Pod 沙箱
@@ -978,12 +1051,25 @@ crictl start <container-id>
 crictl ps
 ```
 
-## Kubernetes
+#### Docker 与 Podman 的区别是什么？
 
-### 简述
+```console
+架构模型：
+- Docker 是传统的 C/S 架构，核心组件是 Docker Daemon 守护进程，需要通过 Dockerd 调用底层组件 containerd 负载容器的实际操作。
+- Podman 是无守护进程（Daemonless）架构，直接与 OCI 运行时（如 runc）交互，通过 Linux 的 fork-exec 模型启动容器。利用 user namespace 使用 Rootless 特性将容器的 root 用户映射到主机的非特权普通用户，安全性更高。
+
+流程：
+- 用户 -> docker CLI -> Docker Daemon (dockerd) -> containerd -> runc -> 容器
+- 用户 -> podman CLI -> runc -> 容器
+```
+
+### Kubernetes
+
+#### 什么是 Kubernetes？核心组件和架构是什么？
 
 ```console
 Kubernetes 是一个开源的容器编排平台，用于自动化管理、部署、扩展和运行容器化应用程序。Kubernetes 通过将应用程序打包到容器中（如 Docker 容器），并在集群中协调这些容器的运行，提供高效、弹性的分布式系统管理。
+
 
 Kubernetes 的核心功能包括：
 容器编排：自动部署、扩展和管理容器化应用。
@@ -993,15 +1079,11 @@ Kubernetes 的核心功能包括：
 存储编排：支持动态挂载和管理存储系统。
 配置管理：通过 ConfigMaps 和 Secrets 管理应用配置和敏感信息。
 滚动更新与回滚：支持无缝更新应用版本，并能在问题发生时回滚。
-
 Pod：Kubernetes 的最小调度单位，通常包含一个或多个容器。
-```
 
-### 组件
 
+核心组件与架构：控制平面 + 数据平面
 - 控制平面（Control Plane）
-
-```console
 API Server：Kubernetes 的前端接口，集群的中央管理入口，接受和处理来自用户、客户端或内部组件的 RESTful API 请求。
 1. 提供 Kubernetes API，处理所有管理操作（如创建、更新、删除资源）。
 2. 与 etcd 通信，存储和检索集群状态。
@@ -1024,11 +1106,8 @@ Etcd：分布式键值存储数据库，用于存储 Kubernetes 集群的所有�
 1. 保存集群配置、状态和元数据（如 Pod、Service、Deployment 的定义）。
 2. 提供高可用性和一致性，保证集群数据的持久性和可靠性。
 3. 仅由 API Server 直接访问，其他组件通过 API Server 间接与 etcd 交互。
-```
 
-- 工作节点（Worker Nodes）
-
-```console
+- 数据平面（Data Plane）/ 工作节点（Works Nodes）
 Kubelet：运行在每个工作节点上的代理进程，负责与控制平面通信并管理节点上的 Pod。
 1. 通过 API Server 接收 Pod 定义（PodSpec），确保 Pod 中的容器按预期运行。
 2. 监控容器健康状态，报告节点和 Pod 的状态给控制平面。
@@ -1048,7 +1127,7 @@ Kube-Proxy：运行在每个工作节点上的网络代理进程，管理网络�
 4. 支持 CRI（Container Runtime Interface），确保与 Kubernetes 的兼容性。
 ```
 
-### Pod 创建过程
+#### 描述 Pod 的完整创建过程。
 
 ```console
 第一步：用户通过 kubectl 或直接调用 Kubernetes API 提交 Pod 的资源清单。
@@ -1114,7 +1193,7 @@ Kube-Proxy 通过 API Server 监控 Pod 的 IP 地址和 Service 的变化，动
 8. Kube-Proxy 更新 Service 相关的网络规则（如果适用）。
 ```
 
-### Resources
+#### Resources
 
 - RS / Deplyment / StatefulSet
 
@@ -1156,20 +1235,20 @@ volume（存储卷）是 Pod 中能够被多个容器访问的共享目录
 emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 ```
 
-### Lifecycle
+#### Kubernetes 中都有哪些应用的探针？区别是什么？
 
 ```console
-1. livenessProbe
+- livenessProbe
 存活探针，检测容器是否正在运行，如果存活探测失败，则 kubelet 会杀死容器，并且容器将受到其重启策略的影响，如果容器不提供存活探针，则默认状态为 Success，livenessprobe 用于控制是否重启 Pod.
 
-2. readinessProbe
+- readinessProbe
 就绪探针，如果就绪探测失败，端点控制器将从与 Pod 匹配的所以 Service 的端点中删除该 Pod 的 IP 地址初始延迟之前的就绪状态默认为 Failure（失败），如果容器不提供就绪探针，则默认状态为 Success，readinessProbe 用于控制 Pod 是否添加至 service.
 
-3. startupprobe
+- startupProbe
 启动探针
 ```
 
-### Others
+#### Others
 
 ```console
 1. hpa 指标以 request 为准
@@ -1178,4 +1257,35 @@ emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
 
 request limit 的分级?
 如何通过 Deployments 创建 Pod？
+```
+
+#### 什么是 Rancher ？Rancher 导入集群的方式有什么？导入集群的流程原理是什么？
+
+```console
+
+核心组件：
+Rancher Server：管理控制中心，提供 UI/API，存储所有集群的元数据，并发出管理指令。
+Cluster Agent：运行在目标集群（下游集群）中的代理，Deployment 方式部署在 cattle-system namespace 中。
+Node Agent：运行在下游集群中，DaemonSet 方式部署。负责执行需要节点级别操作的任务（如升级 Kubernetes 版本、管理节点等）。
+
+导入集群的方式：
+General
+ACK
+EKS
+GKE
+
+前置检查：
+- 网络连通性检查：Rancher Server 需要连通下游集群的 API Server（默认443）；下游集群需要连通 Rancher Server（默认443）。
+- 注册命令的有效性：有效期与 Rancher Server 地址是否正确。
+- 权限和安全：Rancher 会创建 cluster-admin 权限的 service account；TLS 证书。
+- 资源：Rancher Agent 需要消耗下游集群的资源。
+
+导入集群流程原理：
+1. 在 UI 选择导入集群，选择导入的方式。
+2. Rancher Server 生成唯一的注册命令（kubectl apply ...），主要创建 namespace、secret、serviceaccount 与 clusterrolebing（绑定 cluster-admin 角色）、Cluster Agent Deployment 等资源。
+3. 在下游集群执行 kubetctl apply 命令。
+4. 建立连接：Cluster Agent Pod 启动后，读取挂载的 Secret（包含 Rancher Server 的 URL 和认证令牌），然后​主动发起​​一个到 Rancher Server 的​​持久安全的 WebSocket（或 HTTP 长轮询）连接​​。通常是 Agent 连接 Server，而不是 Server 主动连 Agent，简化了防火墙配置（只需下游能访问 Rancher 即可）。
+5. 连接建立后，就形成了一条双向通行渠道。
+- Rancher Server 向下游集群发送指令：无法调用下游集群 API Server，将指令封装为消息，通过 Websocket 连接发送给集群的 Cluster Agent。Agent 收到消息后使用 Kubernetes Go 客户端库（client-go），通过 serviceaccount 的权限调用下游集群的 API Server 执行对应操作。
+- 下游集群向 Rancher Server 上报状态：Cluster Agent 和 Node Agent 定时监视下游集群状态（如 Pod、Node、Deployment）的变化，通过 Websocket 上报给 Rancher Server，Rancher Server 收到后更新数据库并在 UI 展示。
 ```
