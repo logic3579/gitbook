@@ -234,20 +234,17 @@ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.1.0"
 
 ```bash
 # Add and update repo
-helm repo add istio https://istio-release.storage.googleapis.com/charts
-helm repo update
-kubectl create namespace istio-system
+helm repo add istio https://istio-release.storage.googleapis.com/charts --force-update
 
-# Install istio-base CRD
-helm install istio-base istio/base -n istio-system
-
-# Install istiod
-helm install istiod istio/istiod -n istio-system --wait
+# Install istio-base CRD and istiod
+helm install istio-base istio/base -n istio-system --create-namespace --version=1.27.1
+helm install istiod istio/istiod -n istio-system --wait --version=1.27.1
 
 # Install gateway
-kubectl create namespace istio-ingress
-helm install istio-ingress-internal istio/gateway -n istio-ingress --wait -f values-internal.yaml
-helm install istio-ingress-external istio/gateway -n istio-ingress --wait -f values-external.yaml
+# internal gateway
+helm install istio-ingress-internal istio/gateway -n istio-ingress -f values-internal.yaml --create-namespace --version=1.27.1
+# external gateway
+helm install istio-ingress-external istio/gateway -n istio-ingress -f values-external.yaml --create-namespace --version=1.27.1
 ```
 
 #### Deploy application

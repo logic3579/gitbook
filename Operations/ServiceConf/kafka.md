@@ -116,4 +116,3 @@ group.initial.rebalance.delay.ms=3000
 # socket 连接队列，取决于操作系统 somaxconn、tcp_max_syn_backlog
 #socket.listen.backlog.size
 ```
-

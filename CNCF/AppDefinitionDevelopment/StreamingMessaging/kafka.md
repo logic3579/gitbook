@@ -5,17 +5,19 @@ description: Apache Kafka
 # Kafka
 
 ## Introduction
+
 ...
 
 ## Deploy With Binary
+
 ### Quick Start
+
 #### ZooKeeper Mode
-[[zookeeper|zookeeper-deploy]]
 
 ```bash
 # source download
 cd /opt/ && wget https://archive.apache.org/dist/kafka/3.3.1/kafka_2.13-3.3.1.tgz
-tar xf kafka_2.13-3.3.1.tgz && rm -rf kafka_2.13-3.3.1.tgz  
+tar xf kafka_2.13-3.3.1.tgz && rm -rf kafka_2.13-3.3.1.tgz
 
 # soft link
 ln -svf /opt/kafka_2.13-3.3.1/ /opt/kafka
@@ -33,10 +35,11 @@ export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 ```
 
 #### KRaft Mode
+
 ```bash
 # source download
 cd /opt/ && wget https://archive.apache.org/dist/kafka/3.3.1/kafka_2.13-3.3.1.tgz
-tar xf kafka_2.13-3.3.1.tgz && rm -rf kafka_2.13-3.3.1.tgz  
+tar xf kafka_2.13-3.3.1.tgz && rm -rf kafka_2.13-3.3.1.tgz
 
 # soft link
 ln -svf /opt/kafka_2.13-3.3.1/ /opt/kafka
@@ -54,9 +57,12 @@ export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 ./bin/kafka-server-start.sh config/kraft/server.properties
 ```
 
-### [[sc-kafka|Config]] and Boot
+### Config and Boot
+
 #### Config
+
 **ZooKeeper Mode**
+
 ```bash
 cat > config/zookeeper.properties << "EOF"
 # 初始延迟时间（心跳时间单位）
@@ -132,6 +138,7 @@ EOF
 ```
 
 **Kraft Mode**
+
 ```bash
 cat > config/kraft/server.properties << "EOF"
 ############################# Server Basics #############################
@@ -191,7 +198,9 @@ EOF
 ```
 
 #### Boot(systemd)
+
 **ZooKeeper Mode**
+
 ```bash
 # 1. generate zookeeper id
 echo 0 > /opt/kafka/zk-data/myid
@@ -204,13 +213,13 @@ Description=Apache Kafka server
 Documentation=https://kafka.apache.org
 After=network.target
 Wants=network-online.target
- 
+
 [Service]
 Environment=KAFKA_HOME=/opt/kafka
 Environment=KAFKA_HEAP_OPTS="-Xms2G -Xmx2G"
 ExecStartPre=/opt/kafka/bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c /opt/kafka/config/kraft/server.properties --ignore-formatted
 ExecStart=/opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/kraft/server.properties
-ExecStop=/opt/kafka/bin/kafka-server-stop.sh 
+ExecStop=/opt/kafka/bin/kafka-server-stop.sh
 KillSignal=SIGTERM
 KillMode=mixed
 LimitNOFILE=655350
@@ -235,6 +244,7 @@ EOF
 ```
 
 **Kraft Mode**
+
 ```bash
 # 1. generate only once cluster id
 KAFKA_CLUSTER_ID=$(/opt/kafka/bin/kafka-storage.sh random-uuid)
@@ -246,7 +256,7 @@ Description=Apache Kafka server
 Documentation=https://kafka.apache.org
 After=network.target
 Wants=network-online.target
- 
+
 [Service]
 Environment=KAFKA_HOME=/opt/kafka
 Environment=KAFKA_HEAP_OPTS="-Xms2G -Xmx2G"
@@ -283,10 +293,13 @@ systemctl enable kafka.service
 ```
 
 ### Verify
-[[StreamingMessaging#Kafka|Kafka Command]]
+
+[Kafka Command](/Operations/CommandManual/StreamingMessaging.md#kafka)
 
 ## Deploy With Container
+
 ### Run in Docker
+
 ```bash
 docker pull apache/kafka:3.7.1
 docker run -p 9092:9092 apache/kafka:3.7.1
@@ -296,46 +309,51 @@ docker run -p 9092:9092 apache/kafka:3.7.1
 ```
 
 ### Run in Kubernetes
-#### Helm Charts
-```bash
-# add and update repo
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm update
 
-# get charts package
-helm pull bitnami/kafka --untar --version=29.3.5
+#### Install by Helm
+
+```bash
+# Add and update repo
+helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
+
+# Get charts package
+helm pull bitnami/kafka --untar --version=31.5.0
 cd kafka
 
-# configure and run
+# Configure
 vim values.yaml
 global:
-  storageClass: nfs-client
-heapOpts: -Xmx1 -Xms1024m
-extraConfigYaml:
-  default.replication.factor: 3
-  offsets.topic.replication.factor: 3
-  transaction.state.log.replication.factor: 3
-  transaction.state.log.min.isr: 2
-  num.partitions: 3
+  storageClass: premium-rwo
+controller:
+  replicaCount: 3
+  resources:
+    limits: {}
+    requests: {}
+  nodeSelector: {}
+  persistence: {}
+broker:
+  replicaCount: 3
+  extraConfig: |
+    num.partitions=3
+    min.insync.replicas=2
+    default.replication.factor=3
+    offsets.topic.replication.factor=3
+    transaction.state.log.min.isr=2
+    transaction.state.log.replication.factor=3
+  resources:
+    limits: {}
+    requests: {}
+  nodeSelector: {}
+  persistence: {}
 
-# install
-helm -n middleware install kafka .
+# Install
+helm install -n middleware kafka . --create-namespace
 ```
 
-#### Persistent storage
-kafka 需要使用持久化存储配置，k8s 本身不支持 nfs 做 storageclass ，需要安装第三方 nfs 驱动实现
-
-[[nfs-server|1.nfs-server部署]]
-
-2.安装 nfs 第三方驱动插件
-[[nfs-server#nfs-subdir-external-provisioner|deploy provisioner]]
-
-
-
->Reference:
->1. [Official Website](https://kafka.apache.org/documentation/)
->2. [Repository](https://github.com/apache/kafka)
->3. [storageclass 存储类官方说明](https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/)
->4. [nfs-server 驱动部署方式](https://blog.51cto.com/smbands/4903841)
->5. [nfs 驱动 helm 安装](https://artifacthub.io/packages/helm/nfs-subdir-external-provisioner/nfs-subdir-external-provisioner)
->6. [kafka kraft 协议介绍](https://www.infoq.cn/article/j1jm5qehr1jiequby0ot)
+> Reference:
+>
+> 1.  [Official Website](https://kafka.apache.org/documentation/)
+> 2.  [Repository](https://github.com/apache/kafka)
+> 3.  [storageclass 存储类官方说明](https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/)
+> 4.  [kafka kraft protocol](https://www.infoq.cn/article/j1jm5qehr1jiequby0ot)
+> 5.  [nfs-server 部署](/Operations/Network/nfs.md#csi-driver-nfs)

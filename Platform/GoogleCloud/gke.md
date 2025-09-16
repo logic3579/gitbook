@@ -13,70 +13,105 @@ description: Google Kubernetes Engine
 ### Cluster init
 
 ```console
-# node init
-1. cluster_name
-xx-gke-cluster
-2. nodegroup_name
-xxx-app-pool
-xxx-middleware-pool
-3. label settings
-4. taint settings
-5. pod, service CIDR settings
+# cluster_name
+your_cluster_name
+
+# nodegroup_name
+app-pool
+database-pool
+middleware-pool
+mgmt-pool
+
+# label settings
+tier=app
+tier=database
+tier=middleware
+tier=mgmt
+
+# taint setting
+app_dedicated=true
+db_dedicated=true
+
+# pod, service CIDR settings
 
 # cluster add-on
 pd-csi-driver
 
 
-# CICD
-ArgoCD
-Kubesphere
-
-# observability
-Prometheus
-Loki
-Grafana
-
-# manager
-rancher
 ```
 
-### Manager
+### GCP settings and Manager machine init
 
-kubectl && helm
+GCP settings
+
+```console
+# Create Cloud NAT public instance for internet access.
+1. Creted a public NAT public instance on console.
+2. Associate the NAT instance with the GKE cluster.
+
+# Create IAM service-account for gke-manager and cert-manager.
+1. Created service-account(gke-manager and dns01-resolver) on GCP IAM console.
+2. Assign Kubernetes Engine Admin role to gke-manager and DNS Administrator to dns01-resolver.
+3. Generate a service-account json key for each service-account.
+
+# Create a static internal/external IP address for istio external gateway.
+1. Reserve external IP and named istio-ingress-external.
+2. Modify values-external.yaml loadBalancerIP and deployment.
+```
+
+gke-manager init
 
 ```bash
-# kubectl cli
+
+# Install kubectl client
 KUBECTL_VERSION=v1.30.9
 curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
-chmod +x ./kubectl && mv ./kubectl /usr/bin/kubectl
-
-# helm cli
-HELM_VERSION=v3.15.3
+sudo chmod +x ./kubectl && sudo mv ./kubectl /usr/bin/kubectl
+# Install helm client
+HELM_VERSION=v3.19.0
 wget https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz
 tar xf helm-v3.16.2-linux-amd64.tar.gz && rm -f helm-v3.16.2-linux-amd64.tar.gz
-chmod +x linux-amd64/helm && mv linux-amd64/helm /usr/bin/helm && rm -rf ./linux-amd64
-
+sudo chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/bin/helm && rm -rf ./linux-amd64
 # Auto completion
 sudo apt install bash-completion -y
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 echo "source <(helm completion bash)" >> ~/.bashrc
 source ~/.bashrc
-```
 
-gcloud
-
-```bash
 # Install gke-gcloud-auth-plugin
 # option1
 gcloud components install gke-gcloud-auth-plugin
 # option2
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/google-cloud-sdk.gpg
 echo "deb [signed-by=/usr/share/keyrings/google-cloud-sdk.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-sudo apt update && sudo apt install google-cloud-sdk-gke-gcloud-auth-plugin
+sudo apt update && sudo apt install google-cloud-sdk-gke-gcloud-auth-plugin -y
 
-# Init kubeconfig
+# Activate service-account on manager machine
+gcloud auth activate-service-account --key-file=./your-service-account-key.json
+# Init gke cluster connect permission
 gcloud container clusters get-credentials your_cluster_name --region your_cluster_region --project your_project
 kubectl get nodes
+```
+
+### Cluster component
+
+```console
+# Certificate
+cert-manager
+
+# CICD
+Jenkins
+ArgoCD
+
+# Observability
+node-exporter
+Prometheus
+Promtail
+Loki
+Grafana
+
+# Manager
+rancher
 ```
 
 > Reference:

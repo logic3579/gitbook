@@ -5,11 +5,13 @@ description: Zookeeper
 # Zookeeper
 
 ## Introduction
+
 ...
 
-
 ## Deploy With Binary
+
 ### Quick Start
+
 ```bash
 # download source
 wget https://dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-bin.tar.gz
@@ -17,7 +19,9 @@ mv apache-zookeeper-3.7.1-bin zookeeper-3.7.1 && cd zookeeper-3.7.1
 ```
 
 ### Config and Boot
+
 #### Config
+
 ```bash
 # create data and logs dir
 mkdir -p /opt/zookeeper-3.7.1/data
@@ -44,6 +48,7 @@ EOF
 ```
 
 #### Boot(systemd)
+
 ```bash
 cat > /etc/systemd/system/zookeeper.service << "EOF"
 [Unit]
@@ -72,38 +77,32 @@ systemctl enable zookeeper.service
 ```
 
 ## Deploy With Container
+
 ### Run in Docker
-[[cc-docker|Docker Command]]
+
 ```bash
 # run by docker or docker-compose
 # https://hub.docker.com/_/zookeeper
 ```
 
 ### Run in Kubernetes
-#### Helm Charts
+
+#### Install by Helm
+
 ```bash
 # Add and update repo
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
 
 # Get charts package
-helm pull bitnami/zookeeper --untar 
+helm pull bitnami/zookeeper --untar --version=13.8.7
 cd zookeeper
 
-# Configure and run
-vim values.yaml
-global:
-  storageClass: "nfs-client"
-replicaCount: 3
-
-helm -n middleware install zookeeper . --create-namespace 
-
-# verify
-kubectl -n middleware exec -it zookeeper-0 -- zkServer.sh status  
+# Install and verify
+helm -n middleware install zookeeper . --set global.storageClass=nfs-client --set replicaCount=3 --create-namespace
+kubectl -n middleware exec -it zookeeper-0 -- zkServer.sh status
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://zookeeper.apache.org/)
 > 2. [Repository](https://github.com/apache/zookeeper)

@@ -66,9 +66,19 @@ helm rollback：
 
 ### CICD
 
-#### 什么是 ArgoCD？
+#### 什么是 ArgoCD？什么是 GitOps，以及 ArgoCD 如何实现 GitOps？
 
 ```console
+ArgoCD 是一个基于 Kubernetes 的声明式、GitOps 持续交付工具。核心思想是将 Git 仓库作为期望状态的唯一来源，并自动将 Kubernetes 集群的实际状态同步至 Git 中声明的期望状态。
+
+GitOps 核心原则：
+- 声明式：系统的期望状态必须以声明方式描述（如 Kubernetes YAML）。
+- 版本控制且不可变：声明的期望状态必须存储在版本控制系统（如 Git）中，作为唯一可信源。
+- 自动交付：对 Git 仓库的变更会自动部署到系统中。
+- 软件代理：使用自动化 Agent（如 ArgoCD）来持续协调实际状态与期望状态之间的差异。
+
+ArgoCD 实现 GitOps：
+- 声明式 & 版本控制：
 
 ```
 

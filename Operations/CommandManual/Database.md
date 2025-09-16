@@ -5,13 +5,15 @@
 ```bash
 # client
 clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123
-clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123 -q "select * from default.tablex_all"
+clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123 -q "SELECT * FROM default.tablex_all"
 
 
 # http api
-curl -u "user:pwd123" "http://http://clickhouse.com:8123" --data-binary "select * from default.tablex_all" -i
+curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT cluster,shard_num,replica_num,host_name,port FROM system.clusters"
+curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT * FROM system.zookeeper WHERE path IN ('/', '/clickhouse')"
 
-curl -X POST -u "user:pwd123" "http://clickhouse.com:8123" --data-binary "insert into default.tablex_all (key1,key2) values ('xxx',111) " -i
+curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT * FROM default.tablex_all"
+curl -X POST -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "INSERT INTO default.tablex_all (key1,key2) values ('xxx',111) "
 ```
 
 ## elasticsearch
@@ -150,7 +152,7 @@ time curl -X POST "http://localhost:9200/index/_search" \
     "post_tags":["@/kibana-highlighted-field@"],
     "fields":{"message":{}},
     "fragment_size":2147483647},
-    "from":0
+    "FROM":0
   }'
 
 
@@ -207,21 +209,21 @@ CREATE DATABASE mydatabase OWNER myuser;
 GRANT ALL PRIVILEGES ON DATABASE mydatabase TO myuser;
 GRANT ALL PRIVILEGES ON all tables in schema public TO mydatabase;
 
-# select all database
+# SELECT all database
 \l
 
 # switch database
 \c database
 
-# select custom table and table schema
+# SELECT custom table and table schema
 \d
 \d table;
 
-# select all scheme
-select * from information_schema.schemata;
+# SELECT all scheme
+SELECT * FROM information_schema.schemata;
 
-# select all tables
-select * from pg_tables;
+# SELECT all tables
+SELECT * FROM pg_tables;
 
 ```
 
