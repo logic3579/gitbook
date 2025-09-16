@@ -13,31 +13,25 @@ description: Google Kubernetes Engine
 ### Cluster init
 
 ```console
-# cluster_name
-your_cluster_name
+# Cluster basics
+Name: your_cluster_name
+Regional: your_region
 
-# nodegroup_name
-app-pool
-database-pool
-middleware-pool
-mgmt-pool
+# NODE POOLS
+name: app-pool
+Labels: tier=app
+Taint: app_dedicated=true
 
-# label settings
-tier=app
-tier=database
-tier=middleware
-tier=mgmt
+# Networking
+Enable authorized networks: true
+Authorized networks: Add an authorized network(internal)
+Cluster networking: select your VPC and gke subnet.
+Enable Private nodes: true
+Cluster default Pod address range: 192.168.0.0/16
+Service address range: 10.0.0.0/16
 
-# taint setting
-app_dedicated=true
-db_dedicated=true
-
-# pod, service CIDR settings
-
-# cluster add-on
+# Cluster add-on
 pd-csi-driver
-
-
 ```
 
 ### GCP settings and Manager machine init
