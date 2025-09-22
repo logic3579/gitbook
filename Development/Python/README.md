@@ -120,7 +120,7 @@ poetry update
 # Remove Virtualenv
 poetry env remove <env_name>
 
-# Run in poetry Virtualenv
+# Run On poetry Virtualenv
 poetry run python -V
 poetry run python <your_script.py>
 

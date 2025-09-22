@@ -75,7 +75,7 @@ Summary
 
 #### Jobs and instances
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -147,9 +147,9 @@ job_service:rpc_durations_seconds_count:avg_rate5m
 
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 mkdir /opt/prometheus
@@ -164,7 +164,7 @@ docker run --name prometheus --rm -p 9090:9090 -v /opt/prometheus/prometheus.yml
 
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 ```bash
 # add and update repo

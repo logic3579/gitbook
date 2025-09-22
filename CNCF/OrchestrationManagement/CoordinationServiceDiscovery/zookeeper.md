@@ -8,7 +8,7 @@ description: Zookeeper
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -76,16 +76,15 @@ systemctl start zookeeper.service
 systemctl enable zookeeper.service
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
-# run by docker or docker-compose
 # https://hub.docker.com/_/zookeeper
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 #### Install by Helm
 

@@ -7,13 +7,35 @@
 clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123
 clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123 -q "SELECT * FROM default.tablex_all"
 
-
 # http api
 curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT cluster,shard_num,replica_num,host_name,port FROM system.clusters"
 curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT * FROM system.zookeeper WHERE path IN ('/', '/clickhouse')"
 
 curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT * FROM default.tablex_all"
 curl -X POST -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "INSERT INTO default.tablex_all (key1,key2) values ('xxx',111) "
+
+# Created distributed table
+CREATE DATABASE IF NO EXISTS testdb ON CLUSTER cluster_2s_2r;
+# local table
+CREATE TABLE IF NOT EXISTS testdb.test_table_local ON CLUSTER cluster_2s_2r
+(
+    id UInt32,
+    name String,
+    data Date
+) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{database}/{table}/{shard}', '{replica}')
+ORDER BY id;
+# distributed table
+CREATE TABLE IF NOT EXISTS testdb.test_table_distributed ON CLUSTER cluster_2s_2r
+(
+    id UInt32,
+    name String,
+    data Date
+) ENGINE = Distributed('cluster_2s_2r', 'test_table_local', rand());
+
+# Delete distributed table
+DROP TABLE testdb.test_table_distributed ON CLUSTER cluster_2s_2r;
+DROP TABLE testdb.test_table_local ON CLUSTER cluster_2s_2r;
+DROP DATABASE testdb ON CLUSTER cluster_2s_2r;
 ```
 
 ## elasticsearch

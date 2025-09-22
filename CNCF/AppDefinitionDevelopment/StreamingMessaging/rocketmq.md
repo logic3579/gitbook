@@ -8,7 +8,7 @@ description: RocketMQ
 ...
 
 
-## Deploy With Binary
+## Deploy By Binary
 ### Quick Start
 ```bash
 # option1: compile source install
@@ -390,8 +390,8 @@ export NAMESRV_ADDR=localhost:9876
 ```
 
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 # pull image
 docker pull apache/rocketmq:5.3.0
@@ -403,7 +403,7 @@ docker run -it --net=host apache/rocketmq ./mqnamesrv
 docker run -it --net=host --mount source=/tmp/store,target=/home/rocketmq/store apache/rocketmq ./mqbroker -n localhost:9876
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 ```bash
 # rocketmq operator
 # https://artifacthub.io/packages/olm/community-operators/rocketmq-operator

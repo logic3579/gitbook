@@ -8,15 +8,15 @@ description: Cloudfront
 
 ...
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 deploy using helm
 

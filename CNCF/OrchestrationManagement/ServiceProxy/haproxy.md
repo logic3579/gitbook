@@ -147,14 +147,14 @@ systemctl enable haproxy.service
 
 ## Deploy By Container
 
-### Run In Docker
+### Run On Docker
 
 ```bash
 docker run -d --name my-running-haproxy --sysctl net.ipv4.ip_unprivileged_port_start=0 my-haproxy
 # -v ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
 ```
 
-### Run In Kubernetes
+### Run On Kubernetes
 
 ```bash
 # add and update repo

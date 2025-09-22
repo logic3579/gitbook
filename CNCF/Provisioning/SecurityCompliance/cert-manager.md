@@ -8,15 +8,15 @@ description: Automatically provision and manage TLS certificates in Kubernetes
 
 ...
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 #
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 ```bash
 # Add and update repo

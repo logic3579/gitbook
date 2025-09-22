@@ -8,7 +8,7 @@ description: Memory Database Redis
 ...
 
 
-## Deploy With Binary
+## Deploy By Binary
 ### Quick Start
 ```bash
 # dependencies
@@ -127,8 +127,8 @@ apt install libjemalloc-dev
 apt install libsystemd-dev
 ```
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 # Standlone
 docker run --rm --name redis \
@@ -143,7 +143,7 @@ docker run --rm --name redis-cluster \
   -d bitnami/redis-cluster
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami

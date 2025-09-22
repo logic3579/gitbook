@@ -8,7 +8,7 @@ description: GitLab
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -30,9 +30,9 @@ GITLAB_ROOT_PASSWORD="passwOrd123" EXTERNAL_URL="http://gitlab.example.com" apt 
 cat /etc/gitlab/initial_root_password
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 # run container
@@ -59,7 +59,7 @@ gitlab/gitlab-ee
 [install by docker-compose](https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compose)
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 [[cc-k8s|deploy by kubernetes manifest]]
 

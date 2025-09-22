@@ -8,7 +8,7 @@ description: Vault
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -125,9 +125,9 @@ vault kv put -mount=secret creds password="my-long-password"
 
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 ```bash
 # add and update repo

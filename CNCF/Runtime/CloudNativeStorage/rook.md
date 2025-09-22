@@ -5,18 +5,21 @@ description: Rook
 # Rook
 
 ## Introduction
+
 ...
 
+## Deploy By Container
 
-## Deploy With Container
-### Run in Docker
+### Run On Docker
+
 ```bash
-# run by docker or docker-compose
 # https://hub.docker.com/r/rook/ceph/tags
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
+
 [[cc-k8s|deploy by kubernetes manifest]]
+
 ```bash
 # https://rook.io/docs/rook/v1.11/Getting-Started/quickstart/#tldr
 git clone https://github.com/rook/rook.git
@@ -32,6 +35,7 @@ kubectl -n rook-ceph get pod,crd
 ```
 
 [[cc-helm|deploy by helm]]
+
 ```bash
 # Add and update repo
 helm repo add rook https://charts.rook.io/release
@@ -45,7 +49,7 @@ cd rook-ceph
 # Configure and run
 vim values.yaml
 ...
-helm -n rook-ceph install rook-ceph . --create-namespace 
+helm -n rook-ceph install rook-ceph . --create-namespace
 
 # create rook-cluster
 helm pull rook/rook-ceph-cluster --untar
@@ -57,6 +61,7 @@ kubectl -n rook-ceph get pod,crd
 ```
 
 deploy storageclass and use
+
 ```bash
 # storageclass
 # https://github.com/rook/rook/blob/release-1.11/deploy/examples/csi/rbd/storageclass-test.yaml
@@ -86,8 +91,7 @@ EOF
 kubectl -n rook-ceph apply -f pvc-test.yaml
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://rook.io/)
 > 2. [Repository](https://github.com/rook/rook)

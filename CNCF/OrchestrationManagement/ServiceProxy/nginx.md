@@ -7,7 +7,7 @@ description: Nginx
 ## Introduction
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 ### Quick Start
 ```bash
 # Ubuntu Package install
@@ -175,13 +175,13 @@ cp -ar lua-resty-core/lib/resty/* /usr/local/luajit2/share/luajit-2.1.0-beta3/re
 cp -ar lua-resty-lrucache/lib/resty/* /usr/local/luajit2/share/luajit-2.1.0-beta3/resty/
 ```
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 docker run xxx
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 > k8s 集群建议使用 ingress-nginx-controller
 ```bash
 ### for Nginx

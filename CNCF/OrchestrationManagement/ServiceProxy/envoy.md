@@ -5,11 +5,13 @@ description: Envoy
 # Envoy
 
 ## Introduction
+
 ...
 
+## Deploy By Binary
 
-## Deploy With Binary
 ### Quick Start
+
 ```bash
 # download source
 wget https://github.com/envoyproxy/envoy/releases/download/v1.26.2/envoy-x86_64
@@ -26,11 +28,11 @@ EOF
 ./envoy -c /opt/envoy/config.yaml
 ```
 
-## Deploy With Container
-### Run in Docker
-[[cc-docker|Docker常用命令]]
+## Deploy By Container
+
+### Run On Docker
+
 ```bash
-# run by docker or docker-compose
 # https://hub.docker.com/r/envoyproxy/envoy
 
 # dev
@@ -42,19 +44,21 @@ docker run --rm --name=envoy -d -p 80:10000 -v /opt/envoy/envoy.yaml:/etc/envoy/
 curl -v 127.0.0.1:80
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
+
 [[cc-k8s|deploy by kubernetes manifest]]
+
 ```bash
-# 
+#
 ```
 
 [[cc-helm|deploy by helm]]
+
 ```bash
-#  
+#
 ```
 
-
-
 > Reference:
+>
 > 1. [Official Website](https://cloudnative.to/envoy/start/start.html)
 > 2. [Repository](https://github.com/envoyproxy/envoy)

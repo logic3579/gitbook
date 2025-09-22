@@ -8,7 +8,7 @@ description: TiKV
 ...
 
 
-## Deploy With Binary
+## Deploy By Binary
 ### Quick Start
 ```bash
 # create dir
@@ -85,13 +85,13 @@ print(client.get(b'foo')) # b'baz'
 ```
 
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 # not yet
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 ```bash
 # not yet
 ```

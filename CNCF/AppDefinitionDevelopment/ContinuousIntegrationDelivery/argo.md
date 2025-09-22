@@ -10,21 +10,9 @@ description: Argo Project
 
 ...
 
-### Deploy With Container
+### Deploy By Container
 
-#### Run by Resource
-
-```bash
-# version
-ARGO_WORKFLOWS_VERSION=v3.5.10
-
-
-# install
-kubectl create namespace argo
-kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/${ARGO_WORKFLOWS_VERSION}/install.yaml
-```
-
-#### Run in Kubernetes
+#### Run On Kubernetes
 
 ```bash
 # add and update repo
@@ -89,23 +77,9 @@ argo -n argo get @latest
 
 ...
 
-### Deploy With Container
+### Deploy By Container
 
-#### Run by Resource
-
-```bash
-# version
-ARGO_CD_VERSION=v2.7.9
-kubectl create namespace argocd
-
-# non-ha install
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${ARGO_CD_VERSION}/manifests/install.yaml
-
-# ha install
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${ARGO_CD_VERSION}/manifests/ha/install.yaml
-```
-
-#### Run in Kubernetes
+#### Run On Kubernetes
 
 ```bash
 # add and update repo

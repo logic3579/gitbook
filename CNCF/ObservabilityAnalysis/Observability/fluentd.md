@@ -10,7 +10,7 @@ description: Fluentd and Fluent Bit
 
 ...
 
-### Deploy With Binary
+### Deploy By Binary
 
 #### Quick Start
 
@@ -53,15 +53,9 @@ fluentd -c fluentd.conf --dry-run
 #
 ```
 
-### Deploy With Container
+### Deploy By Container
 
-#### Run by Resource
-
-```bash
-# https://docs.fluentd.org/container-deployment/kubernetes
-```
-
-#### Run in Kubernetes
+#### Run On Kubernetes
 
 ```bash
 # add and update repo
@@ -97,7 +91,7 @@ helm -n logging install fluentd .
 **Fluent Bit & Fluentd 区别**
 Fluentd 和 Fluent Bit 都可以充当聚合器或转发器，它们可以互补使用或单独用作为解决方案。[详情](https://hulining.gitbook.io/fluentbit/about/fluentd-and-fluent-bit)
 
-### Deploy With Binary
+### Deploy By Binary
 
 ```bash
 # source code download
@@ -127,7 +121,7 @@ systemctl enable td-agent-bit.service
 
 ```
 
-### Deploy With Container
+### Deploy By Container
 
 #### 相关概念
 

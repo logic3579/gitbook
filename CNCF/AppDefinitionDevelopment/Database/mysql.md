@@ -5,17 +5,19 @@ description: MySQL
 # MySQL
 
 ## Introduction
+
 ...
 
+## Deploy By Binary
 
-## Deploy With Binary
 ### Quick Start
+
 ```bash
 # download source with boost lib
 wget https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.34.tar.gz
 tar xf mysql-boost-8.0.34.tar.gz && rm -f mysql-8.0.34
 
-# compile 
+# compile
 mkdir /opt/mysql
 mkdir bld && cd bld
 cmake .. -DCMAKE_INSTALL_PREFIX=/opt/mysql -DMYSQL_DATADIR=/opt/mysql/data -DWITH_BOOST=/root/mysql-8.0.34/boost/ -DSYSCONFDIR=/opt/mysql/sysconfig
@@ -42,10 +44,11 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '123qwe';
 ```
 
 ### Config and Boot
+
 [[sc-mysqld|Mysqld Config]]
 
 ```bash
-# boot 
+# boot
 cp support-files/mysql.server /etc/init.d/mysql
 
 systemctl daemon-reload
@@ -54,6 +57,7 @@ systemctl enable mysql.service
 ```
 
 ### Verify
+
 ```bash
 # syntax check
 ./bin/mysql -V
@@ -61,6 +65,7 @@ Ver 8.0.34 for Linux on x86_64 (Source distribution)
 ```
 
 ### Troubleshooting
+
 ```bash
 # every remake need to execute
 make clean && rm CMakeCache.txt
@@ -77,14 +82,10 @@ apt install pkg-config
 
 ```
 
+## Deploy By Container
 
-## Deploy With Container
-### Run by Resource
-```bash
-#
-```
+### Run On Kubernetes
 
-### Run in Kubernetes
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -101,8 +102,8 @@ helm -n middleware install mysql .
 
 ```
 
-
 > Reference:
+>
 > 1. [Official Website](https://www.mysql.com/)
 > 2. [Repository](https://github.com/mysql/mysql-server)
 > 3. [Download](https://dev.mysql.com/downloads/)

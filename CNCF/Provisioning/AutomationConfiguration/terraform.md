@@ -7,7 +7,7 @@ description: Terraform
 ## Introduction
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 ### Install
 ```bash
 # package
@@ -106,8 +106,8 @@ terraform state list
 terraform output
 ```
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 # docker container
 docker run --rm -it hashicorp/terraform:latest plan

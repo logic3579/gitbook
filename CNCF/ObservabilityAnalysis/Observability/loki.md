@@ -103,7 +103,7 @@ systemctl enable loki.service
 
 ## Deploy By Container
 
-### Run In Docker
+### Run On Docker
 
 ```bash
 # Using by docker
@@ -120,7 +120,7 @@ wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-starte
 docker compose up -d
 ```
 
-### Run In Kubernetes
+### Run On Kubernetes
 
 ```bash
 # add and update repo

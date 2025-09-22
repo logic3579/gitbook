@@ -8,7 +8,7 @@ description: Jenkins
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -23,13 +23,13 @@ JENKINS_HOME=/opt/jenkins-config java -jar jenkins.war
 cat /opt/jenkins-config/secrets/initialAdminPassword
 
 
-# Run On Ubuntu
+# On Ubuntu
 # https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 # create bridge network
@@ -43,7 +43,7 @@ docker inspect jenkins_home
 cat /var/lib/docker/volumes/jenkins_home/_data/secrets/initialAdminPassword
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 ```bash
 # Add and update repo

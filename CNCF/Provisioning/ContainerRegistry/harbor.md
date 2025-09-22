@@ -8,9 +8,9 @@ description: Harbor
 
 ...
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 # download offline or online installer and verify
@@ -21,7 +21,7 @@ https://goharbor.io/docs/2.8.0/install-config/download-installer/
 
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 ```bash
 # add and update repo

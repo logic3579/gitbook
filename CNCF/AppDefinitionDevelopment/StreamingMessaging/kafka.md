@@ -8,7 +8,7 @@ description: Apache Kafka
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -296,9 +296,9 @@ systemctl enable kafka.service
 
 [Kafka Command](/Operations/CommandManual/StreamingMessaging.md#kafka)
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 ```bash
 docker pull apache/kafka:3.7.1
@@ -308,7 +308,7 @@ docker run -p 9092:9092 apache/kafka:3.7.1
 # https://hub.docker.com/r/bitnami/kafka
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 #### Install by Helm
 

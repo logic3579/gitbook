@@ -24,6 +24,7 @@ Taint: app_dedicated=true
 
 # Networking
 Enable authorized networks: true
+Access using the control plane's external IP address: false
 Authorized networks: Add an authorized network(internal)
 Cluster networking: select your VPC and gke subnet.
 Enable Private nodes: true
@@ -85,6 +86,20 @@ gcloud auth activate-service-account --key-file=./your-service-account-key.json
 # Init gke cluster connect permission
 gcloud container clusters get-credentials your_cluster_name --region your_cluster_region --project your_project
 kubectl get nodes
+
+# Configuring and deploying the ip-masq-agent
+cat > ip-masq-agent.yaml << "EOF"
+apiVersion: v1
+kind: ConfigMap
+data:
+  config: |
+    nonMasqueradeCIDRs:
+      - 192.168.0.0/16
+      - 10.0.0.0/16
+    masqLinkLocal: false
+    resyncInterval: 60s
+EOF
+kubectl apply -n kube-system -f ip-masq-agent.yaml
 ```
 
 ### Cluster component

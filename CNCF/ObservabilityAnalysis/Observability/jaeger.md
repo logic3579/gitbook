@@ -6,9 +6,9 @@ description: Jaeger
 
 ## Introduction
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 all-in-one 部署，用于测试环境
 
@@ -29,7 +29,7 @@ docker run -d --name jaeger \
   jaegertracing/all-in-one:1.45
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 > Must be installed: ingress & cert-manager
 

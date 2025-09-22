@@ -8,7 +8,7 @@ description: CoreDNS
 ...
 
 
-## Deploy With Binary
+## Deploy By Binary
 ### Quick Start
 ```bash
 # get and run from source
@@ -57,14 +57,14 @@ systemctl start coredns.service
 systemctl enable coredns.service
 ```
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 [[cc-docker|Docker常用命令]]
 ```bash
 # https://hub.docker.com/r/coredns/coredns/tags
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 [[cc-k8s|deploy by kubernetes manifest]]
 ```bash
 #

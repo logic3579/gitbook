@@ -8,7 +8,7 @@ description: RabbitMQ
 ...
 
 
-## Deploy With Binary
+## Deploy By Binary
 ### Quick Start
 ```bash
 # dependencies: install erlang
@@ -92,8 +92,8 @@ Erlang (SMP,ASYNC_THREADS) (BEAM) emulator version 13.2.2.2
 ```
 
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 # pull image
 docker pull rabbitmq:3
@@ -108,7 +108,7 @@ docker exec -it rabbitmq sh
 
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami

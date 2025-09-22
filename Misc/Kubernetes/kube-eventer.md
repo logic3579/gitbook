@@ -122,8 +122,6 @@ kafka-zookeeper-0               1/1     Running   6 (168m ago)   10d
 
 ##### elasticsearch
 
-[[elasticsearch#Run by Helm|helm 部署]]
-
 #### c) kube-eventer 部署
 
 - 获取官方 YAML 资源文件进行部署

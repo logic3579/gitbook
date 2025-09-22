@@ -8,12 +8,12 @@ description: Portainer
 ...
 
 
-## Deploy With Container
-### Run in Docker
+## Deploy By Container
+### Run On Docker
 ```bash
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 [[cc-k8s|deploy by kubernetes manifest]]
 ```bash
 # 

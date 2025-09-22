@@ -78,7 +78,66 @@ GitOps 核心原则：
 - 软件代理：使用自动化 Agent（如 ArgoCD）来持续协调实际状态与期望状态之间的差异。
 
 ArgoCD 实现 GitOps：
-- 声明式 & 版本控制：
+- 声明式 & 版本控制：ArgoCD 的 Application 资源指向一个 Git 仓库或 Helm 仓库，其中的文件就是声明式的期望状态。
+- 自动交付：ArgoCD 可以配置自动同步（automated），Git 仓库有新的提交，ArgoCD 可以检测到并立刻变更应用。
+- 软件代理：ArgoCD Controller 就是运行在集群中的 Agent，持续监控集群状态和 Git 状态，并在出现偏差（Drift）时进行协调（reconcile）。
+```
+
+#### ArgoCD 的 Application、Project、ApplicationSet 分别什么？如何回滚 ArgoCD 管理的应用
+
+```console
+Application：
+核心自定义资源（CRD），定义一个来源（Source，如 Git 仓库和路径、Helm Chart）和一个目标（Destination，如目标集群和命名空间）。一个 Application 资源代表一个需要被同步的应用。
+
+Project：用于分组和管理 Applications，提供一套安全隔离和多租户的规则。可以限制：
+- 源仓库：Application 只能从哪些 Git/Helm 创建。
+- 目标集群和命名空间：Application 可以部署到哪些集群和命名空间。
+- 可执行资源：允许部署哪些 Kubernetes 资源（如可以禁止部署 PodSecurityPolicy）。
+- 权限：哪些用户/角色可以管理该项目下的 Applications。
+  
+ApplicationSet：用于自动化地生成多个 Applications。可以根据一个模板和一组生成器（Generators）来动态创建 Application 资源。
+- 使用场景：需要为每个分支、每个环境或每个客户部署一个相同的应用的不同实例时，使用 ApplicationSet 可以避免手动创建大量重复的 Application 资源。比如使用 git 生成器为仓库的每个分支自动创建一个 Application。
+
+如何回滚：
+- Git Revert 或 Git Reset：还原提交。或使用分支硬重置到上一个良好的提交（git reset --hard <good-commit-hash> && git push -f）
+- 同步：更改推送 Git 后，ArgoCD 检测到新的期望状态，并开始自动同步到之前版本。
+- 手动同步（临时）：在 ArgoCD UI 中手动 APPROVE 操作临时将应用同步到历史的某个版本。
+```
+
+#### 如何基于 ArgoCD 实现一个部署工作流程？ArgoCD 的最佳实践？
+
+```console
+部署工作流程：
+1. 开发者将应用代码提供到 GitHub/GitLab 指定分支，通过 CI 管道（如 Jenkins/GitLab CI/GitHub Actions 等）触发，执行编译、测试、构建等任务。
+2. CI 管道将新构建等镜像标签更新到 Kubernetes 清单中（如用 sed 替换 `image: nginx:1.0` 为 `image: nginx:1.1` ），然后将更改提交到 Git 仓库的另一个分支或单独的 ArgoCD 专用仓库。
+3. ArgoCD 持续监控 Git 仓库和目标分支。监测到清单发生变化（镜像标签变化）。
+4. ArgoCD 根据配置的同步策略（automated 或 manual）：
+- automated：自动将更改应用到 Kubernetes 集群。
+- manual：在 UI/CLI 中显示 OutOfSync 状态，等待用户手动操作 Sync 动作。
+1. ArgoCD 执行滚动更新，部署新版本 Pod。并持续监控应用的健康状态，报告部署成功或失败。
+
+安全实践：
+- 使用 RBAC：精细配置 ArgoCD 的 argocd-rbac-cm ConfigMap，遵循最小权限原则，控制用户和项目对资源的访问。
+- 使用 Projects：用 Projects 隔离租户和环境，限制其原仓库和目标命名空间。
+- 保护 Git 仓库：Git 仓库是入口，必须严格控制写入权限。只允许 CI 系统和少量管理员推送变更。
+- 使用 SSO 集成：尽量不使用本地用户，集成现有的 OIDC 提供商（如 GitHub、GitLab、Google）进行身份验证。
+- Secret 管理：不要将密码、密钥等明文放在 Git 中。集成 Sealed Secrets、HashiCorp Vault 等工具管理 secrets。
+- 禁用匿名访问：在 argocd-cm ConfigMap 中配置 policy.default: role:readonly 或更严格策略。
+
+
+ArgoCD 最佳实践：
+
+**推荐架构**
+1. 两个核心仓库分离：
+- 应用代码仓库（Application Code Repository）：存放源代码、Dockerfile 和 CI 流程配置（如 .gitlab-ci.yml 或 Jenkinsfile）
+- 配置仓库（GitOps Config Repository）：存放所有 Kubernetes 清单文件（Kustomize/Helm Charts）和 ArgoCD Application 定义。ArgoCD 直接监控的仓库。
+2. 流程分离：
+- CI（Continuous Integration）：由 Jenkins、GitLab CI、GitHub Actions 等工具完成。负责代码构建、测试、打包镜像并推送到镜像仓库）
+- CD（Continuous Delivery）：由 ArgoCD 完成。CI 流程的最后一步是更新 GitOps 配置仓库（如修改 kustomization.yaml 中的镜像标签），ArgoCD 检测到后自动部署应用。
+
+**实践细节**
+
+
 
 ```
 

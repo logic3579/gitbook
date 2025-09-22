@@ -8,7 +8,7 @@ description: Logstash
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -61,15 +61,9 @@ systemctl start .service
 systemctl enable .service
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run by Resource
-
-```bash
-# https://docs.fluentd.org/container-deployment/kubernetes
-```
-
-### Run in Kubernetes
+### Run On Kubernetes
 
 ```bash
 # add and update repo

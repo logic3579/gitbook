@@ -109,9 +109,9 @@ docker run --name mrdoc \
 ## containerd
 
 ```bash
-# default run by systemd
+# default(systemd)
 systemctl start containerd.service
-# run by k3s
+# run on k3s
 containerd -c /var/lib/rancher/k3s/agent/etc/containerd/config.toml -a /run/k3s/containerd/containerd.sock --state /run/k3s/containerd --root /var/lib/rancher/k3s/agent/containerd
 
 
@@ -119,7 +119,7 @@ containerd -c /var/lib/rancher/k3s/agent/etc/containerd/config.toml -a /run/k3s/
 ## default
 ctr --address /run/containerd/containerd.sock namespace ls
 ctr --address /run/containerd/containerd.sock -n k8s.io images ls
-## run by k3s
+## run on k3s
 ctr --address /run/k3s/containerd/containerd.sock namespace ls
 ctr --address /run/k3s/containerd/containerd.sock -n k8s.io images ls
 ctr --address /run/k3s/containerd/containerd.sock -n k8s.io container ls

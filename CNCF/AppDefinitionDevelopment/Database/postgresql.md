@@ -5,18 +5,20 @@ description: PostgreSQL
 # PostgreSQL
 
 ## Introduction
+
 ...
 
+## Deploy By Binary
 
-## Deploy With Binary
 ### Quick Start
+
 ```bash
 # download source
 wget https://ftp.postgresql.org/pub/source/v15.1/postgresql-15.1.tar.gz
-tar xf postgresql-15.1.tar.gz && rm -f postgresql-15.1.tar.gz 
+tar xf postgresql-15.1.tar.gz && rm -f postgresql-15.1.tar.gz
 cd postgresql-15.1/
 
-# compile 
+# compile
 mkdri bld && cd bld
 ../configure --prefix=/opt/pgsql --with-systemd
 make -j `grep processor /proc/cpuinfo | wc -l`
@@ -28,17 +30,18 @@ useradd -r -g postgres -s /bin/false postgres
 mkdir /opt/pgsql/data /opt/pgsql/logs
 chown postgres:postgres /opt/pgsql -R
 
-# startup 
+# startup
 /opt/pgsql/bin/pg_ctl -D /opt/pgsql/data initdb
 /opt/pgsql/bin/pg_ctl -D /opt/pgsql/data -l /opt/pgsql/logs/pgsql.log start
 
 ```
 
 ### Config and Boot
+
 [[sc-mysqld|Postgresql Config]]
 
 ```bash
-# boot 
+# boot
 cat > /etc/systemd/system/postgresql.service << "EOF"
 [Unit]
 Description=PostgreSQL database server
@@ -63,6 +66,7 @@ systemctl enable postgresql.service
 ```
 
 ### Verify
+
 ```bash
 # syntax check
 /opt/pgsql/bin/postgres --version
@@ -70,26 +74,23 @@ postgres (PostgreSQL) 15.1
 ```
 
 ### Troubleshooting
+
 ```bash
 # problem 1
 # configure: error: readline library not found
 apt install libreadline-dev
 
 # problem 2
-# configure: error: header file <systemd/sd-daemon.h> is required for systemd support 
+# configure: error: header file <systemd/sd-daemon.h> is required for systemd support
 apt install libsystemd-dev
 
 
 ```
 
+## Deploy By Container
 
-## Deploy With Container
-### Run by Resource
-```bash
-#
-```
+### Run On Kubernetes
 
-### Run in Kubernetes
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -106,8 +107,8 @@ helm -n middleware install postgresql .
 
 ```
 
-
 > Reference:
+>
 > 1. [Official Website](https://www.postgresql.org/)
 > 2. [Repository](https://github.com/postgres/postgres)
 > 3. [apt 安装方式](https://www.postgresql.org/download/linux/ubuntu/)

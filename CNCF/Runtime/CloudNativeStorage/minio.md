@@ -5,11 +5,13 @@ description: Minio
 # Minio
 
 ## Introduction
+
 ...
 
+## Deploy By Binary
 
-## Deploy With Binary
 ### Quick Start
+
 ```bash
 # download source
 wget https://dl.min.io/server/minio/release/linux-amd64/minio
@@ -32,6 +34,7 @@ minio server --console-address :9001 http://1.1.1.1/opt/minio/data http://2.2.2.
 ```
 
 ### Storage Requirements
+
 ```bash
 # Use local Storage
 mkdir /opt/minio/data
@@ -43,7 +46,9 @@ cat /etc/fstab
 ```
 
 ### Config and Boot
+
 #### Config
+
 ```bash
 cat > /etc/default/minio << "EOF"
 # set this for MinIO to reload entries with 'mc admin service restart'
@@ -77,6 +82,7 @@ EOF
 ```
 
 #### Boot(systemd)
+
 ```bash
 cat > /etc/systemd/system/minio.service << "EOF"
 [Unit]
@@ -110,6 +116,7 @@ systemctl enable minio.service
 ```
 
 ### Verify
+
 ```bash
 # download and install minio client
 curl https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
@@ -127,21 +134,24 @@ mc cat myminio/mybucket/1.txt
 ```
 
 ### Troubleshooting
+
 ```bash
 # problem 1
-# 
+#
 ```
 
+## Deploy By Container
 
-### Deploy With Container
-### Run in Docker
+### Run On Docker
+
 ```bash
 # single node test
 docker run -p 9000:9000 -p 9001:9001 quay.io/minio/minio server /data --console-address ":9001"
 
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
+
 ```bash
 # add and update repo
 helm repo add minio https://helm.min.io/
@@ -166,7 +176,7 @@ mc mb myminio/mybucket
 mc ls myminio/mybucket
 ```
 
-
 > Reference:
+>
 > 1. [Official Website](https://min.io/docs/minio/kubernetes/upstream/)
 > 2. [Repository](https://github.com/minio/minio)

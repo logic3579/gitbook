@@ -8,7 +8,7 @@ description: Etcd
 
 ...
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -95,9 +95,9 @@ etcdctl  --endpoints http://x.x.x.x:2379 --user=root --password=9A4mEZmkjU put m
 etcdctl get my-key
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run in Docker
+### Run On Docker
 
 [[cc-docker|Docker常用命令]]
 
@@ -132,7 +132,7 @@ docker exec etcd-gcr-v3.4.26 /usr/local/bin/etcdctl put foo bar
 docker exec etcd-gcr-v3.4.26 /usr/local/bin/etcdctl get foo
 ```
 
-### Run in Kubernetes
+### Run On Kubernetes
 
 [[cc-k8s|deploy by kubernetes manifest]]
 

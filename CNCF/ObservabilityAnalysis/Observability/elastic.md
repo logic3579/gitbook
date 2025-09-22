@@ -8,7 +8,7 @@ description: ElasticSearch
 
 Elasticsearch is an open source, distributed search and analytics engine built for speed, scale, and AI applications. As a retrieval platform, it stores structured, unstructured, and vector data in real time — delivering fast hybrid and vector search, powering observability and security analytics, and enabling AI-driven applications with high performance, accuracy, and relevance.
 
-## Deploy With Binary
+## Deploy By Binary
 
 ### Quick Start
 
@@ -113,9 +113,9 @@ systemctl start elasticsearch.service
 systemctl enable elasticsearch.service
 ```
 
-## Deploy With Container
+## Deploy By Container
 
-### Run on Helm
+### Run On Kubernetes
 
 ```bash
 # add and update repo
@@ -138,12 +138,6 @@ volumeClaimTemplate:
 ...
 
 helm -n logging install elasticsearch .
-
-```
-
-### Run on ECK Operator
-
-```bash
 
 ```
 
