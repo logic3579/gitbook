@@ -99,8 +99,6 @@ etcdctl get my-key
 
 ### Run On Docker
 
-[[cc-docker|Docker常用命令]]
-
 ```bash
 rm -rf /tmp/etcd-data.tmp && mkdir -p /tmp/etcd-data.tmp && \
 docker rmi gcr.io/etcd-development/etcd:v3.4.26 || true && \

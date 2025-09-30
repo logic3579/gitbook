@@ -155,6 +155,7 @@
 - [System](./Operations/System/README.md)
   - [Boot](./Operations/System/boot.md)
   - [iptables](./Operations/System/iptables.md)
+  - [KVM](./Operations/System/kvm.md)
   - [Linux From Scratch](./Operations/System/lfs.md)
   - [Nix](./Operations/System/nix.md)
 - [Kernel](./Operations/Kernel.md)

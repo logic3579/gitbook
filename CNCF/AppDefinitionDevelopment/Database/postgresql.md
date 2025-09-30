@@ -111,5 +111,5 @@ helm -n middleware install postgresql .
 >
 > 1. [Official Website](https://www.postgresql.org/)
 > 2. [Repository](https://github.com/postgres/postgres)
-> 3. [apt 安装方式](https://www.postgresql.org/download/linux/ubuntu/)
-> 4. [PgsqlConfig Generate](https://pgtune.leopard.in.ua/)
+> 3. [Percona Distribution for PostgreSQL](https://docs.percona.com/postgresql/)
+> 4. [PGsqlConfig Generate](https://pgtune.leopard.in.ua/)

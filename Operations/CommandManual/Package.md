@@ -65,14 +65,26 @@ dpkg -r mysql-common && dpkg -P mysql-common
 ## RedHat
 ### dnf
 ```bash
+# repolist
+dnf repolist
+
+# enable/disable repo
+dnf config-manager --set-enabled crb
+dnf config-manager --set-disabled crb
+
 # update repo
 dnf update
-
 
 # install package
 dnf install zsh git svn telnet wget curl make cmake
 dnf install containerd
 
+# module
+dnf module list
+dnf module disable <module>:<stream>
+dnf module enable <module>:<stream>
+dnf module enable nodejs:18
+dnf module reset <module>
 
 # search
 dnf search gtk | grep theme
@@ -84,16 +96,17 @@ dnf search cursor-theme
 dnf list --showduplicates gcc
 dnf search --showduplicates gcc
 
-# Fedora
-# install extensions
+
+# Fedora Init
+# 1. install extensions
 dnf install gnome-shell-extension-user-theme
 gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
-# install chrome
+# 2. install chrome
 dnf install fedora-workstation-repositories
 dnf config-manager --set-enabled google-chrome
 dnf update
 dnf install google-chrome-stable
-# install theme tools
+# 3. install theme tools
 dnf install gnome-shell-theme-yaru
 dnf install gnome-tweak-tool
 ```
