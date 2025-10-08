@@ -123,11 +123,14 @@ docker compose up -d
 ### Run On Kubernetes
 
 ```bash
-# add and update repo
-helm repo add grafana https://grafana.github.io/helm-charts
-helm update
+# Add and update repo
+helm repo add grafana https://grafana.github.io/helm-charts --force-update
 
-# configure and run
+# Get charts package
+helm pull grafana/loki-simple-scalable --untar
+cd loki-simple-scalable
+
+# Configure and run
 vim values.yaml
 deploymentMode: SimpleScalable  # single-binary, simple-scalable, distributed(microservices)
 loki:
