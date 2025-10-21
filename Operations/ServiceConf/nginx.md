@@ -257,6 +257,7 @@ server {
     # frontend project
     location / {
         root /app/frontend-project;
+        try_files $uri $uri/ /index.html;
 
         # cache settings
         #if ($request_filename ~ .*\.(htm|html|json)$) {
@@ -264,9 +265,6 @@ server {
         #}
         if ($request_filename ~ .*\.(htm|html)$) { add_header Cache-Control "max-age=60, s-maxage=120"; }
         if ($request_filename !~ .*\.(htm|html)$) { add_header Cache-Control "max-age=31536000, s-maxage=86400"; }
-            root /usr/share/nginx/html;
-            try_files $uri $uri/ /index.html;
-        }
 
         # Cross-Origin Resource Sharing
         add_header Access-Control-Allow-Origin '*';

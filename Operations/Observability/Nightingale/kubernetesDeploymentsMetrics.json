@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 11,
+  "id": 10,
   "links": [],
   "panels": [
     {
@@ -113,7 +113,7 @@
             "uid": "cepal4vdmbg1se"
           },
           "editorMode": "code",
-          "expr": "(sum(irate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$statefulset.*\",image!~\".*pause.*\",container!=\"\"}[2m])) by (pod) / max(kube_pod_container_resource_limits{namespace=\"middleware\",pod=~\"$statefulset.*\",image!~\".*pause.*\",resource=\"cpu\"}) by (pod)) * 100",
+          "expr": "(sum(irate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$deployment.*\",image!~\".*pause.*\",container!=\"\"}[2m])) by (pod) / max(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$deployment.*\",image!~\".*pause.*\",resource=\"cpu\"}) by (pod)) * 100",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -216,7 +216,7 @@
             "uid": "cepal4vdmbg1se"
           },
           "editorMode": "code",
-          "expr": "sum(irate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$statefulset.*\",image!~\".*pause.*\",container!=\"\"}[2m])) by (pod)",
+          "expr": "sum(irate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$deployment.*\",image!~\".*pause.*\",container!=\"\"}[2m])) by (pod)",
           "hide": false,
           "legendFormat": "{{pod}}",
           "range": true,
@@ -318,7 +318,7 @@
             "uid": "cepal4vdmbg1se"
           },
           "editorMode": "code",
-          "expr": "(sum(container_memory_usage_bytes{namespace=\"$namespace\",pod=~\"$statefulset.*\",image!~\".*pause.*\",container!=\"\"}) by (pod)/ max(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$statefulset.*\",image!~\".*pause.*\",resource=\"memory\"}) by (pod)) * 100",
+          "expr": "(sum(container_memory_usage_bytes{namespace=\"$namespace\",pod=~\"$deployment.*\",image!~\".*pause.*\",container!=\"\"}) by (pod)/ max(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$deployment.*\",image!~\".*pause.*\",resource=\"memory\"}) by (pod)) * 100",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -422,39 +422,38 @@
             "uid": "cepal4vdmbg1se"
           },
           "editorMode": "code",
-          "expr": "sum(container_memory_usage_bytes{namespace=\"$namespace\",pod=~\"$statefulset.*\",image!~\".*pause.*\",container!=\"\"}) by (pod)",
+          "expr": "sum(container_memory_usage_bytes{namespace=\"$namespace\",pod=~\"$deployment.*\",image!~\".*pause.*\",container!=\"\"}) by (pod)",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Memory Usage",
+      "title": "MEMORY Usage",
       "type": "timeseries"
     }
   ],
   "preload": false,
-  "refresh": "",
+  "refresh": "1m",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "text": "logging",
-          "value": "logging"
+          "text": "1block",
+          "value": "1block"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "cepal4vdmbg1se"
         },
-        "definition": "label_values(kube_statefulset_status_replicas,namespace)",
+        "definition": "label_values(kube_deployment_status_condition,namespace)",
         "includeAll": false,
         "name": "namespace",
         "options": [],
         "query": {
-          "qryType": 1,
-          "query": "label_values(kube_statefulset_status_replicas,namespace)",
+          "query": "label_values(kube_deployment_status_condition,namespace)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -463,20 +462,20 @@
       },
       {
         "current": {
-          "text": "eck-elasticsearch-es-prod",
-          "value": "eck-elasticsearch-es-prod"
+          "text": "backend-multi-server-task",
+          "value": "backend-multi-server-task"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "cepal4vdmbg1se"
         },
-        "definition": "label_values(kube_statefulset_status_replicas{namespace=\"$namespace\"},statefulset)",
+        "definition": "label_values(kube_deployment_status_condition{namespace=\"$namespace\"},deployment)",
         "includeAll": false,
-        "name": "statefulset",
+        "name": "deployment",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(kube_statefulset_status_replicas{namespace=\"$namespace\"},statefulset)",
+          "query": "label_values(kube_deployment_status_condition{namespace=\"$namespace\"},deployment)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -486,12 +485,12 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Kubernetes Statefulset Metrics",
-  "uid": "d249cc23-6930-403e-91f6-c9c30389b830",
-  "version": 5
+  "title": "Kubernetes Deployments Metrics",
+  "uid": "d249cc23-6930-403e-91f6-c9c30389b829",
+  "version": 12
 }
