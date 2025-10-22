@@ -1,3 +1,4 @@
+#SPDX-License-Identifier: MIT-0
 ---
 # tasks file for security
 - name: Create config directory
@@ -10,10 +11,9 @@
 - name: Restart iptables
   shell: /sbin/iptables-restore < /etc/sysconfig/iptables
 
-
 # /etc/security/limits.conf
 - name: Set ulimit
   pam_limits: domain=* limit_type=- limit_item={{ item }} value=655350
   with_items:
-   - nofile
-   - nproc
+    - nofile
+    - nproc

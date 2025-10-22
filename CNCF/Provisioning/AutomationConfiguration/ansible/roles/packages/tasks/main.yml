@@ -13,13 +13,13 @@
     - libssl-dev
     - iftop
     - iproute2
-    - sysstat 
+    - sysstat
     - telnet
     - tcpdump
     - traceroute
     - unzip
     - vim
     - wget
-    - zlib1g-dev 
+    - zlib1g-dev
   # when: ansible_os_family == "Debian"
   when: ansible_distribution_file_variety  == "Debian"
