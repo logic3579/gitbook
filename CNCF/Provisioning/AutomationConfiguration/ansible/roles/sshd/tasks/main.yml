@@ -1,9 +1,3 @@
+#SPDX-License-Identifier: MIT-0
 ---
 # tasks file for sshd
-- name: Update sshd_config
-  copy: src=sshd_config.ali dest=/etc/ssh/sshd_config owner=root group=root mode=600
-
-- name: Change root Password
-  user: name=root update_password=always password={{ password }}
-  notify: Restart SSH
-  when: env == 'ali'
