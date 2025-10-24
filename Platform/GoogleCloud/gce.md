@@ -38,7 +38,6 @@ lvdisplay
 lvextend -l +100%free /dev/vg_name/lv_name
 resize2fs /dev/vg_name/lv_name
 
-
 # option2: add new disk or new disk partition to expand
 # create pv
 pvcreate /dev/sdc
@@ -50,7 +49,14 @@ lvdisplay
 lvextend -l +100%free /dev/vg_name/lv_name
 # reidentify filesystem size
 resize2fs /dev/vg_name/lv_name
-xfs_growfs /dev/vg_name/lv_name
+#xfs_growfs /dev/vg_name/lv_name
+
+# option3: expand Disks
+lsblk
+growpart /dev/sda 1
+resize2fs /dev/sda1
+#xfs_growfs /dev/sda1
+df -h
 ```
 
 > Reference:

@@ -28,8 +28,8 @@ Access using the control plane's external IP address: false
 Authorized networks: Add an authorized network(internal)
 Cluster networking: select your VPC and gke subnet.
 Enable Private nodes: true
-Cluster default Pod address range: 192.168.0.0/16
-Service address range: 10.0.0.0/16
+Cluster default Pod address range: 172.16.0.0/16
+Service address range: 192.168.0.0/16
 
 # Cluster add-on
 pd-csi-driver
