@@ -8,20 +8,23 @@
 user  nobody nobody;
 worker_processes  auto;
 worker_cpu_affinity auto;
-worker_rlimit_nofile 655350;
-
-error_log  logs/error.log;
 pid        logs/nginx.pid;
+error_log  logs/error.log;
+include /opt/nginx/modules-enabled/*.conf;
+worker_rlimit_nofile 655350;
 
 events {
     worker_connections  102400;
+	# multi_accept on;
 }
 
+##
+# TCP Stream Settings
+##
 stream{
     log_format tcp_log '$remote_addr [$time_local]'
          '$protocol $status $bytes_sent $bytes_received $session_time'
          '"$upstream_addr" "$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
-
     access_log /opt/nginx/logs/tcp-access.log tcp_log;
 
     upstream tcp_backend_server {
@@ -37,12 +40,34 @@ stream{
 }
 
 http {
+    ###
+    # Basic Settings
+    ##
+	
+    sendfile on;
+	tcp_nopush on;
+	types_hash_max_size 2048;
+    server_tokens off;
+    server_names_hash_max_size 3072;
+    server_names_hash_bucket_size 1024;
+	
     include       mime.types;
     default_type  application/octet-stream;
+	
+    ##
+    # SSL Settings
+    ##
+    #ssl_protocols SSLv3 TLSv1.0 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
 
-    log_format  main  escape=json
-'$remote_addr |$ip2location_country_long |$ip2location_region |$ip2location_city |[$time_local] |$host |$request |$status |BodySent:$body_bytes_sent |ReqTime:$request_time |$request_completion |$http_x_forwarded_for |$proxy_host |$upstream_addr |$upstream_status |$upstream_cache_status |UpResTime:$upstream_response_time |UpConnTime:$upstream_connect_time |UpResLen:$upstream_response_length |$hostname-$request_id |$scheme |$request_body |$http_cookie |$http_referer |$http_user_agent';
-
+    ## 
+    # Logging Settings
+    ##
+    log_format main '$remote_addr $remote_user $ip2location_country_long $ip2location_region $ip2location_city '
+                    '[$time_local] Host:$host Request:$request Status:$status RequestLength:$request_length BodyBytesSent:$body_bytes_sent RequestTime:$request_time '
+                    'UpstreamAddr:$upstream_addr UpstreamStatus:$upstream_status UpstreamConnTime:$upstream_connect_time UpstreamResTime:$upstream_response_time '
+                    'Scheme:$scheme Referer:$http_referer Cookie:$http_cookie UA:$http_user_agent XFF:$http_x_forwarded_for'
     log_format main_json escape=json '{"time_local":"$time_local",'
 '"server_addr":"$server_addr",'
 '"country":"$ip2location_country_long",'
@@ -76,37 +101,11 @@ http {
 '"https":"$https",'
 '"request_id":"$hostname-$request_id"'
 '}';
+    access_log /opt/nginx/logs/access.log main;
 
-    resolver 8.8.8.8 1.1.1.1 114.114.114.114 valid=5 ipv6=off;
-    resolver_timeout 3s;
-
-    sendfile      on;
-    server_tokens off;
-    proxy_intercept_errors on;
-
-    keepalive_timeout  180;
-    client_body_buffer_size  50m;
-    client_body_timeout      300;
-    client_max_body_size     50m;
-    proxy_next_upstream error  timeout  http_502  http_503 http_504;
-    proxy_next_upstream_timeout 20;
-    proxy_connect_timeout    10;
-    proxy_read_timeout       300;
-    proxy_send_timeout       300;
-    proxy_buffer_size        512k;
-    proxy_buffers            4 512k;
-    proxy_busy_buffers_size    512k;
-    proxy_temp_file_write_size 512k;
-    client_header_buffer_size 512k;
-    large_client_header_buffers 4 512k;
-
-    server_names_hash_max_size 3072;
-    server_names_hash_bucket_size 1024;
-    proxy_ignore_client_abort on;
-
-    variables_hash_max_size 2048;
-    variables_hash_bucket_size 2048;
-
+    ##
+    # Gzip Settings
+    ##
     gzip  on;
     gzip_disable "msie6";
     gzip_proxied any;
@@ -114,6 +113,35 @@ http {
     gzip_comp_level 6;
     gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript application/octet-stream;
 
+	
+    resolver 8.8.8.8 1.1.1.1 114.114.114.114 valid=5 ipv6=off;
+    resolver_timeout 3s;
+
+    keepalive_timeout 180;
+    client_body_buffer_size 50m;
+    client_body_timeout 300;
+    client_max_body_size 50m;
+    proxy_intercept_errors on;
+    proxy_ignore_client_abort on;
+    proxy_next_upstream error timeout http_502 http_503 http_504;
+    proxy_next_upstream_timeout 20;
+    proxy_connect_timeout 10;
+    proxy_read_timeout 300;
+    proxy_send_timeout 300;
+    proxy_buffer_size 512k;
+    proxy_buffers 4 512k;
+    proxy_busy_buffers_size 512k;
+    proxy_temp_file_write_size 512k;
+    client_header_buffer_size 512k;
+    large_client_header_buffers 4 512k;
+
+    variables_hash_max_size 2048;
+    variables_hash_bucket_size 2048;
+
+
+    ##
+    # Map Settings
+    ##
     # ip2location = https://github.com/chrislim2888/IP2Location-C-Library
     ip2location_database /opt/nginx/conf/IPV6-COUNTRY-REGION-CITY.BIN;
     ip2location_proxy_recursive on;
@@ -121,22 +149,21 @@ http {
 	    default no;
 	    ~*(AU|IN|NG|US)$ yes;
     }
-
-    # geoip2 = https://github.com/leev/ngx_http_geoip2_module
-    geoip2 /opt/nginx/conf/GeoLite2-Country.mmdb {
-       $geoip2_country_code country iso_code;
-       $geoip2_country_name country names en;
-    }
-    geoip2 /opt/nginx/conf/GeoLite2-City.mmdb {
-        $geoip2_city_name city names en;
-        $geoip2_subdivisions_name subdivisions 0 names en;
-        $geoip2_latitude location latitude;
-        $geoip2_longitude location longitude;
-    }
-    map $geoip2_country_code $allowed_country {
-        default no;
-        ~*(AU|IN|NG|US)$ yes;
-    }
+    ## geoip2 = https://github.com/leev/ngx_http_geoip2_module
+    #geoip2 /opt/nginx/conf/GeoLite2-Country.mmdb {
+    #   $geoip2_country_code country iso_code;
+    #   $geoip2_country_name country names en;
+    #}
+    #geoip2 /opt/nginx/conf/GeoLite2-City.mmdb {
+    #    $geoip2_city_name city names en;
+    #    $geoip2_subdivisions_name subdivisions 0 names en;
+    #    $geoip2_latitude location latitude;
+    #    $geoip2_longitude location longitude;
+    #}
+    #map $geoip2_country_code $allowed_country {
+    #    default no;
+    #    ~*(AU|IN|NG|US)$ yes;
+    #}
 
     # websocket connection keepalive
     map $http_upgrade $connection_upgrade {
@@ -154,7 +181,9 @@ http {
        ~*^(.+\.)*([^\.]+\.[^\.]+)$ /opt/nginx/conf/keys/$2.key;
     }
 
-    # vhosts dir
+    ##
+    # Virtual Host Configs
+    ##
     include vhosts/*.conf;
 }
 

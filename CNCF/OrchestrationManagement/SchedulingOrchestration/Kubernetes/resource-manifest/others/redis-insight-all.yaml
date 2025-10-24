@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis-insight
-  namespace: management
+  namespace: mgmt
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -18,7 +18,7 @@ spec:
     metadata:
       labels:
         app: redis-insight
-      namespace: management
+      namespace: mgmt
     spec:
       containers:
         - env:
@@ -54,7 +54,7 @@ metadata:
   labels:
     app: redis-insight
   name: redis-insight
-  namespace: management
+  namespace: mgmt
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
@@ -69,26 +69,46 @@ spec:
     app: redis-insight
   sessionAffinity: None
   type: ClusterIP
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: redis-insight
+#  namespace: mgmt
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: redis-insight.example.com
+#      http:
+#        paths:
+#          - backend:
+#              service:
+#                name: redis-insight
+#                port:
+#                  number: 8001
+#            path: /
+#            pathType: ImplementationSpecific
+#status:
+#  loadBalancer:
+#    ingress:
+#      - ip: 1.1.1.1
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: networking.istio.io/v1
+kind: VirtualService
 metadata:
-  name: redis-insight-ing
-  namespace: management
+  name: redis-insight
+  namespace: mgmt
 spec:
-  ingressClassName: nginx
-  rules:
-    - host: redis-insight.example.com
-      http:
-        paths:
-          - backend:
-              service:
-                name: redis-insight
-                port:
-                  number: 8001
-            path: /
-            pathType: ImplementationSpecific
-status:
-  loadBalancer:
-    ingress:
-      - ip: 1.1.1.1
+  gateways:
+    - istio-ingress/gateway-internal
+  hosts:
+    - redis-insight.example.com
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: redis-insight.mgmt.svc.cluster.local
+            port:
+              number: 8001

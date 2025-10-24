@@ -21,24 +21,24 @@ spec:
       namespace: monitoring
     spec:
       containers:
-      - args:
-        - "--rocketmq.config.namesrvAddr=rocketmq-nameserver.middleware.svc:9876"
-        - "--rocketmq.config.rocketmqVersion=V5_3_0"
-        image: apache/rocketmq-exporter:v0.0.2-SNAPSHOT
-        imagePullPolicy: IfNotPresent
-        name: rocketmq-exporter
-        ports:
-        - containerPort: 5557
-          protocol: TCP
-        resources:
-          limits:
-            cpu: 200m
-            memory: 256Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
+        - args:
+            - "--rocketmq.config.namesrvAddr=rocketmq-nameserver.middleware.svc:9876"
+            - "--rocketmq.config.rocketmqVersion=V5_3_0"
+          image: apache/rocketmq-exporter:v0.0.2-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          name: rocketmq-exporter
+          ports:
+            - containerPort: 5557
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       securityContext:
@@ -57,13 +57,13 @@ metadata:
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
-  - IPv4
+    - IPv4
   ipFamilyPolicy: SingleStack
   ports:
-  - name: port-5557
-    port: 5557
-    protocol: TCP
-    targetPort: 5557
+    - name: port-5557
+      port: 5557
+      protocol: TCP
+      targetPort: 5557
   selector:
     app: rocketmq-exporter
   sessionAffinity: None

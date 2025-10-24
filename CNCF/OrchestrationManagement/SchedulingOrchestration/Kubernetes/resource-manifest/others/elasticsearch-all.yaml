@@ -9,22 +9,6 @@ data:
   username: ZWxhc3RpYw==
   password: cEFzc3cwcmQK
 ---
-kind: Service
-apiVersion: v1
-metadata:
-  name: elasticsearch
-  labels:
-    app: "elasticsearch"
-spec:
-  type: ClusterIP
-  selector:
-    app: "elasticsearch"
-  ports:
-    - name: http
-      protocol: TCP
-      port: 9200
-      targetPort: 9200
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -131,23 +115,59 @@ spec:
               name: es-plugins
               readOnly: false
 ---
-# Source: elasticsearch/templates/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+kind: Service
+apiVersion: v1
 metadata:
   name: elasticsearch
   labels:
-    app: elasticsearch
+    app: "elasticsearch"
 spec:
-  ingressClassName: "nginx"
-  rules:
-    - host: es.example.com
-      http:
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: elasticsearch
-                port:
-                  number: 9200
+  type: ClusterIP
+  selector:
+    app: "elasticsearch"
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9200
+      targetPort: 9200
+#---
+## Source: elasticsearch/templates/ingress.yaml
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: elasticsearch
+#  labels:
+#    app: elasticsearch
+#spec:
+#  ingressClassName: "nginx"
+#  rules:
+#    - host: es.example.com
+#      http:
+#        paths:
+#          - path: /
+#            pathType: ImplementationSpecific
+#            backend:
+#              service:
+#                name: elasticsearch
+#                port:
+#                  number: 9200
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: elastic
+  namespace: mgmt
+spec:
+  gateways:
+    - istio-ingress/gateway-internal
+  hosts:
+    - elasticsearch.example.com
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: elasticsearch.mgmt.svc.cluster.local
+            port:
+              number: 9200

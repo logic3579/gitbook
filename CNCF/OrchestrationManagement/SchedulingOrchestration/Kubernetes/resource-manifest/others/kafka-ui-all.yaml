@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kafka-ui
-  namespace: management
+  namespace: mgmt
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -18,7 +18,7 @@ spec:
     metadata:
       labels:
         app: kafka-ui
-      namespace: management
+      namespace: mgmt
     spec:
       containers:
         - env:
@@ -48,36 +48,13 @@ spec:
         fsGroup: 1000
       terminationGracePeriodSeconds: 30
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: kafka-ui-ing
-  namespace: management
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: kafka-ui.example.com
-      http:
-        paths:
-          - backend:
-              service:
-                name: kafka-ui
-                port:
-                  number: 8080
-            path: /
-            pathType: ImplementationSpecific
-status:
-  loadBalancer:
-    ingress:
-      - ip: 1.1.1.1
----
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     app: kafka-ui
   name: kafka-ui
-  namespace: management
+  namespace: mgmt
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
@@ -92,3 +69,46 @@ spec:
     app: kafka-ui
   sessionAffinity: None
   type: ClusterIP
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: kafka-ui-ing
+#  namespace: mgmt
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: kafka-ui.example.com
+#      http:
+#        paths:
+#          - backend:
+#              service:
+#                name: kafka-ui
+#                port:
+#                  number: 8080
+#            path: /
+#            pathType: ImplementationSpecific
+#status:
+#  loadBalancer:
+#    ingress:
+#      - ip: 1.1.1.1
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: kafka-ui
+  namespace: mgmt
+spec:
+  gateways:
+    - istio-ingress/gateway-internal
+  hosts:
+    - kafka-ui.example.com
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: kafka-ui.mgmt.svc.cluster.local
+            port:
+              number: 8080

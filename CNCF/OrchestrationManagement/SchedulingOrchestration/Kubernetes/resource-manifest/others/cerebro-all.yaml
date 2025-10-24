@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cerebro-config
-  namespace: management
+  namespace: mgmt
 data:
   application.conf: |
     secret = "ki:s:[[@=Ag?QI`W2jMwkY:eqvrJ]JqoJyi2axj3ZvOv^/KavOT4ViJSv?6YY4[N"
@@ -58,7 +58,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cerebro
-  namespace: management
+  namespace: mgmt
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -74,7 +74,7 @@ spec:
     metadata:
       labels:
         app: cerebro
-      namespace: management
+      namespace: mgmt
     spec:
       containers:
         - args:
@@ -113,36 +113,13 @@ spec:
             name: cerebro-config
           name: app-config
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: cerebro-ing
-  namespace: management
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: cerebro.example.com
-      http:
-        paths:
-          - backend:
-              service:
-                name: cerebro
-                port:
-                  number: 9000
-            path: /
-            pathType: ImplementationSpecific
-status:
-  loadBalancer:
-    ingress:
-      - ip: 1.1.1.1
----
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     app: cerebro
   name: cerebro
-  namespace: management
+  namespace: mgmt
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
@@ -157,3 +134,46 @@ spec:
     app: cerebro
   sessionAffinity: None
   type: ClusterIP
+---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: cerebro
+#  namespace: mgmt
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: cerebro.example.com
+#      http:
+#        paths:
+#          - backend:
+#              service:
+#                name: cerebro
+#                port:
+#                  number: 9000
+#            path: /
+#            pathType: ImplementationSpecific
+#status:
+#  loadBalancer:
+#    ingress:
+#      - ip: 172.16.1.1
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: cerebro
+  namespace: mgmt
+spec:
+  gateways:
+    - istio-ingress/gateway-external
+  hosts:
+    - cerebro.example.com
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: cerebro.mgmt.svc.cluster.local
+            port:
+              number: 9000
