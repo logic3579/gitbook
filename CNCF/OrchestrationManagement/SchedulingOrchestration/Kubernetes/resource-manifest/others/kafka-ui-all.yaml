@@ -24,9 +24,19 @@ spec:
         - env:
             - name: SERVICE_NAME
               value: kafka-ui
-            - name: DYNAMIC_CONFIG_ENABLED
+            #- name: DYNAMIC_CONFIG_ENABLED
+            #  value: "true"
+            - name: AUTH_TYPE
+              value: "LOGIN_FORM"
+            - name: SPRING_SECURITY_USER_NAME
+              value: admin
+            - name: SPRING_SECURITY_USER_PASSWORD
+              value: your-password
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: kafka.mgmt.svc:9092
+            - name: KAFKA_CLUSTERS_0_READONLY
               value: "true"
-          image: provectuslabs/kafka-ui@sha256:477d4c3d896a0deefdcccf0e08e8fb0d4258e5340d34f3c3513f75073de5835c
+          image: provectuslabs/kafka-ui:latest
           imagePullPolicy: IfNotPresent
           name: kafka-ui
           ports:

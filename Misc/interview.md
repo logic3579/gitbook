@@ -48,7 +48,7 @@ helm rollback：
 - 执行更改，并将这次回滚操作也记录为一个新的 Revison。
 ```
 
-#### 编写一个生产可用的 Helm Chart 有哪些最佳实践？
+#### 编写一个生产可用的 Helm Chart 最佳实践
 
 ```console
 - 为资源使用正确的标签：确保所有模板化的资源都有标准标签，如 app.kubernetes.io/name, app.kubernetes.io/instance, app.kubernetes.io/version, helm.sh/chart。
@@ -104,7 +104,7 @@ ApplicationSet：用于自动化地生成多个 Applications。可以根据一�
 - 手动同步（临时）：在 ArgoCD UI 中手动 APPROVE 操作临时将应用同步到历史的某个版本。
 ```
 
-#### 如何基于 ArgoCD 实现一个部署工作流程？ArgoCD 的最佳实践？
+#### 如何基于 ArgoCD 实现一个部署工作流程？
 
 ```console
 部署工作流程：
@@ -114,20 +114,13 @@ ApplicationSet：用于自动化地生成多个 Applications。可以根据一�
 4. ArgoCD 根据配置的同步策略（automated 或 manual）：
 - automated：自动将更改应用到 Kubernetes 集群。
 - manual：在 UI/CLI 中显示 OutOfSync 状态，等待用户手动操作 Sync 动作。
-1. ArgoCD 执行滚动更新，部署新版本 Pod。并持续监控应用的健康状态，报告部署成功或失败。
+5. ArgoCD 执行滚动更新，部署新版本 Pod。并持续监控应用的健康状态，报告部署成功或失败。
+```
 
-安全实践：
-- 使用 RBAC：精细配置 ArgoCD 的 argocd-rbac-cm ConfigMap，遵循最小权限原则，控制用户和项目对资源的访问。
-- 使用 Projects：用 Projects 隔离租户和环境，限制其原仓库和目标命名空间。
-- 保护 Git 仓库：Git 仓库是入口，必须严格控制写入权限。只允许 CI 系统和少量管理员推送变更。
-- 使用 SSO 集成：尽量不使用本地用户，集成现有的 OIDC 提供商（如 GitHub、GitLab、Google）进行身份验证。
-- Secret 管理：不要将密码、密钥等明文放在 Git 中。集成 Sealed Secrets、HashiCorp Vault 等工具管理 secrets。
-- 禁用匿名访问：在 argocd-cm ConfigMap 中配置 policy.default: role:readonly 或更严格策略。
+#### ArgoCD 最佳实践
 
-
-ArgoCD 最佳实践：
-
-**推荐架构**
+```console
+推荐架构
 1. 两个核心仓库分离：
 - 应用代码仓库（Application Code Repository）：存放源代码、Dockerfile 和 CI 流程配置（如 .gitlab-ci.yml 或 Jenkinsfile）
 - 配置仓库（GitOps Config Repository）：存放所有 Kubernetes 清单文件（Kustomize/Helm Charts）和 ArgoCD Application 定义。ArgoCD 直接监控的仓库。
@@ -135,7 +128,7 @@ ArgoCD 最佳实践：
 - CI（Continuous Integration）：由 Jenkins、GitLab CI、GitHub Actions 等工具完成。负责代码构建、测试、打包镜像并推送到镜像仓库）
 - CD（Continuous Delivery）：由 ArgoCD 完成。CI 流程的最后一步是更新 GitOps 配置仓库（如修改 kustomization.yaml 中的镜像标签），ArgoCD 检测到后自动部署应用。
 
-**实践细节**
+实践细节：
 1. 仓库结构与环境分离：dev、staging、prod 使用独立的 namespace 或集群。使用 Kustomize 的 overlays 或 Helm 的 values.yaml 管理不同环境的差异。
 2. ArgoCD 配置与管理
 - 使用 App of Apps 模式：创建一个母应用（app-of-apps.yaml），只饮用其他 ArgoCD Application，可以一键同步整个环境。
@@ -144,6 +137,14 @@ ArgoCD 最佳实践：
 - 项目与 RBAC：使用 Projects 对应用进行逻辑分组，严格的配置 RBAC 规则限制团队只能访问所属的项目和应用。
 3. 安全与密钥管理：集成 Vault 动态拉取密钥。
 4. 部署策略与回滚：使用 ArgoCD Rollouts 控制器实现更安全的发布策略。可以自动进行流量切换、分析指标并决定继续发布或回滚。
+
+安全实践：
+- 使用 RBAC：精细配置 ArgoCD 的 argocd-rbac-cm ConfigMap，遵循最小权限原则，控制用户和项目对资源的访问。
+- 使用 Projects：用 Projects 隔离租户和环境，限制其原仓库和目标命名空间。
+- 保护 Git 仓库：Git 仓库是入口，必须严格控制写入权限。只允许 CI 系统和少量管理员推送变更。
+- 使用 SSO 集成：尽量不使用本地用户，集成现有的 OIDC 提供商（如 GitHub、GitLab、Google）进行身份验证。
+- Secret 管理：不要将密码、密钥等明文放在 Git 中。集成 Sealed Secrets、HashiCorp Vault 等工具管理 secrets。
+- 禁用匿名访问：在 argocd-cm ConfigMap 中配置 policy.default: role:readonly 或更严格策略。
 ```
 
 #### 什么是 Jenkins？主要功能是什么？什么是 Jenkins 的 Master/Agent 架构？
@@ -315,28 +316,20 @@ Redis Sentinel（哨兵）高可用方案：分布式系统，用于管理多个
 - 自动故障转移：如果主节点故障，Sentinel 会将一个从节点提升为新的主节点，并让其他从节点指向新的主节点。
 - 配置提供者：客户端应用会连接到 Sentinel 来获取当前主节点的地址。
 
-
 Redis Cluster（集群）高可用方案：数据自动分片到多个节点，在部分节点故障时，集群仍能继续对外提供服务。它是一个 AP 系统（CAP 定理中），即在网络分区发生时，优先保证可用性，并尽可能保证数据的一致性。
 - 数据分片：整个集群分为 16384 个槽，每个主节点在集群初始化时分配 0-16383 中属于自己的哈希槽，可以通过 CLUSTER SLOTS 查看槽的分配情况。
 - 路由：数据通过哈希算法后得到 0-16383 之间的槽编号，某些 Redis 客户端也会在内部维护一份“槽位-节点”的映射表。通过直接连接或重定向（MOVED 或 ASK）将数据写入到正确的节点的槽位中。
 - 节点：主节点负责槽相关的数据读写命令，并参与故障选举。从节点通过异步复制同步数据，当主节点故障时提升从节点为主节点实现故障转移。
-
 - 故障检测：Gossip 协议与投票
     1. PING/PONG：集群中每个节点都会定期通过 Gossip 协议向其他节点发送 PING 消息，接收方回复 PONG。以此交换元数据并检测节点是否可达。
     2. 主观下线：如果节点 A 在 cluster-node-timeout 时间内无法与节点 B 通信，节点 A 会将节点 B 标记为主观下线。
     3. 客观下线：主观下线只是节点 A 的“个人观点”。节点 A 会通过 Gossip 消息在集群中传播“节点B可能下线了”的信息。当集群中大多数主节点都认为节点 B 主观下线时，节点 B 的状态就被提升为客观下线。此时，集群认为节点 B 真的故障了，可以开始故障转移。
-        
 - 故障转移：从节点晋升
     1. 当一个主节点被标记为客观下线后，它的从节点会开始竞选成为新的主节点。
     2. 选举资格：从节点的数据不能太旧，其主从复制偏移量需要尽可能接近原主节点（数据尽可能新）。
     3. 投票：所有正常的主节点都会参与投票。每个主节点在一次故障转移选举中只有一票。
     4. 获胜条件：一个从节点需要获得超过半数主节点的投票才能获胜。
     5. 槽继承：获胜的从节点执行 SLAVEOF NO ONE，提升自己为主节点，并接管原主节点负责的所有哈希槽。然后通过 Gossip 协议广播，通知整个集群这一变化。
-
-- 生产环境最佳实践：
-	1. 至少三主三从，如果只有两个主节点，当一个主节点宕机时，剩下的一个主节点无法满足“大多数”（N/2+1）的投票条件，导致集群无法完成故障转移。
-	2. 合理的 cluster-node-timeout：默认15秒。在网络环境较差或机器负载较高时，可以适当调大，避免因临时拥塞导致不必要的故障转移。
-	3. 所有节点全互联：确保防火墙规则允许所有节点之间的端口（客户端端口和集群总线端口=客户端端口+10000）互通。
 ```
 
 #### 什么是 Redis 的缓存穿透、缓存击穿以及缓存雪崩？如何解决？
@@ -364,15 +357,139 @@ Redis Cluster（集群）高可用方案：数据自动分片到多个节点，�
 - 服务降级与熔断：在应用层做限流和降级，当检测到数据库压力过大时，对非核心业务直接返回默认值或错误页面。
 ```
 
-#### Kafka
+#### Redis 最佳实践
+
+```console
+集群模式部署：
+- 至少三主三从，如果只有两个主节点，当一个主节点宕机时，剩下的一个主节点无法满足“大多数”（N/2+1）的投票条件，导致集群无法完成故障转移。
+- 合理的 cluster-node-timeout：默认15秒。在网络环境较差或机器负载较高时，可以适当调大，避免因临时拥塞导致不必要的故障转移。
+- 所有节点全互联：确保防火墙规则允许所有节点之间的端口（客户端端口和集群总线端口=客户端端口+10000）互通。
+```
+
+#### 什么是 Kafka？核心架构与应用场景是什么？
+
+```console
+Kafka 是一个高吞吐、低延迟、分布式的发布-订阅消息系统，基于磁盘实现持久化。更像是一个分布式提交日志。
+  
+核心架构：
+- Broker：独立的 Kafka 服务器节点，多个 Broker 组成一个集群。
+- Topic：消息的类别或主题，逻辑上的概念。生产者发送消息到 Topic，消费者从 Topic 拉取消息。
+- Partition：分区，是 Topic 在物理上的分组。一个 Topic 可以分层多个 Partition，分布在不同 Broker 上。每个 Partition 是一个有序、不可变的序列，且每条消息在 Partition 内部都有一个 offset。
+- Producer：生产者，向 Topic 发布消息的客户端。
+- Consumer：消费者，向 Topic 订阅并消费消息的客户端。
+- Consumer Group：消费者组，由多个 Consumer 实例组成，共同消费一个 Topic。Group 是 Kafka 实现队列和发布-订阅模型的关键。
+  - 队列模型：所有 Consumer 在一个 Group 内，每条消息只会被组内一个 Consumer 消费。
+  - 发布-订阅模型：每个 Consumer 在不同 Group 中，每条消息会被所有 Group 消费。
+
+应用场景：
+- 消息队列/系统解耦：连接上下游系统，实现异步通信。
+- 流处理平台：作为实时流数据处理管道（如 Flink、Spark Streaming）的数据源。
+- 用户行为追踪/日志聚合：收集各服务的日志和用户活动数据，统一存入大数据处理系统。
+- 事件驱动架构：作为事件的骨干，驱动微服务之间的状态变更和通信。
+```
+
+#### 为什么 Kafka 能做到高吞吐、低延迟？
+
+```console
+顺序读写：Kafka 将消息追加到 Partition 末尾，充分利用磁盘顺序读写性能，性能堪比内存。
+
+零拷贝：使用 sendfile 系统调用，数据直接从磁盘文件通过 DMA 拷贝到网卡缓冲区，bypass 了应用程序和内核缓冲区，减少上下文切换和数据拷贝次数。
+
+页缓存：Kafka 不使用 JVM 内存，而是利用操作系统的页缓存来缓存数据。避免了 JVM GC 的开销，并且可以利用操作系统的内存管理优势。
+
+批量处理：Producer 和 Consumer 都支持批量发送和拉取消息，大大减少了网络 I/O 开销。
+
+数据压缩：Producer 端可以对批量消息进行压缩（如 Snappy、LZ4、GZIP），减少网络传输和磁盘存储的压力。
+```
+
+#### Kafka 的消息投递语义都有哪些？什么是 Kafka 副本机制与 ISR？Kafka 如何保证消息不丢失？
+
+```console
+消息投递语义：
+- At least once：消息绝不会丢失，但可能重复。通过 Producer 的 retries 和 Consumer 处理完再提交 offset 实现。
+- At most once：消息可能丢失，但绝不会重复。通过 Producer 不重试和 Consumer 自动提交 offset 实现。
+- Exactly once：消息有且仅被处理一次。Kafka 通过幂等性 Producer 和事务来实现精确一次。
+  - 幂等性 Producer：通过为每个 Producer 实例分配一个 PID 和每个消息分配一个序列号，Broker 去重，避免因 Producer 重试导致的重复。
+  - 事务：允许将消费和生产作为一个原子操作，实现 读-处理-写 模式的精确一次。
+
+副本机制：Kafka 为每个 Partition 创建多个副本，分布在不同 Broker 上。其中一个是 Leader 副本，处理所有读写请求，其他是 Follower 副本，被动从 Leader 同步数据。
+
+ISR：In-Sync Replicas，指与 Leader 副本保持同步的副本集合（包含 Leader）
+- Follower 副本会定期向 Leader 发送 FETCH 请求来同步数据。
+- 如果一个 Follower 在 replica.lag.time.max.ms 时间内没有向 Leader 发起 fetch 请求，或者落后 Leader 的消息数量超过 replica.lag.max.messages（已弃用），就会被 Leader 从 ISR 中移除，重新追上 Leader 进度后再加回。
+- 重要性：只有 ISR 中的副本才有资格在 Leader 宕机时选举为新的 Leader。
+  
+如何保证消息不丢失？
+Producer 端：
+- 设置 acks=all（或-1）。意味着 Leader 副本必须等待所有 ISR 副本都成功接收消息后，才会向 Producer 返回确认。
+- 设置 retries 为一个较大的值，并处理好重试可能带来的消息重复问题。
+Broker 端：
+- 设置 unclean.leader.electon.enable = false。防止落后太多的非 ISR 副本成为 leader，导致数据丢失。
+- 设置 replicas.factor >= 3，确保每个 Partition 有足够的副本。
+- 设置 min.insync.replicas >= 2，表示最少存在2个 ISR 副本，Producer 才认为写入成功。与 acks=all 配合构成 Quorum 机制。
+Consumer 端：
+- 关闭自动提交 offset （enable.auto.commit = false），改为在消息被业务逻辑成功处理后再手动提交 offset。
+```
+
+#### Kafka 最佳实践
+
+```console
+集群规划与设置
+- Broker 配置：
+  - log.dirs：配置多个物理磁盘路径，不同 Partition 分布不同磁盘，提升 I/O 并行度。
+  - num.network.threads 和 num.io.threds：根据服务器 CPU 核心数和网络情况适当调大。
+  - auto.create.topic.enable：生产环境必须为 false，防止创建无用 Topic。
+- Topic 规划：
+  - 分区数：决定 Topic 最大并发能力。通常总分区数不应超过集群 Broker 数 * (num.io.threads | number of CPU cores)，建议从最小（如6-12）开始，根据监控数据进行扩容。
+  - 副本数：生产环境至少为3。保证即使一台 Broker 宕机，数据依然可用且不影响写入（在 min.insync.replicas = 2）。
+
+运维与监控
+- 容量规划与监控：
+  - 磁盘：磁盘使用率，设置合理的数据保留策略（log.retention.hours 或 log.retention.bytes）。Kafka 在磁盘使用率超过85-90%后会急剧下降。
+  - 网络：监控网络吞吐量，避免成为瓶颈。
+  - 关键指标：监控 ISR 数量变化、Under Replicated Partitions、Controller 状态、请求处理延迟。
+- 客户端最佳实践：
+  - Producer：
+    - 使用带回调的 send 方法，处理发送失败的情况。
+    - 根据业务对延迟和可靠性的要求，合理设置 linger.ms 和 batch.size 以优化批量发送。
+    - 对可靠性要求高的场景，使用 acks=all 和 min.sync.replicas。
+  - Consumer：
+    - 始终使用 Consumer Group。
+    - 手动提交 offset，并确保消息处理成功后再提交。
+    - 处理好 Rebalance：在 ConsumerRebalanceListener 中实现优雅的推出逻辑，如在 Rebalance 开始时提交 offset。
+
+常见问题排查：
+- Consumer Lag 高：消费速度跟不上生产速度。需要检查 Consumer 应用性能（GC、CPU）、网络、是否处理中阻塞。可以考虑增加分区数和同 Group 下的 Consumer 实例数。
+- Leader Not Available：通常是由于 Controller 选举或网络分区导致 Partition Leader 暂不可用。需要检查 Broker 健康状态、网络连通性、Zookeeper 连接状态。
+- 消息重复消费：Consumer 处理完消息后提交 offset 前崩溃，重启后会重新消费已处理的消息。需要在消费逻辑中具备幂等性。
+```
+
+#### 什么是 RocketMQ？核心架构与特点是什么？存储模型是什么？
+
+```console
+RocketMQ 是一个分布式、队列模型的消息中间件，具有低延迟、高可靠、万亿级容量和灵活的扩展性。
+
+核心架构：
+
+```
+
+#### RocketMQ 支持哪些消息类型？什么是 RocketMQ 的事务消息机制？RocketMQ 如何保证消息不丢失？
 
 ```console
 
 ```
-
-#### RocketMQ
+#### RocketMQ 最佳实践
 
 ```console
+集群部署与配置
+- 多 Master 多 Slave 模式：
+  - 异步复制
+  - 同步双写
+
+运维与监控
+
+
+常见问题排查
 
 ```
 

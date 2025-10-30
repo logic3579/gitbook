@@ -1,9 +1,0 @@
-## Istio
-```console
-
-```
-
-## Terraform
-```console
-
-```
