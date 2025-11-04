@@ -470,27 +470,90 @@ Consumer 端：
 RocketMQ 是一个分布式、队列模型的消息中间件，具有低延迟、高可靠、万亿级容量和灵活的扩展性。
 
 核心架构：
+- NameServer: 轻量级服务发现与路由中心。Broker 向所有 NameServer 注册，Producer 和 Consumer 从 NameServer 获取路由信息（哪个 Topic 在哪个 Broker 上）。NameServer 之间互不通信，是无状态的，因此非常轻量级和高效。
+- Broker：消息存储和转发节点。负责消息的存储、投递和查询。通常采用主从架构（Master-Slave）实现高可用。
+- Producer：消息生产者，向 Broker 生产消息。
+- Consumer：消息消费者，从 Broker 拉取消息。消费者必须属于一个消费者组。
+
+存储模型：
+- CommitLog：所有 Topic 的所有消息都顺序追加到同一个 CommitLog 文件中。极致利用磁盘顺序写性能，写入吞吐量非常高。
+- ConsumeQueues：
+  - CommitLog 的索引文件，每个 Topic 的每个 Queue 都有一个对应的 ConsumeQueue。
+  - 存储的是消息在 CommitLog 中的物理偏移量、消息大小和 Tag 哈希码。
+  - 优点：消费时，先查询轻量级 ConsumeQueue，再根据物理偏移量到 CommitLog 中精准读取消息内容。实现了写时合并，读时分离，兼顾了写入性能和消费速度。
+- 工作流程：
+  - 生产者发送消息，Broker 将其顺序写入 CommitLog。
+  - 一个后台线程 ReputMessageService 异步地将消息的索引构建到对应的 ConsumeQueue 中。
+  - 消费者拉取消息时，先读 ConsumeQueue 得到索引，再根据索引去 CommitLog 拿到完整的消息体。
 
 ```
 
 #### RocketMQ 支持哪些消息类型？什么是 RocketMQ 的事务消息机制？RocketMQ 如何保证消息不丢失？
 
 ```console
+支持消息类型：
+- 普通消息：无特殊功能的消息。
+- 顺序消息：保证消息在同一个 MessageQueue 内被严格顺序地生产和消费。全局顺序需要 Topic 只有一个 MessageQueue。
+- 广播消息：一条消息被一个 Consumer Group 下的所有 Consumer 实例消费一次。
+- 延迟消息：消息发送后，不会立即被消费，而是在指定延迟时间后才会投递给 Consumer。RocketMQ 原生支持 18 个延迟级别（1s, 5s, 10s, 30s, 1m ... 2h）。
+- 事务消息：事务消息机制的消息。
 
+事务消息：用于解决本地事务执行和消息发送的原子性问题。核心阶段是两阶段提交和事务状态回查。
+- 第一阶段：
+  - 发送半消息，Producer 向 Broker 发送一条“半消息”，此时这条消息对 Consumer 不可见。
+  - 执行本地事务：Producer 执行本地数据库事务。
+- 第二阶段：提交或回滚
+  - 根据本地事务执行结果。Producer 向 Broker 发送 Commit 或 Rollback 指令。
+  - Commit：半消息变为正式消息，对 Consumer 可见。
+  - Rollback：半消息被删除。
+- 事务状态回查：
+  - 如果 Producer 在第二阶段因为宕机等原因没有返回指令，Broker 会定时向 Producer 发起回查。
+  - Producer 需要检查本地事务的最终状态，并返回 Commit 或 Rollback。
+
+如何保证消息不丢失：
+- Producer 端
+  - 使用同步发送，并处理发送失败的情况（重试）。
+  - 对于可靠性要求极高的场景，可以采用事务消息机制。
+- Broker 端
+  - 刷盘策略：默认是异步刷盘，性能高但有丢失风险。可以设置为同步刷盘，保证消息落盘后才返回成功，但性能会下降。
+  - 复制策略：默认是异步复制，主从同步有延迟。可以设置为同步双写，保证消息复制到从节点后才返回成功，进一步保证高可用。
+  - 组合使用：同步刷盘+同步双写是最高级别的可靠性保证，但性能损耗最大。
+- Consumer 端
+  - 使用 PUSH 模式或 PULL 模式，在消息业务逻辑处理成功后，再返回 CONSUME_SUCCESS 状态给 Broker。如果处理失败，返回 RECONSUME_LATER，消息会稍后重试。
 ```
 #### RocketMQ 最佳实践
 
 ```console
 集群部署与配置
 - 多 Master 多 Slave 模式：
-  - 异步复制
-  - 同步双写
+  - 异步复制：主从异步同步，性能高，有毫秒级延迟。适用于消息可靠性要求稍低的场景。
+  - 同步双写：主从同步成功后才返回，数据零丢失。适用于金融等对可靠性要求极高的场景。
+- NameServer 集群：至少部署2-3个节点。互不依赖，只要有节点存活整个集群即可工作。
+- Broker 配置：
+  - flushDiskType：根据业务在性能和可靠性间权衡，选择 ASYNC_FLUSH 或 SYNC_FLUSH。
+  - brokerRole：选择 ASYNC_MASTER / SYNC_MASTER 或 SLAVE。
 
 运维与监控
-
+- 容量规划：
+  - 磁盘：使用 SSD，监控磁盘使用率，并设置合理的清理策略（默认72小时）。
+  - JVM：合理设置堆内存，Old 区过大可能导致 Full GC 时间过长，影响 Broker 与 Slave 或 NameServer 的心跳，造成主从切换。
+- 监控告警：
+  - 使用 RocketMQ Console：官方控制台，可查看 Topic、消费者组、消息堆积等情况。
+  - 关键指标：消息堆积量、TPS、Broker 存活状态和主从同步延迟。
+- 客户端最佳实践：
+  - Producer：设置合理的 SendMsgTimeout；为消息设置唯一的 key；使用 setInstanceName 为 Producer 设置实例名。
+  - Consumer：保证消息逻辑幂等性；关注消费耗时；处理好重试队列和死信队列消息。
 
 常见问题排查
-
+- 消息堆积：
+  - 原因：消费速度远低于生产速度。
+  - 解决：优化消费逻辑性能；增加 Consumer 实例数量（注意：一个 Queue 只能被一个 Consumer 消费，所以增加 Consumer 数量不能超过 Queue 的总数）。
+- 消息重复：
+  - 原因：网络波动、Client 重启等可能导致消息重投。
+  - 解决：必须在消费端做幂等。利用数据库唯一键、Redis 分布式锁或状态机等方式。
+- No route info of this topic：
+  - 原因：Producer 无法找到 Topic 的路由信息。
+  - 解决：检查 Topic 是否已在 Broker 上创建；检查 Producer 能否正确连接到 NameServer 并获取路由。
 ```
 
 ## Observability

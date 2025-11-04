@@ -91,6 +91,9 @@ kubectl get nodes
 cat > ip-masq-agent.yaml << "EOF"
 apiVersion: v1
 kind: ConfigMap
+metadata:
+  name: ip-masq-agent
+  namespace: kube-system
 data:
   config: |
     nonMasqueradeCIDRs:
@@ -99,7 +102,7 @@ data:
     masqLinkLocal: false
     resyncInterval: 60s
 EOF
-kubectl apply -n kube-system -f ip-masq-agent.yaml
+kubectl apply -f ip-masq-agent.yaml
 ```
 
 ### Cluster component
