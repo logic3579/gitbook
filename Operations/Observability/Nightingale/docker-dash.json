@@ -2,7 +2,7 @@
     "name": "Docker Overview",
     "tags": "",
     "ident": "",
-    "uuid": 1761099726035000,
+    "uuid": 1763992093311000,
     "configs": {
         "var": [
             {
@@ -23,7 +23,9 @@
                     "cate": "prometheus",
                     "value": 2
                 },
-                "definition": "label_values(docker_container_status_uptime, com_docker_compose_service)"
+                "definition": "label_values(docker_container_status_uptime, com_docker_compose_service)",
+                "multi": true,
+                "allOption": true
             }
         ],
         "panels": [
@@ -223,7 +225,7 @@
                 "targets": [
                     {
                         "refId": "A",
-                        "expr": "docker_container_status_oomkilled{com_docker_compose_service=\"$Application\"}",
+                        "expr": "docker_container_status_oomkilled{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}",
                         "legend": ""
                     }
                 ]
@@ -302,7 +304,7 @@
                 "targets": [
                     {
                         "refId": "A",
-                        "expr": "sum (rate(docker_container_cpu_usage_total{com_docker_compose_service=\"$Application\"}[2m])) by (com_docker_compose_service)",
+                        "expr": "sum (rate(docker_container_cpu_usage_total{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}[2m])) by (ident,com_docker_compose_service)",
                         "legend": "{{com_docker_compose_service}}"
                     }
                 ]
@@ -381,7 +383,7 @@
                 "targets": [
                     {
                         "refId": "A",
-                        "expr": "sum (docker_container_mem_usage{com_docker_compose_service=\"$Application\"}) by (com_docker_compose_service)",
+                        "expr": "sum (docker_container_mem_usage{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}) by (ident,com_docker_compose_service)",
                         "legend": "{{com_docker_compose_service}}"
                     }
                 ]
@@ -400,19 +402,6 @@
                 "version": "3.1.0",
                 "datasourceCate": "prometheus",
                 "datasourceValue": 2,
-                "targets": [
-                    {
-                        "refId": "A",
-                        "expr": "sum (docker_container_cpu_usage_percent{com_docker_compose_service=\"$Application\"}) by (com_docker_compose_service)",
-                        "legend": "{{com_docker_compose_service}}"
-                    }
-                ],
-                "transformations": [
-                    {
-                        "id": "organize",
-                        "options": {}
-                    }
-                ],
                 "name": "CPU Usage Percent",
                 "maxPerRow": 4,
                 "options": {
@@ -466,6 +455,13 @@
                             "rightYAxisDisplay": "off"
                         }
                     }
+                ],
+                "targets": [
+                    {
+                        "refId": "A",
+                        "expr": "sum (docker_container_cpu_usage_percent{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}) by (ident,com_docker_compose_service) / 8",
+                        "legend": "{{com_docker_compose_service}}"
+                    }
                 ]
             },
             {
@@ -482,19 +478,6 @@
                 "version": "3.1.0",
                 "datasourceCate": "prometheus",
                 "datasourceValue": 2,
-                "targets": [
-                    {
-                        "refId": "A",
-                        "expr": "sum (docker_container_mem_usage_percent{com_docker_compose_service=\"$Application\"}) by (com_docker_compose_service)",
-                        "legend": "{{com_docker_compose_service}}"
-                    }
-                ],
-                "transformations": [
-                    {
-                        "id": "organize",
-                        "options": {}
-                    }
-                ],
                 "name": "Memory Usage Percent",
                 "maxPerRow": 4,
                 "options": {
@@ -547,6 +530,13 @@
                         "properties": {
                             "rightYAxisDisplay": "off"
                         }
+                    }
+                ],
+                "targets": [
+                    {
+                        "refId": "A",
+                        "expr": "sum (docker_container_mem_usage_percent{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}) by (ident,com_docker_compose_service)",
+                        "legend": "{{com_docker_compose_service}}"
                     }
                 ]
             },
@@ -625,7 +615,7 @@
                 "targets": [
                     {
                         "refId": "A",
-                        "expr": "rate(docker_container_net_rx_bytes{com_docker_compose_service=\"$Application\"}[$__rate_interval])",
+                        "expr": "rate(docker_container_net_rx_bytes{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}[$__rate_interval])",
                         "legend": "{{com_docker_compose_service}}"
                     }
                 ]
@@ -705,7 +695,7 @@
                 "targets": [
                     {
                         "refId": "A",
-                        "expr": "rate(docker_container_net_tx_bytes{com_docker_compose_service=\"$Application\"}[$__rate_interval])",
+                        "expr": "rate(docker_container_net_tx_bytes{ident=\"$Node\",com_docker_compose_service=~\"$Application\"}[$__rate_interval])",
                         "legend": "{{com_docker_compose_service}}"
                     }
                 ]

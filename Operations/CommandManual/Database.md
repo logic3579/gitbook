@@ -1,44 +1,49 @@
 # Database
 
-## clickhouse
+## ClickHouse
 
 ```bash
-# client
-clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123
-clickhouse-client -h clickhouse --port 9000 -m -u root --password pwd123 -q "SELECT * FROM default.tablex_all"
+# Client
+clickhouse-client -h clickhouse --port 9000 -m -u default --password pwd123
+clickhouse-client -h clickhouse --port 9000 -m -u default --password pwd123 -q "SELECT cluster, shard_num, replica_num, host_name, port FROM system.clusters"
+# import / export data
+clickhouse-client -h clickhouse --port 9000 -m -u default --password pwd123 --query "SELECT * FROM mydb.mytable FORMAT TSV" > /tmp/mytable.tsv
+cat /tmp/mytable.tsv | clickhouse-client -h clickhouse --port 9000 -m -u default --password pwd123 --query "INSERT INTO mydb.mytable FORMAT TSV"
 
-# http api
+# HTTP API
+## select
 curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT cluster,shard_num,replica_num,host_name,port FROM system.clusters"
 curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT * FROM system.zookeeper WHERE path IN ('/', '/clickhouse')"
-
 curl -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "SELECT * FROM default.tablex_all"
+## insert
 curl -X POST -u "default:default_pwd" "http://clickhouse.com:8123" --data-binary "INSERT INTO default.tablex_all (key1,key2) values ('xxx',111) "
 
 # Created distributed table
-CREATE DATABASE IF NO EXISTS testdb ON CLUSTER cluster_2s_2r;
+CREATE DATABASE IF NO EXISTS mydb ON CLUSTER cluster_2s_2r;
 # local table
-CREATE TABLE IF NOT EXISTS testdb.test_table_local ON CLUSTER cluster_2s_2r
+CREATE TABLE IF NOT EXISTS mydb.mytable_local ON CLUSTER cluster_2s_2r
 (
     id UInt32,
     name String,
-    data Date
+    create_date Date
 ) ENGINE = ReplicatedMergeTree('/clickhouse/tables/{database}/{table}/{shard}', '{replica}')
+PARTITION BY toYYYYMM(create_date)
 ORDER BY id;
 # distributed table
-CREATE TABLE IF NOT EXISTS testdb.test_table_distributed ON CLUSTER cluster_2s_2r
+CREATE TABLE IF NOT EXISTS mydb.mytable_distributed ON CLUSTER cluster_2s_2r
 (
     id UInt32,
     name String,
     data Date
-) ENGINE = Distributed('cluster_2s_2r', 'test_table_local', rand());
+) ENGINE = Distributed('cluster_2s_2r', 'mytable_local', rand());
 
 # Delete distributed table
-DROP TABLE testdb.test_table_distributed ON CLUSTER cluster_2s_2r;
-DROP TABLE testdb.test_table_local ON CLUSTER cluster_2s_2r;
-DROP DATABASE testdb ON CLUSTER cluster_2s_2r;
+DROP TABLE mydb.mytable_distributed ON CLUSTER cluster_2s_2r;
+DROP TABLE mydb.mytable_local ON CLUSTER cluster_2s_2r;
+DROP DATABASE mydb ON CLUSTER cluster_2s_2r;
 ```
 
-## elasticsearch
+## Elasticsearch
 
 ```bash
 # all restful api
@@ -183,7 +188,7 @@ time curl -X POST "http://localhost:9200/index/_search" \
 curl -X POST http://localhost:9200/_license/start_basic?acknowledge=true
 ```
 
-## mongodb
+## MongoDB
 
 ```bash
 # connect
@@ -198,28 +203,55 @@ db.myCollection.updateOne({ name: "xxx" }, { $set: { age: 555 } })
 db.myCollection.deleteOne({ name: "xxx" })
 ```
 
-## mysql
+## MySQL
 
 ```bash
-# init reset password
+# Init reset password
 mysql -u root -p
 mysql -u root --skip-password
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'root-password';
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 
-# create database with character
+# Create database with character
 CREATE DATABASE mydatabase DEFAULT CHARACTER SET utf8mb4 COLLATE utf8_general_ci;
 
-# create account and grant
+# Create account and grant
 use mysql
-CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON *.* TO 'new_user'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'new_user'@'%';
+#CREATE USER 'readonly'@'%' IDENTIFIED WITH mysql_native_password BY 'readonly_password';
+CREATE USER 'readonly'@'%' IDENTIFIED BY 'readonly_password';
+GRANT SELECT, PROCESS, REPLICATION CLIENT ON *.* TO 'readonly'@'%';
+CREATE USER 'app'@'10.%' IDENTIFIED BY 'app_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `db_a`.* TO 'app'@'10.%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `db_b`.* TO 'app'@'10.%';
 FLUSH PRIVILEGES;
+SELECT user, host, authentication_string, plugin FROM mysql.user WHERE user='readonly';
 
+# Variable
+SHOW PROCESSLIST;
+SHOW STATUS LIKE 'Threads_connected';
+SHOW VARIABLES LIKE 'max_connections';
+SET GLOBAL max_connections = 3000;
 
+# Role
+## create roles
+CREATE ROLE 'user_ro_role';
+CREATE ROLE 'user_rw_role';
+CREATE ROLE 'user_admin_role';
+## grant permission
+GRANT SELECT ON user_info.* TO 'user_ro_role';
+GRANT SELECT, INSERT, UPDATE, DELETE ON user_info.* TO 'user_rw_role';
+GRANT ALL PRIVILEGES ON user_info.* TO 'user_admin_role';
+## create real user
+CREATE USER 'readonly'@'%' IDENTIFIED BY 'your_password';
+GRANT 'user_ro_role' TO 'readonly'@'%';
+SET DEFAULT ROLE 'user_ro_role' TO 'readonly_user1'@'%';
+CREATE USER 'operator'@'%' IDENTIFIED BY 'your_password';
+GRANT 'user_rw_role' TO 'operator'@'%';
+SET DEFAULT ROLE 'user_rw_role' TO 'operator'@'%';
+
+# View
 ```
 
-## postgres
+## PostgreSQL
 
 ```bash
 # login
@@ -249,7 +281,7 @@ SELECT * FROM pg_tables;
 
 ```
 
-## redis
+## Redis
 
 ```bash
 # common

@@ -1,6 +1,6 @@
 # Network Tools
 
-## TCP
+## TCP && UCP
 
 ### arp && arping
 
@@ -236,6 +236,16 @@ apt install dsniff
 tcpkill -i <interface> host <destination_ip> and port <destination_port>
 # example
 tcpkill -i lo host 127.0.0.1 and port
+```
+
+### wscat
+
+```bash
+# install
+npm install wscat -g
+
+wscat -c ws://api.example.com/ws
+wscat -c wss://api.example.com/ws --no-check
 ```
 
 ## HTTP

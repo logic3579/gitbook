@@ -71,39 +71,26 @@ docker exec -it busybox sh
 docker run --name busybox --rm -it busybox sh
 
 # kafka-client
-docker run --name kafka-client --rm -it bitnami/kafka bash
+docker run --name kafka-client --rm -it bitnamilegacy/kafka bash
 
 # mysql-client
-docker run --name mysql-client --rm -it bitnami/mysql bash
+docker run --name mysql-client --rm -it bitnamilegacy/mysql bash
 
 # redis-client
-docker run --rm --name redis-client -it bitnami/redis bash
+docker run --rm --name redis-client -it bitnamilegacy/redis bash
 
-
-# minio server
+# minio-server
 docker run --rm --name minio-server \
   -p 9000-9001:9000-9001 \
   -v $(pwd)/data/minio/:/data \
   quay.io/minio/minio server /data --console-address ":9001"
 
-# mysql server
+# mysql-server
 docker run --name mysql \
   -e MYSQL_ROOT_PASSWORD=root_password \
-  -e MYSQL_DATABASE=your_database \
   -p 3306:3306 \
-  -v $(pwd)/data/mysql/:/var/lib/mysql \
+  -v $(pwd)/mysql-data:/var/lib/mysql \
   -d mysql --character-set-server=utf8mb4
-
-# knowledge-base
-docker run --name mrdoc_mysql \
-  -e MYSQL_ROOT_PASSWORD=knowledge_base123 \
-  -e MYSQL_DATABASE=knowledge_base \
-  -v $(pwd)/data/mysql/:/var/lib/mysql \
-  -d mysql --character-set-server=utf8mb4
-docker run --name mrdoc \
-  -p 10086:10086 \
-  -v /opt/MrDoc:/app/MrDoc \
-  -d zmister/mrdoc:v4
 ```
 
 ## containerd
@@ -247,13 +234,14 @@ kubectl cp pod_name:/path/path /tmp/path
 kubectl auth can-i create applications --as=system:serviceaccount:argocd:argocd-server -n argocd
 
 # debug
-kubectl debug -it pod/pod_name --image=busybox [--target=container_name] -- /bin/sh
+kubectl debug pod/pod_name -it --image=busybox [-c=container_name] -- /bin/sh
 # debug node(need to be deleted pod manually and node persistent in /host/)
-kubectl debug -it node/node_name --image=ubuntu -- /bin/bash
+kubectl debug node/mynode -it --image=ubuntu -- /bin/bash
 kubectl delete pod node-debuger-xxx
 
 # events
 kubectl events -n namespace_name
+kubectl get events --sort-by='.lastTimestamp'
 ```
 
 ### Advanced
@@ -336,13 +324,13 @@ kubectl exec -it busybox -- sh
 kubectl run busybox --rm -it --image=busybox -- sh
 
 # mysql-client
-kubectl run mysql-client --rm -it --image=bitnami/mysql -- bash
+kubectl run mysql-client --rm -it --image=bitnamilegacy/mysql -- bash
 
 # kafka-client
-kubectl run kafka-client --rm -it --image=bitnami/kafka -- bash
+kubectl run kafka-client --rm -it --image=bitnamilegacy/kafka -- bash
 
 # redis-client
-kubectl run redis-client --rm -it --image=bitnami/redis -- bash
+kubectl run redis-client --rm -it --image=bitnamilegacy/redis -- bash
 
 # net-tools
 kubectl run netshoot --rm -it --image=nicolaka/netshoot -- bash

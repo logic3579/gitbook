@@ -1,15 +1,24 @@
 # System Tools
 
-## sar
+## base64
+
 ```bash
-# install 
+# rancher password
+PASSWORD=$(base64 < /dev/urandom | head -c13); echo "$PASSWORD"; echo "$PASSWORD" | sha256sum | tr -d '-'
+
+```
+
+## sar
+
+```bash
+# install
 apt install sysstat
 
 # example
 sar [options] [delay [count]]
 sar -r 1 10
 
-# cpu 
+# cpu
 -u     Report CPU utilization
 -q     Report queue length and load averages
 -P (cpu_list|ALL)    Report per-processor statistics for the specified processor or processors
@@ -20,12 +29,12 @@ sar -r 1 10
 -S     Report swap space utilization statistics
 -W     Report swapping statistics
 
-# network 
+# network
 -n (DEV|ICMP|IP|SOCK|TCP|UDP)   Report network statistics
 
 # I/O statistics
 -b     Report I/O and transfer rate statistics
--d     Report activity for each block device 
+-d     Report activity for each block device
 -p     Pretty-print device names
 
 # others
@@ -36,8 +45,9 @@ sar -r 1 10
 ```
 
 ## strace
+
 ```bash
-# install 
+# install
 apt install sysstat
 
 #
@@ -46,11 +56,12 @@ strace -c ls
 ```
 
 ## systemtap
+
 ```bash
 # install
 apt install systemtap
 
-# example 
+# example
 tee helloword.stp << "EOF"
 probe begin
 {
@@ -94,6 +105,7 @@ stap -v sg.stp
 ```
 
 ## trap
+
 ```bash
 # 捕获 ctrl+c 信号，执行对应命令，只生效于当前环境
 trap "exit" SIGINT
@@ -109,6 +121,7 @@ trap - SIGINT
 ```
 
 ## vmstat
+
 ```bash
 # install
 apt install procps
@@ -127,19 +140,21 @@ vmstat -s
 # The -f switch displays the number of forks since boot
 vmstat -f
 # Report disk statistics
-vmstat -d -t 
+vmstat -d -t
 
-# 
+#
 vmstat -ant 1
 ```
 
 ## watch
+
 ```bash
 # 查看系统软中断速率
 watch -d cat /proc/softirqs
 ```
 
 > Reference:
+>
 > 1. [Official systemtap Doc](https://sourceware.org/systemtap/documentation.html)
 > 2. [Ubuntu Install systemtap](https://wiki.ubuntu.com/Kernel/Systemtap#Systemtap_Installation)
 > 3. [IBM Documentation](https://www.ibm.com/docs/zh/power9/9080-M9S?topic=commands-vmstat-command)

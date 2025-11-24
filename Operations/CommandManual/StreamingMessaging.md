@@ -7,7 +7,8 @@
 # 动态查看&更新节点配置（官方配置支持 cluster-wide 类型配置才可以更新）
 ./kafka-configs.sh --bootstrap-server localhost:9092 --entity-type brokers --entity-name 1 --describe
 ./kafka-configs.sh --bootstrap-server localhost:9092 --entity-type brokers --entity-name 1 --alter --add-config log.cleaner.threads=2
-# 使用 --entity-default 参数为调整整个集群的动态配置
+./kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name myTopic --describe
+./kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name myTopic --alter --add-config retention.ms=259200000,segment.ms=86400000
 
 # cluster
 ./kafka-cluster.sh cluster-id --bootstrap-server localhost:9092
@@ -18,7 +19,7 @@
 # modifying a topic partition with manual
 ./kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic myTopic --partitions 3
 # select topic
-./kafka-topics.sh --bootstrap-server localhost:9092 --topic myTopic --descibe
+./kafka-topics.sh --bootstrap-server localhost:9092 --topic myTopic --describe
 ./kafka-topics.sh --bootstrap-server localhost:9092 --list
 
 # production messages
@@ -32,7 +33,7 @@ second event
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic myTopic --from-beginning
 
 # consumer groups
-./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --descibe --group myGroup [--members] [--verbose]
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group myGroup [--members] [--verbose]
 ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 
 # offset
