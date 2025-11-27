@@ -1,13 +1,5 @@
 # System Tools
 
-## base64
-
-```bash
-# rancher password
-PASSWORD=$(base64 < /dev/urandom | head -c13); echo "$PASSWORD"; echo "$PASSWORD" | sha256sum | tr -d '-'
-
-```
-
 ## sar
 
 ```bash
