@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "bproxy": "^5.2.36",
-    "localtunnel": "^2.0.2",
-    "wscat": "^5.2.1"
-  }
-}

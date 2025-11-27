@@ -224,12 +224,12 @@ Hash 索引：
 - 一个主节点承担所有写操作。
 - 一个或多个从节点异步地复制主节点的数据变更，通常只承担读操作。
 - 复制基于主节点的 binlog 实现。
-  
+
 主从复制架构原理：
 - 主节点将数据变更事件写入二进制日志。
 - 从节点的 I/O 线程从主节点拉取 binlog。
 - 从节点的 SQL 线程重放 binlog 中的事件，应用数据变更。
-  
+
 主从复制架构优缺点：
 - 读写分离：扩展读能力，将读请求分散到多个从节点。
 - 数据备份与高可用：从节点可以作为实时的数据备份节点。主节点故障时可以手动提升一个从节点为主节点。
@@ -292,7 +292,7 @@ AOF（Append Only File）
 - 数据文件：文本文件（appendonly.aof）
 - 优点：数据安全性高，默认每秒同步，最多丢失1秒数据；AOF 文件易于理解和解析。
 - 缺点：文件通常比 RDB 大，恢复速度通常比 RDB 慢；AOF 重写期间会有阻塞。
-  
+
 如何选择：生产环境通常使用混合持久化（同时开启 RDB 和 AOF）
 - 利用 AOF 保证数据的安全性，最多丢失一秒数据。
 - 利用 RDB 进行快速数据恢复，并且 AOF 重写时的基础数据时 RDB 格式的。兼具 RDB 和 AOF 的优点。
@@ -370,7 +370,7 @@ Redis Cluster（集群）高可用方案：数据自动分片到多个节点，�
 
 ```console
 Kafka 是一个高吞吐、低延迟、分布式的发布-订阅消息系统，基于磁盘实现持久化。更像是一个分布式提交日志。
-  
+
 核心架构：
 - Broker：独立的 Kafka 服务器节点，多个 Broker 组成一个集群。
 - Topic：消息的类别或主题，逻辑上的概念。生产者发送消息到 Topic，消费者从 Topic 拉取消息。
@@ -418,7 +418,7 @@ ISR：In-Sync Replicas，指与 Leader 副本保持同步的副本集合（包�
 - Follower 副本会定期向 Leader 发送 FETCH 请求来同步数据。
 - 如果一个 Follower 在 replica.lag.time.max.ms 时间内没有向 Leader 发起 fetch 请求，或者落后 Leader 的消息数量超过 replica.lag.max.messages（已弃用），就会被 Leader 从 ISR 中移除，重新追上 Leader 进度后再加回。
 - 重要性：只有 ISR 中的副本才有资格在 Leader 宕机时选举为新的 Leader。
-  
+
 如何保证消息不丢失？
 Producer 端：
 - 设置 acks=all（或-1）。意味着 Leader 副本必须等待所有 ISR 副本都成功接收消息后，才会向 Producer 返回确认。
@@ -521,6 +521,7 @@ RocketMQ 是一个分布式、队列模型的消息中间件，具有低延迟�
 - Consumer 端
   - 使用 PUSH 模式或 PULL 模式，在消息业务逻辑处理成功后，再返回 CONSUME_SUCCESS 状态给 Broker。如果处理失败，返回 RECONSUME_LATER，消息会稍后重试。
 ```
+
 #### RocketMQ 最佳实践
 
 ```console
