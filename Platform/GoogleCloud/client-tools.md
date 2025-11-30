@@ -1,10 +1,12 @@
 ---
-description: gcloud client tool
+description: client tool: gcloud / gsutil
 ---
 
-# gcloud
+# Client Tools
 
-## Common
+## gcloud
+
+### Common
 
 ```bash
 # Personalization
@@ -37,7 +39,7 @@ gcloud iam service-accounts keys list
 --format
 ```
 
-## GCE
+### GCE
 
 ```bash
 # Virutual machines
@@ -56,7 +58,7 @@ gcloud compute snapshots describe
 gcloud compute snapshots delete
 ```
 
-## GKE
+### GKE
 
 ```bash
 gcloud auth configure-docker
@@ -66,7 +68,7 @@ gcloud container clusters get-credentials
 gcloud container images list-tags
 ```
 
-## Network
+### Network
 
 ```bash
 # VPC networks
@@ -79,6 +81,15 @@ gcloud compute addresses create test-external --region=asia-southeast1
 
 # Cloud NAT
 
+```
+
+## gsutil
+
+```bash
+# iam
+gsutil iam ch allUsers:objectViewer gs://YOUR_BUCKET_NAME
+gsutil iam ch -d allUsers:objectViewer gs://YOUR_BUCKET_NAME
+gsutil iam get gs://YOUR_BUCKET_NAME
 ```
 
 > Reference:
