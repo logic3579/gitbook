@@ -1019,47 +1019,297 @@ Zipkin：类似 Jaeger，支持 OpenTelemetry
 
 ### ServiceMesh & ServiceProxy
 
-#### 什么是 Istio？
+#### Istio 的核心架构是什么？控制平台和数据平面是什么？Sidecar 自动注入是如何实现的？
 
 ```console
+核心架构：
+istiod
+Ingress/Egress Gateway 模式：独立共享的代理，部署在集群中作为网格的边界入口。
+Sidercar Proxy 模式：注入到每个 Pod 的代理，负责应用的所有进出流量。
 
+控制平面：是数据平面的“大脑”，负责管理和配置 Envoy 代理。核心组件是 istiod。
+数据平面：由一组作为 Sidecar 代理的 Envoy 组成，负责处理服务间的所有流量（进出）。它们负责服务发现、负载均衡、流量路由、故障注入、安全通信（mTLS）和遥测数据生成。
+
+istiod 的作用：
+istiod 是 Istio 1.5+ 版本后的统一控制平面组件，它整合了旧版的 Pilot、Citadel 和 Galley。
+- Pilot：负责服务发现和流量管理（将高级路由规则转换为 Envoy 配置）。
+- Citadel：负责安全，提供身份和证书管理，实现自动 mTLS。
+- Galley：负责配置的验证、处理和分发，是用户配置和控制平面之间的桥梁。
+
+Sidercar 自动注入：
+利用了 Kubernetes 的 Admission Webhook 机制。当创建 Pod 时，Kubernetes API Server 会调用 Istio 的 istio-sidecar-injector Webhook。该 Webhook 会检查 Pod 所在的命名空间是否有 istio-injection=enabled 标签或 Pod 自身是否有 sidecar.istio.io/inject: "true" 注解。如果满足条件，它会自动修改 Pod 的定义，将 Envoy 容器（Sidecar）注入进去。
 ```
 
-#### 什么是 HAProxy？
+#### 什么是 Istio Gateway？VirtualService 和 DestinationRule 的区别是什么？如何实现灰度发布/金丝雀发布？
 
 ```console
+Istio Gateway：
+Gateway 是一个 Istio CRD，它描述了如何将流量从网格外引入网格内。它配置了负载均衡器的端口、协议、TLS 设置等。它本身不处理流量，而是配置一个专门的组件来处理。
+- istio-ingressgateway（真正运行在集群中的 Pod，通常是 Deployment 形式），内部运行一个 Envoy 代理。Envoy 会监听 Gateway 资源的变化，并应用其配置从而成为网络的流量入口。
 
+VirtualService 和 DestinationRule 的区别：
+- VirtualService：定义了如何路由流量。它告诉 Envoy，对于满足特定条件的请求（如 Host、Headers、URI），应该发送到哪个服务。它定义了路由规则。
+- DestinationRule：定义了流量到达目的地后的行为。它为 VirtualService 中引用的服务定义子集、负载均衡策略（如轮询、随机）、连接池设置、熔断策略等。
+- VirtualService 负责路由，DestinationRule 负责描述路由目标服务的版本（子集）和策略。两者通常配合使用。
+
+灰度发布/金丝雀发布：
+1. 在 DestinationRule 中为同一个服务定义不同的子集，例如 v1 和 v2，通过标签来区分。
+2. 在 VirtualService 中设置路由规则，将流量按权重（如 90% 到 v1，10% 到 v2）分发到不同的子集。
+3. 可以逐步调整权重，直到所有流量都切换到新版本。
 ```
 
-#### Nginx 的特点是什么？常用的模块与参数是什么？
-
-- 特点
+#### Istio 最佳实践
 
 ```console
-特点：
-- 支持高并发，官方测试连接数支持5万，生产可支持2~4万。
-- 内存消耗成本低
-- 配置文件简单，支持 rewrite 重写规则等
-- 节省带宽，支持 gzip 压缩。
-- 稳定性高
-- 支持热部署
+#
+```
 
-常用的模块与参数：
-- 模块
-负载均衡 upstream
-反向代理 proxy_pass
-路由匹配 location
-重定向规则 rewrite
-- Proxy 参数
-proxy_sent_header
+#### 什么是 Istio mTLS 以及如何实现？mTLS 有几种模式和作用？PeerAuthentication 和 AuthorizationPolicy 的作用是什么？
+
+```console
+mTLS (Mutual TLS）：双向 TLS 认证。在通信的双方（客户端和服务端）都进行证书验证，确保通信双方都是可信的，并且通信内容被加密。
+Istio 实现：
+- Citadel (在 istiod 中) 作为证书颁发机构（CA），为每个服务的工作负载身份（Service Account）签发证书。
+- 证书通过 Envoy Sidecar 安全地分发给工作负载。
+- 当服务 A 调用服务 B 时，A 的 Sidecar 会用它的证书向 B 的 Sidecar 发起 TLS 握手。B 的 Sidecar 会验证 A 的证书，并出示自己的证书。
+- 握手成功后，建立一个加密通道，后续所有流量都在此通道中传输。
+
+mTLS 模式：
+- DISABLE：禁用 mTLS，使用明文通信。
+- PERMISSIVE：宽容模式。Sidecar 会同时接受 mTLS 和明文流量。这是渐进式迁移的关键，允许网格内的服务与尚未加入网格的服务通信。
+- STRICT：严格模式。只接受 mTLS 流量，拒绝所有明文请求。这是生产环境的最终目标。
+
+PeerAuthentication 和 AuthorizationPolicy：
+- PeerAuthentication：定义服务间的认证策略，主要用于配置 mTLS 模式（STRICT, PERMISSIVE）。
+- AuthorizationPolicy：定义服务间的授权策略。基于 source（调用者身份）、operation（HTTP 方法、路径等）和 when（条件）来精细地控制访问权限，实现零信任网络。
+```
+
+#### 什么是 HAProxy？核心配置和概念是什么？
+
+```console
+HAProxy 是一个开源、高性能、高可用的 TCP/HTTP 负载均衡器和反向代理。
+- L4（传输层）：可以基于 IP 地址和端口进行负载均衡。如为 MySQL、Redis 等数据库做负载均衡。
+- L7（应用层）：可以解析 HTTP 协议，基于 URL、Cookie、Header 等信息进行更智能的负载均衡。
+
+核心配置：
+- frontend：前端，定义客户端连接的监听套接字（IP和端口）。它是流量的入口。
+- backend：后端，定义一组服务器（真实服务器，如 Web 服务器），负载均衡算法和健康检查规则。它是流量的出口。
+- listen：监听块，是 frontend 和 backend 的结合体，适用于简单的场景，将监听和后端服务器定义在一个块中。
+- acl：访问控制列表，用于在 frontend 或 backend 中定义测试条件，从而实现智能路由。例如，根据请求的路径、域名或源 IP 来将流量导向不同的后端。
+`acl is_static path_beg -i /static /images`
+```
+
+#### HAProxy 支持哪些常见的负载均衡算法？如何实现会话保持？健康检查机制是怎么样的？
+
+```console
+支持常见的负载均衡算法：
+- roundrobin：轮询，动态算法，后端服务器权重在运行时调整。这是最常用、最公平的算法。
+- leastconn：最小连接数，将新请求发送给当前连接数最少的服务器。非常适合长连接场景，如数据库、MQ。
+- source：源 IP 哈希，对客户端 IP 进行哈希计算，同一 IP 的请求总是发往同一台服务器。可用于实现**会话保持，但不如 cookie 灵活。
+- uri：对整个 URI 或指定的参数进行哈希，保证同一资源的请求落到同一后端，常用于提高后端缓存命中率。
+- static-rr：静态轮询，基于服务器权重进行轮询，但权重在运行时不可调整。
+
+会话保持：
+- Cookie 插入：HAProxy 在后端服务器的响应中插入一个特殊的 Cookie，客户端后续请求会携带此 Cookie，HAProxy 根据 Cookie 值将请求路由到指定的服务器。`cookie <cookie_name> insert indirect nocache`
+- 基于源 IP：使用 balance source 算法。在 L4 或无法使用 Cookie 时使用。（客户端基于 NAT 时会导致负载不均）。
+- Cookie 识别：如果应用自己已经设置了会话 Cookie，可以告诉 HAProxy 使用这个现有的 Cookie 值来做持久化。`cookie <cookie_name> prefix`
+
+健康检查：
+- L4 检查：默认方式，尝试与后端服务器建立 TCP 连接。如果成功则认为服务健康。
+- L7 检查：更智能的方式，向后端服务器发送一个 HTTP 请求（如 OPTIONS / HTTP/1.0），并检查返回的状态码（如 2xx/3xx 表示健康）。
+- 自定义检查：可以指定一个特定的 URI 进行检查，对于检查特定接口（如 /health）的健康状态非常有用。
+option httpchk GET /health
+http-check expect status 200
+server web1 10.0.1.10:80 check inter 3s fall 3 rise 2
+```
+
+#### HAProxy 最佳实践
+
+```console
+性能与稳定性配置：
+- 全局配置
+  - maxconn：最大并发连接数。需要根据服务器内存估算（通常一个连接约 16KB）。
+  - nbproc 和 nbthread：在多核机器上，可以配置多个工作进程或线程来利用多核能力。注意：这会使内存中的计数器不共享，增加监控复杂度。
+  - ulimit -n：文件描述符限制，必须大于 maxconn。
+- 超时控制：
+  - timeout client：客户端不活动时间。
+  - timeout server：后端服务器不活动时间。
+  - timeout connect：与后端服务器建立连接的最大时间。
+
+日志与监控：
+- 默认配置日志很短。需要在 frontend 中配置 option httplog 来获取详细的 HTTP 日志。
+- 将日志发送到远程 rsyslog 服务器或 ELK/Loki 栈，便于集中分析和告警。
+- 启用 HAProxy 的 Stats 页面。（配置独立 listen 块并限制访问）。
+
+高可用架构：
+HAProxy + Keepalived
+```
+
+#### Nginx 的优势是什么？Master-Worker 工作模式是什么？如何热部署？
+
+```console
+优势：高并发、高性能（事件驱动模型）、低内存消耗、高稳定性、热部署（配置重载不丢连接）、反向代理功能强大。异步非阻塞事件驱动模型（一个进程处理多个连接）。
+
+Master-Worker 工作模式：
+- Master 进程：不处理请求，主要负责读取配置文件、管理 Worker 进程（启动、重启、关闭）、热加载等。
+- Worker 进程：真正处理请求的进程。每个 Worker 都是独立的，通过异步非阻塞的方式处理多个连接。
+- 无锁设计：Worker 进程之间相互独立，通过 Master 进程通信，避免了锁竞争带来的性能开销。
+- 事件驱动：基于 Linux 的 epoll（BSD 的 kqueue）等 I/O 多路复用模型。一个 Worker 可以同时监听并处理成千上万个连接，而不会因为某个连接的 I/O 等待而阻塞。
+- CPU 亲和性：可以将 Worker 进程绑定到特定的 CPU 核心，减少 CPU 缓存失效，提高性能。
+
+热部署：
+- 修改配置后：执行 nginx -s reload。Master 进程会检查新配置的语法，然后启动新的 Worker 进程，并告诉旧的 Worker 进程优雅地退出（等处理完手上的请求再关闭）。
+- 升级版本：用新版本的 Nginx 可执行文件替换旧文件，然后发送 USR2 信号给 Master 进程。Master 会重命名自己的 pid 文件并启动新的 Master 进程，新的 Master 再启动新的 Worker。旧 Master 和 Worker 会继续服务，直到请求处理完毕后关闭。
+```
+
+#### Nginx 的主要结构块和继承关系是什么？location 的匹配规则和优先级是什么？root 和 alias 指令的区别？location 有哪些常用的参数配置？
+
+```console
+nginx.conf 主要结构块：
+- main：全局配置，影响所有其他块。
+- events：配置连接处理，如 worker_connections。
+- tcp：嵌套在 main 中，用于配置 TCP 服务器。
+- http：嵌套在 main 中，用于配置 HTTP 服务器。
+- server：嵌套在 http 中，定义一个虚拟主机。
+- location：嵌套在 server 中，用于匹配 URI，并配置特定路径的处理规则。
+继承关系：http -> server -> location。子块会继承父块的配置，但如果子块有同名配置，会覆盖父块。
+
+location 的匹配规则和优先级：
+1. = /uri：精确匹配。如果匹配成功，立即停止搜索并处理此请求。
+2. ^~ /uri：前缀匹配。如果匹配成功，不再检查正则表达式。
+3. ~ /uri：区分大小写的正则匹配。
+4. ~* /uri：不区分大小写的正则匹配。
+5. /uri：普通前缀匹配。
+6. /：通用匹配，所有请求都会匹配到。
+优先级顺序：= > ^~ > ~ > ~* > /prefix > /
+
+root 和 alias 指令的区别：
+- root 会拼接 location 匹配到的路径。
+比如 location /i/ {root /data/w3;}，访问 /i/top.gif，实际查找文件路径是 /data/w3/i/top.gif。
+- alias 会用 alias 路径替换 location 匹配到的路径（比如要以 / 结尾）。
+比如 location /i/ {root /data/w3/images/;}，访问 /i/top.gif，实际查找文件路径是 /data/w3/images/top.gif。
+
+location 常用参数配置：
+- proxy 参数
 proxy_connent_timeout
 proxy_read_timeout
 proxy_send_timeout
 - rewrite flag 参数
-last：表示完成当前的 rewrite 规则
-break：停止执行当前虚拟主机的后续 rewrite
-redirect：返回302临时重定向，地址栏会显示跳转后的地址
-permanent：返回301永久重定向，地址栏会显示跳转后的地址
+last：表示完成当前的 rewrite 规则。
+break：停止执行当前虚拟主机的后续 rewrite。
+redirect：返回302临时重定向，地址栏会显示跳转后的地址。
+permanent：返回301永久重定向，地址栏会显示跳转后的地址。
+```
+
+#### Nginx 反向代理如何实现？支持哪些负载均衡策略？动静分离策略？
+
+```console
+反向代理：客户端访问的是代理服务器，代理服务器再将请求转发给后端真实的服务器，并将结果返回给客户端。客户端不知道真实服务器的存在。
+Nginx 使用 proxy_pass 指令实现反向代理。
+
+负载均衡策略：
+- 轮询：默认策略。
+- 权重：weight; 参数值越大权重越大。
+- IP Hash：ip_hash; 根据客户端 IP 地址的哈希值分配，保证同一客户端的请求总是落到同一台服务器，解决会话粘性问题。
+- 最少连接：least_conn; 将请求分配给当前连接数最少的服务器。
+- URL Hash（第三方模块）：根据请求 URL 的哈希值分配，保证同一 URL 的请求总是落到同一台服务器，有利于缓存。
+
+动静分离配置：
+server {
+    # 动态请求，代理到后端应用服务器
+    location / {
+        proxy_pass http://app_servers;
+    }
+    # 静态资源，由 Nginx 直接处理
+    location ~* \.(jpg|jpeg|png|gif|css|js)$ {
+        root /static_files;
+        expires 30d; # 添加缓存
+    }
+}
+```
+
+#### 如何限制 Nginx 的并发连接数和请求速率？
+
+```console
+限制连接数：使用 limit_conn_zone 和 limit_conn。
+http {
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+    server {
+        limit_conn addr 10; # 每个 IP 最多 10 个并发连接
+    }
+}
+
+限制请求速率：使用 limit_req_zone 和 limit_req。
+http {
+    limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
+    server {
+        limit_req zone=one burst=20 nodelay; # 平均 10r/s，峰值可突发 20 个
+    }
+}
+```
+
+#### Nginx 最佳实践
+
+```console
+性能优化：
+1. Worker 进程与连接数调优：
+    - `worker_processes auto;`：让 Nginx 自动检测 CPU 核心数，通常设置为等于 CPU 核心数。
+    - `worker_connections 65535;`：每个 Worker 进程的最大连接数。这个值要小于操作系统的 `ulimit -n`（单个进程能打开的最大文件句柄数）。
+    - `worker_rlimit_nofile 100000;`：在 Master 进程启动时就设置所有 Worker 进程的 `ulimit -n`，避免每次都去设置。
+2. I/O 模型优化：
+    - `use epoll;`：在 Linux 系统上，明确使用最高效的 `epoll` 模型。
+3. 高效处理 TCP 连接：
+    - `keepalive_timeout 65;`：开启 Keep-Alive，让客户端可以复用 TCP 连接，减少握手开销。
+    - `keepalive_requests 10000;`：单个长连接上可以处理的最大请求数。
+    - `reset_timedout_connection on;`：及时关闭超时的连接，释放资源。
+4. 启用高效压缩：
+    - `gzip on;`：启用 Gzip 压缩，对文本文件（HTML, CSS, JS）效果显著。
+    - `gzip_vary on;`：在响应头中添加 `Vary: Accept-Encoding`，告知代理服务器进行缓存。
+    - `gzip_comp_level 6;`：压缩级别（1-9），级别越高 CPU 消耗越大，但压缩率更高。6 是一个较好的平衡点。
+    - `gzip_min_length 1000;`：设置最小压缩文件大小，小于此值的不压缩，避免浪费 CPU。
+    - 考虑 Brotli：如果客户端支持，Brotli 压缩率比 Gzip 更高，但需要编译 `ngx_brotli` 模块。
+5. 缓存配置：
+    - 浏览器缓存：通过 `expires` 指令设置静态资源的 `Cache-Control` 响应头，让浏览器缓存资源，减少重复请求。
+    - 代理缓存：如果 Nginx 作为反向代理，可以开启 `proxy_cache`，将后端响应缓存到本地，减轻后端压力。
+
+安全加固：
+1. 隐藏版本信息：
+    - `server_tokens off;`：在错误页面和响应头中隐藏 Nginx 版本号，避免泄露信息给攻击者。
+2. 强化 SSL/TLS：
+    - 使用现代协议和密码套件：禁用 SSLv2, SSLv3, TLSv1, TLSv1.1，只使用 TLSv1.2 和 TLSv1.3。使用强密码套件（推荐使用 Mozilla SSL Config Generator 生成）。
+    - 启用 HSTS：`add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;` 强制浏览器使用 HTTPS。
+    - 证书管理：使用 Let's Encrypt 获取免费证书，并设置自动续期。
+3. 限制访问：
+    - IP 白名单/黑名单：对管理后台等敏感路径使用 `allow` 和 `deny` 指令。
+    - 防 DDoS：使用 `limit_req_zone` 和 `limit_conn_zone` 限制请求速率和连接数。
+    - 防止恶意请求：通过 `location` 规则拒绝访问常见的敏感文件（如 `.htaccess`, `.git`）。
+4. 安全响应头：
+    - `add_header X-Frame-Options "SAMEORIGIN";`：防止点击劫持。
+    - `add_header X-Content-Type-Options "nosniff";`：防止 MIME 类型嗅探攻击。
+    - `add_header X-XSS-Protection "1; mode=block";`：启用浏览器内置的 XSS 过滤器。
+5. 降权运行：
+    - `user www-data;`：在 `nginx.conf` 顶层配置，让 Worker 进程以非 root 用户运行，降低被攻击后的危害。
+
+可观测性与监控：
+1. 日志管理：
+    - 结构化日志：将 `log_format` 定义为 JSON 格式，便于后续的日志收集和分析（如 ELK Stack, Loki）。
+    - 日志轮转：使用 `logrotate` 工具对 Nginx 日志进行按天/按大小切割和压缩，防止磁盘写满。
+    - 错误日志级别：生产环境通常设置为 `warn` 或 `error`，避免 `info` 级别产生过多无用日志。
+2. 监控指标：
+    - 开启 `stub_status`：提供一个简单的状态页，可以获取 Active connections, accepts, handled, requests 等基础指标。
+    - 集成 Prometheus：使用 `nginx-prometheus-exporter` 或 `nginx-vts-exporter` 暴露更详细的指标，由 Prometheus 抓取并存入 Grafana 进行可视化监控。
+    - 关键监控指标：活跃连接数、QPS、5xx 错误率、请求延迟（通过 OpenTelemetry 或自定义日志分析）。
+
+运维与维护：
+1. 配置管理：
+    - 版本控制：将所有 Nginx 配置文件（`/etc/nginx/`）纳入 Git 管理，所有变更都有记录。
+    - 模块化配置：不要把所有配置都写在 `nginx.conf` 里。使用 `include` 指令将不同 `server` 块或 `upstream` 块的配置拆分到单独的文件中（如 `/etc/nginx/conf.d/`），保持主配置文件整洁。
+2. 部署与变更：
+    - 配置测试：`nginx -t` 是每次修改配置后的必须操作，确保语法无误。
+    - 优雅重载：`nginx -s reload` 是更新配置的标准操作，确保服务不中断。
+    - 自动化部署：使用 Ansible、SaltStack 或 CI/CD 流程自动化 Nginx 的部署和配置更新。
+3. 高可用架构：
+    - Keepalived + VRRP：部署至少两台 Nginx 服务器，使用 Keepalived 实现主备高可用，通过虚拟 IP（VIP）对外提供服务。当主 Nginx 宕机时，VIP 自动漂移到备用服务器。
 ```
 
 ## Provisioning
@@ -1419,71 +1669,82 @@ crictl ps
 
 ### Kubernetes
 
-#### 什么是 Kubernetes？核心组件和架构是什么？
+#### Kubernetes 的概念和核心功能是什么？核心组件和架构是什么？
 
 ```console
 Kubernetes 是一个开源的容器编排平台，用于自动化管理、部署、扩展和运行容器化应用程序。Kubernetes 通过将应用程序打包到容器中（如 Docker 容器），并在集群中协调这些容器的运行，提供高效、弹性的分布式系统管理。
 
+核心功能：
+- 容器编排部署：自动部署、扩展和管理容器化应用。
+- 滚动更新与回滚：支持无缝更新应用版本，并能在问题发生时回滚。
+- 弹性伸缩：根据需求（如 CPU、内存使用率）自动调整容器数量。
+- 故障自愈：自动检测并重启故障容器，替换或重新调度到健康的节点。
+- 服务发现和负载均衡：内置服务发现机制，自动分配流量到容器。
+- 配置管理：通过 ConfigMaps 和 Secrets 管理应用配置和敏感信息。
+- 存储编排：支持动态挂载和管理存储系统。
 
-Kubernetes 的核心功能包括：
-容器编排：自动部署、扩展和管理容器化应用。
-服务发现和负载均衡：内置服务发现机制，自动分配流量到容器。
-自动扩展：根据需求（如 CPU、内存使用率）自动调整容器数量。
-自我修复：自动检测并重启故障容器，替换或重新调度到健康的节点。
-存储编排：支持动态挂载和管理存储系统。
-配置管理：通过 ConfigMaps 和 Secrets 管理应用配置和敏感信息。
-滚动更新与回滚：支持无缝更新应用版本，并能在问题发生时回滚。
-Pod：Kubernetes 的最小调度单位，通常包含一个或多个容器。
+核心组件与架构：（控制平面 + 工作节点）
 
+控制平面（Control Plane）
 
-核心组件与架构：控制平面 + 数据平面
-- 控制平面（Control Plane）
 API Server：Kubernetes 的前端接口，集群的中央管理入口，接受和处理来自用户、客户端或内部组件的 RESTful API 请求。
-1. 提供 Kubernetes API，处理所有管理操作（如创建、更新、删除资源）。
-2. 与 etcd 通信，存储和检索集群状态。
-3. 验证和授权请求，确保安全性。
-4. 控制平面与其他组件交互的枢纽
+- 提供 Kubernetes API，处理所有管理操作（如创建、更新、删除资源）。
+- 与 Etcd 通信，存储和检索集群状态。
+- 验证和授权请求，确保安全性。
+- 控制平面与其他组件交互的枢纽
 
 Controller Manager：运行多个控制器进程，监控集群状态并确保其与期望状态一致。
-1. Replication Controller：确保指定数量的 Pod 副本始终运行。
-2. Deployment Controller：管理应用的滚动更新和回滚。
-3. StatefulSet Controller：管理有状态应用的 Pod。
-4. Node Controller：监控节点状态，处理节点故障。
+- ReplicaSet Controller：确保指定数量的 Pod 副本始终运行。
+- Deployment Controller：管理应用的滚动更新和回滚。
+- StatefulSet Controller：管理有状态应用的 Pod。
+- Node Controller：监控节点状态，处理节点故障。
 通过 API Server 读取集群状态，与 etcd 协作，执行必要的调整。
 
 Scheduler：负责将 Pod 调度到合适的 Worker 节点上。
-1. 根据资源需求（如 CPU、内存）、节点状态、亲和性规则、约束条件等，选择最合适的节点来运行 Pod。
-2. 考虑负载均衡、硬件限制和用户定义的策略（如节点选择器、污点与容忍）。
-3. 监控未调度的 Pending 状态 Pod，并动态分配到节点。
+- 根据资源需求（如 CPU、内存）、节点状态、亲和性规则、约束条件等，选择最合适的节点来运行 Pod。
+- 考虑负载均衡、硬件限制和用户定义的策略（如节点选择器、污点与容忍）。
+- 监控未调度的 Pending 状态 Pod，并动态分配到节点。
 
 Etcd：分布式键值存储数据库，用于存储 Kubernetes 集群的所有状态数据。
-1. 保存集群配置、状态和元数据（如 Pod、Service、Deployment 的定义）。
-2. 提供高可用性和一致性，保证集群数据的持久性和可靠性。
-3. 仅由 API Server 直接访问，其他组件通过 API Server 间接与 etcd 交互。
+- 保存集群配置、状态和元数据（如 Pod、Service、Deployment 的定义）。
+- 提供高可用性和一致性，保证集群数据的持久性和可靠性。
+- 仅由 API Server 直接访问，其他组件通过 API Server 间接与 etcd 交互。
 
-- 数据平面（Data Plane）/ 工作节点（Works Nodes）
+工作节点（Works Nodes）
+
 Kubelet：运行在每个工作节点上的代理进程，负责与控制平面通信并管理节点上的 Pod。
-1. 通过 API Server 接收 Pod 定义（PodSpec），确保 Pod 中的容器按预期运行。
-2. 监控容器健康状态，报告节点和 Pod 的状态给控制平面。
-3. 与容器运行时交互，启动、停止或重启容器。
-4. 执行节点级别的健康检查（liveness/readiness probes）。
+- 通过 API Server 接收 Pod 定义（PodSpec），确保 Pod 中的容器按预期运行。
+- 监控容器健康状态，报告节点和 Pod 的状态给控制平面。
+- 与容器运行时交互，启动、停止或重启容器。
+- 执行节点级别的健康检查（liveness/readiness probes）。
 
 Kube-Proxy：运行在每个工作节点上的网络代理进程，管理网络通信和负载均衡。
-1. 实现 Kubernetes Service 的网络功能，通过规则（如 iptables 或 IPVS）将流量转发到正确的 Pod。
-2. 支持服务发现，确保客户端请求到达正确的后端 Pod。
-3. 提供负载均衡，均匀分配流量到多个 Pod 副本。
-4. 处理外部流量（如通过 NodePort 或 LoadBalancer）。
+- 实现 Kubernetes Service 的网络功能，通过规则（如 iptables 或 ipvs）将流量转发到正确的 Pod。
+- 支持服务发现，确保客户端请求到达正确的后端 Pod。
+- 提供负载均衡，均匀分配流量到多个 Pod 副本。
+- 处理外部流量（如通过 NodePort 或 LoadBalancer）。
 
-容器运行时：负责在节点上运行容器的软件，如 Docker、containerd 或 CRI-O。
-1. 拉取容器镜像，创建并运行容器。
-2. 管理容器的生命周期（如启动、停止、删除）。
-3. 与 Kubelet 协作，执行容器相关的操作。
-4. 支持 CRI（Container Runtime Interface），确保与 Kubernetes 的兼容性。
+Container Runtime：负责在节点上运行容器的软件，如 Docker、containerd 或 CRI-O。
+- 拉取容器镜像，创建并运行容器。
+- 管理容器的生命周期（如启动、停止、删除）。
+- 与 Kubelet 协作，执行容器相关的操作。
+- 支持 CRI（Container Runtime Interface），确保与 Kubernetes 的兼容性。
 ```
 
-#### 描述 Pod 的完整创建过程。
+#### 简述 Pod 概念和生命周期？描述 Pod 的完整创建过程。
 
 ```console
+Pod 概念：Kubernetes 中最小的、可部署的、可管理的计算单元。
+- 一个 Pod 可以包含一个或多个紧密关联的容器。
+- Pod 内的容器共享网络命名空间（IP 地址和端口）和存储卷（Volume）。
+- 它是基本部署单元是因为 Kubernetes 是直接调度和管理 Pod，而不是单个容器。这种设计允许将需要协同工作的容器（如主应用容器和辅助容器）打包在一起，简化了部署和管理。
+- 无状态：Pod 之间没有区别，任何一个 Pod 都可以被另一个新创建的 Pod 替代。
+- 可互换：Pod 的名字是随机生成的（web-app-abc123），没有固定身份。
+
+Pod 生命周期
+Pending -> Running -> Succeeded/Failed -> Unknown
+
+Pod 的完整创建过程：
 第一步：用户通过 kubectl 或直接调用 Kubernetes API 提交 Pod 的资源清单。
 1. 用户客户端（如 kubectl）向 API Server（kube-apiserver）发送 HTTP POST 请求，提交 Pod 资源定义。
 2. 请求路径通常为 /api/v1/namespaces/{namespace}/pods。
@@ -1547,76 +1808,137 @@ Kube-Proxy 通过 API Server 监控 Pod 的 IP 地址和 Service 的变化，动
 8. Kube-Proxy 更新 Service 相关的网络规则（如果适用）。
 ```
 
-#### Resources
+#### Kubernetes 中都有哪些核心资源对象？
 
-- RS / Deplyment / StatefulSet
+**Application：ReplicaSet、Deployment、StatefulSet、DaemonSet**
 
 ```console
-Replication Controller
-(1)确保 Pod 数量: 它会确保 Kubernetes 中有指定数量的 Pod 在运⾏，如果少于指定数量的 Pod ， RC 就会创建新的，反之这会删除多余的，保证 Pod 的副本数量不变。
-(2)确保 Pod 健康: 当 Pod 不健康，比如运⾏出错了，总之无法提供正常服务时， RC 也会杀死不健康的 Pod ，重新创建一个新的Pod。
-(3)弹性伸缩: 在业务⾼峰或者低峰的时候，可以通过 RC 来动态调整 Pod 数量来提供资源的利用率，当然我们也提到过如何使用 HPA 这种资源对象的话可以做到自动伸缩。
-(4)滚动升级: 滚动升级是⼀种平滑的升级⽅式，通过逐步替换的策略，保证整体系统的稳定性。
+ReplicaSet：作为 Deployment 的底层组件。通过一个 Pod 模板创建和维护一组完全相同的 Pod 副本。它通过 selector 来持续监控集群中匹配的 Pod 数量，并通过 replicas 字段来确保实际运行的 Pod 数量始终等于期望的数量（少于期望值则创建，多于期望值则删除）。
 
-Deployment
-和 RC ⼀样的都是保证 Pod 的数量和健康，⼆者大部分功能都是完全⼀致的，我们可以看成是⼀个升级版的 RC 控制器
-(1)RC 的全部功能:  Deployment 具备上⾯描述的 RC 的全部功能；
-(2)事件和状态查看: 可以查看 Deployment 的升级详细进度和状态；
-(3)回滚: 当升级 Pod 的时候如果出现问题，可以使用回滚操作回滚到之前的任⼀版本；
-(4)版本记录: 每⼀次对 Deployment 的操作，都能够保存下来，这也是保证可以回滚到任⼀版本的基础；
-(5)暂停和启动: 对于每⼀次升级都能够随时暂停和启动。
+Deployment：用于无状态应用。它管理 ReplicaSet，确保指定数量的 Pod 副本在运行。核心价值是为无状态应用提供了声明式的滚动更新和回滚能力。
+- 滚动更新：当更新 Pod 模板（如镜像版本）时，Deployment 会创建一个新的 ReplicaSet，并逐步用新 Pod 替换旧 ReplicaSet 中的 Pod，实现零停机更新。可以控制 maxUnavailable 和 maxSurge 来控制更新步长。
+- 回滚：通过 rollout undo 可以回滚到 Deployment 指定的历史版本。
+- 暂停与继续：通过 rollout pause/resume 暂停或继续更新/继续更新过程。
 
-StatefulSet
-1. 每个 Pod 都有稳定唯一的网络标识可以发现集群里的其他成员
-控制的 Pod 副本的启停顺序是受控的
-2. Pod 采用稳定的持久化存储卷
+StatefulSet：用于有状态应用（如数据库、消息队列）。
+- 稳定的网络标识：为 Pod 提供固定的、唯一的网络标识（如 db-0, db-1）和持久化存储。Pod 的启停、升级都是有序的。
+- 稳定的持久化存储：每个 Pod 都会绑定一个独立 PersistentVolumeClaim。当 Pod 重新调度（如节点故障）时，新的 Pod 挂载回同一个 PVC，从而访问原有数据。通过 volumeClaimTemplates 实现。
+- 有序部署与终止：按索引顺序（1，2，3...）创建 Pod，按倒序终止 Pod。
+
+DaemonSet：确保在集群中的每一个（或部分）Node 上都运行一个 Pod。当新节点加入集群时在节点上自动创建 Pod。通常不部署到 Master 节点（通过 tolerations 可调整）。常用于
+- 集群存储守护进程：glusterd，ceph 等。
+- 日志组件 Agent：fluentd、filebeat 等。
+- 监控组件 Agent：node_exporter、categraf 等。
+- 网络插件：Calico，Flannel 等 CNI 插件的代理组件。
 ```
 
-- Service
+**Network：Service、Endpoint、Ingress、Gateway API**
 
 ```console
-一个 Pod 只是一个运行服务的实例，随时可能在一个节点上停止，在另一个节点以一个新的 IP 启动一个新的 Pod，因此不能以确定的 IP 和端口号提供服务。要稳定地提供服务,需要服务发现和负载均衡能力.
+Service：定义了一组 Pod 的逻辑集合和一个访问它们的策略，为 Pod 提供了稳定的网络入口和服务发现。
+- ClusterIP：默认，仅在集群内部可见，提供一个虚拟 IP（service_range）。
+- NodePort：在每个节点上固定端口上暴露服务，允许通过 <NodeIP>:<NodePort> 从集群外部访问。
+- LoadBalancer：在 NodePort 的基础上，向云厂商（如 AWS，GCP）请求一个 LB，将流量导向服务。
+- ExternalName：将服务映射到外部的一个 DNS 名称，常用于连接集群外的服务或者为内部 Service 创建短别名。
 
-在 k8s 集群中，客户端需要访问的服务就是 Service 对象。每个 Service 会对应一个集群内部有效的虚拟 IP，集群内部通过虚拟 IP 访问一个服务
-Service -> Endpoint -> Pod
-LB -> NodePort -> CNI bridge -> Pod
+Endpoint/EndpointSlice：Service 的实际后端列表。由 Kubernetes 自动维护，记录所有匹配 Service Selector 选择器的、健康的 Pod 的 IP 地址和端口。是 Service 流量转发的直接依据。
+
+Ingress：HTTP(S) 的外部访问入口。管理从集群外部到内部服务的 HTTP 和 HTTPS 路由，提供基于 hostname、URL 路径等应用层规则的流量转发。需要与 Ingress controller（ingress-nginx、Traefik）配合工作。
+- Kubernetes 1.22版本后已移除旧 API，只能通过 networking.k8s.io/v1 版本使用。
+
+Gateway API：Kubernetes社区官方设计的下一代服务网络标准，旨在解决 Ingress 在表达能力、扩展性和角色分离上的局限性。它得到了几乎所有主流网关和服务网格项目的支持，代表着明确的技术方向。
 ```
 
-- Volume
+**Persistent：PersistenVolume、PersistentVolumeClaim、StorageClass**
 
 ```console
-volume（存储卷）是 Pod 中能够被多个容器访问的共享目录
-emptyDir Volume 是在 Pod 分配到 Node 时创建的。临时空间分配
+PersistenVolume：由管理员预先创建的一块存储资源（如一块磁盘、一个 NFS 目录），是集群中的一等公民。
+
+PersistenVolumeClaim：用户对存储资源的申请。用户声明需要多大的存储、什么访问模式，Kubernetes 会为其寻找或创建一个合适的 PV 进行绑定。
+
+StorageClass：定义了如何动态创建 PV。它将存储划分为不同的等级（如 SSD，HDD）。当用户创建 PVC 时，可以指定一个 StorageClass，Kubernetes 会根据该类的定义动态创建一个新的 PV。
 ```
 
-#### Kubernetes 中都有哪些应用的探针？区别是什么？
+#### Kubernetes 中都有哪些应用的探针？
 
 ```console
+- startupProbe
+启动探针，判断容器是否已经启动成功，启动成功后即被禁用。如果探测失败则杀死容器并按重启策略处理。适合启动慢的容器，防止存活探针在启动阶段误杀。
+
 - livenessProbe
-存活探针，检测容器是否正在运行，如果存活探测失败，则 kubelet 会杀死容器，并且容器将受到其重启策略的影响，如果容器不提供存活探针，则默认状态为 Success，livenessprobe 用于控制是否重启 Pod.
+存活探针，判断容器是否还在健康运行，在整个生命周期执行。如果探测失败则 kubelet 会杀死容器并按重启策略处理。如果容器不提供存活探针，则默认状态为 Success，livenessprobe 用于控制是否重启 Pod。
 
 - readinessProbe
-就绪探针，如果就绪探测失败，端点控制器将从与 Pod 匹配的所以 Service 的端点中删除该 Pod 的 IP 地址初始延迟之前的就绪状态默认为 Failure（失败），如果容器不提供就绪探针，则默认状态为 Success，readinessProbe 用于控制 Pod 是否添加至 service.
-
-- startupProbe
-启动探针
+就绪探针，判断容器是否已准备接收外部流量，在整个生命周期执行。如果探测失败，则从 Service 的负载均衡端点中移除该 Pod。初始延迟之前的就绪状态默认为 Failure，如果容器不提供就绪探针，则默认状态为 Success，readinessProbe 用于控制 Pod 是否添加至 Service 接收流量。
 ```
 
-#### Others
+#### Kubernetes 中的 RBAC 概念与用法？
 
 ```console
-1. hpa 指标以 request 为准
-2. 主机调度 Pod 以 request 为准
-
-
-request limit 的分级?
-如何通过 Deployments 创建 Pod？
+RBAC (Role-Based Access Control)：Kubernetes 中基于角色的访问控制机制，用于精细化管理用户或应用对 API 资源的访问权限。
+- Subject（主体）：可以是用户、组或 ServiceAccount。
+- Role / ClusterRole（角色）：定义了一组权限规则（如对 Pod 的 get, list, watch 权限）。Role 作用于命名空间，ClusterRole 作用于整个集群。
+- RoleBinding / ClusterRoleBinding（角色绑定）：将角色绑定到主体上，从而赋予主体相应的权限。
 ```
 
-#### 什么是 Rancher ？Rancher 导入集群的方式有什么？导入集群的流程原理是什么？
+#### Kubernetes 中的调度策略是什么？
 
 ```console
 
+```
+
+#### Kubernetes 中都有哪些网络插件？
+
+```console
+
+```
+
+#### Kubernetes 中都有哪些存储插件？
+
+```console
+
+```
+
+#### Kubernetes 中 resources 的 requests/limits 的核心概念？都有什么资源与调度相关的配置？Kubernetes 中 Pod 的 QoS 类有哪些？
+
+```console
+requests：容器需要的最小资源保证。调度器会严格依据所有 Pod 的 requests 之和，确保其不超过节点的可分配容量，从而决定 Pod 可以放置在哪台机器上。一旦调度成功，kubelet 会在该节点预留 requests 资源。
+- CPU：通过 Linux CFS 调度器，为容器进程保障了最低份额的 CPU 时间。
+- 内存：调度和预留资源。
+
+limits：容器可以使用的最大资源上限，调度器完全不考虑 limits。
+- CPU：为容器设置了使用上限。如果容器试图使用超过 limits 的 CPU，CPU 被 throttled，进程将被限制，在下一个调度周期才能继续运行，导致性能波动，但进程不会被杀死。
+- 内存：硬性限制，如果容器的内存使用量超过 limits，被 Linux 内核的 OOM Killer 强制终止，容器将出现 OOMKilled 状态并重启。
+
+LimitRange：限制范围。
+- 设置 namespace 中容器的默认/最小/最大资源限制。
+- 自动为未设置 resources 的容器添加默认值。
+
+ResourceQuota：资源配额。
+- 限制 namespace 级别的总资源使用。
+- 可以限制 requests、limits、pod 数量等。
+
+HPA（Horizontal Pod Autoscaler）：
+- 基于 requests 的值作为分母计算使用率进行判断。
+- 基于 CPU/内存使用率自动扩缩容。
+
+VPA（Vertical Pod Autoscaler）：
+- 基于历史使用模式，自动调整容器的 requests 和 limits。
+
+QoS 类（Quality of Service）：
+- Guaranteed：Pod 具有最严格的资源限制，并且最不可能面临驱逐。在这些 Pod 超过其自身的限制或者没有可以从 Node 抢占的低优先级 Pod 之前， 这些 Pod 保证不会被杀死。这些 Pod 不可以获得超出其指定 limit 的资源。这些 Pod 也可以使用 CPU 管理策略来使用独占的 CPU。
+- Guaranteed 类的依据：Pod 中的所有容器必须设置 CPU 和内存 requests 和 limits，且 CPU 和内存的 requests 等于 limits。
+
+- Burstable：Pod 有一些基于 request 的资源下限保证，但不需要特定的 limit。 如果未指定 limit，则默认为其 limit 等于 Node 容量，这允许 Pod 在资源可用时灵活地增加其资源。 在由于 Node 资源压力导致 Pod 被驱逐的情况下，只有在所有 BestEffort Pod 被驱逐后 这些 Pod 才会被驱逐。因为 Burstable Pod 可以包括没有资源 limit 或资源 request 的容器， 所以 Burstable Pod 可以尝试使用任意数量的节点资源。
+- Burstable 类的依据：Pod 不满足 Guaranteed 类，Pod 中至少一个容器设置了 CPU 或内存的 requests 或 limits。
+
+- BestEffort：QoS 类中的 Pod 可以使用未专门分配给其他 QoS 类中的 Pod 的节点资源。 例如若你有一个节点有 16 核 CPU 可供 kubelet 使用，并且你将 4 核 CPU 分配给一个 Guaranteed Pod， 那么 BestEffort QoS 类中的 Pod 可以尝试任意使用剩余的 12 核 CPU。
+- BestEffort 类的依据：Pod 不满足 Guaranteed 或 Burstable，没有设置任何 CPU 或 内存的 requests 或 limits。
+```
+
+#### Rancher 的核心组件是什么？Rancher 导入集群的方式有什么？导入集群的流程原理是什么？
+
+```console
 核心组件：
 Rancher Server：管理控制中心，提供 UI/API，存储所有集群的元数据，并发出管理指令。
 Cluster Agent：运行在目标集群（下游集群）中的代理，Deployment 方式部署在 cattle-system namespace 中。
@@ -1628,7 +1950,7 @@ ACK
 EKS
 GKE
 
-前置检查：
+导入集群前置检查：
 - 网络连通性检查：Rancher Server 需要连通下游集群的 API Server（默认443）；下游集群需要连通 Rancher Server（默认443）。
 - 注册命令的有效性：有效期与 Rancher Server 地址是否正确。
 - 权限和安全：Rancher 会创建 cluster-admin 权限的 service account；TLS 证书。
@@ -1642,4 +1964,93 @@ GKE
 5. 连接建立后，就形成了一条双向通行渠道。
 - Rancher Server 向下游集群发送指令：无法调用下游集群 API Server，将指令封装为消息，通过 Websocket 连接发送给集群的 Cluster Agent。Agent 收到消息后使用 Kubernetes Go 客户端库（client-go），通过 serviceaccount 的权限调用下游集群的 API Server 执行对应操作。
 - 下游集群向 Rancher Server 上报状态：Cluster Agent 和 Node Agent 定时监视下游集群状态（如 Pod、Node、Deployment）的变化，通过 Websocket 上报给 Rancher Server，Rancher Server 收到后更新数据库并在 UI 展示。
+```
+
+#### Kubernetes 最佳实践
+
+```console
+集群规划与部署
+1. **使用托管服务**：
+
+    - 优先选择云厂商提供的托管 Kubernetes 服务（如 EKS, GKE, AKS）。它们极大地简化了控制平面的管理、升级和高可用性，让你能更专注于业务应用。
+2. **高可用架构**：
+
+    - **控制平面**：托管服务已保证高可用。自建时需部署多 Master 节点。
+    - **工作节点**：将节点分布在不同的可用区。使用**反亲和性**策略，将关键应用的 Pod 副本分散到不同节点和可用区，避免单点故障。
+3. **集群规模与资源规划**：
+
+    - 根据业务负载预估集群规模，合理规划节点大小和数量。为系统组件（如 Ingress Controller, DNS）预留足够的资源。
+
+### 二、 应用部署与管理
+
+1. **采用 GitOps 模式**：
+
+    - **核心思想**：将 Kubernetes 的声明式配置文件存储在 Git 仓库中，作为**唯一可信源**。
+    - **工具**：使用 ArgoCD 或 Flux 等 GitOps 工具，自动将 Git 中的状态同步到 Kubernetes 集群。
+    - **优势**：版本控制、变更审计、自动化回滚、提高协作效率。
+2. **定义资源请求和限制**：
+
+    - **必须为所有 Pod 设置 `resources.requests` 和 `resources.limits`**。
+    - `requests` 用于 Kube-Scheduler 调度，保证 Pod 有最基本的资源。
+    - `limits` 防止 Pod 消耗过多资源影响其他应用（ noisy neighbor 问题）。
+    - 使用工具如 `kube-opex-analytics` 或 Prometheus 监控资源使用率，持续优化。
+3. **配置健康检查**：
+
+    - 为所有关键应用配置 `livenessProbe` 和 `readinessProbe`。这是保证服务可用性和实现自愈的关键。
+4. **安全上下文**：
+
+    - 在 Pod 的 `securityContext` 中配置：
+        - 以非 root 用户运行容器。
+        - 使用只读的根文件系统（`readOnlyRootFilesystem: true`）。
+        - 删除不必要的 Linux capabilities（`drop: ["ALL"]`）。
+
+### 三、 安全加固
+
+1. **启用 RBAC**：
+
+    - 遵循**最小权限原则**。为不同的应用创建专用的 ServiceAccount，并仅授予其完成任务所需的最小权限。避免使用 `cluster-admin`。
+2. **使用网络策略**：
+
+    - 默认情况下，Kubernetes 集群内网络是全通的。使用 `NetworkPolicy` 定义 Pod 之间的防火墙规则，实现“默认拒绝，按需允许”，大大增强安全性。
+3. **实施 Pod 安全标准**：
+
+    - PodSecurityPolicies (PSP) 已被废弃，新的方式是使用 **Pod Security Admission**。在命名空间级别设置 `enforce` 模式，强制要求新建的 Pod 符合 `baseline` 或 `restricted` 安全标准。
+4. **镜像安全**：
+
+    - 使用可信的、最小化的基础镜像（如 distroless, Alpine）。
+    - 定期扫描镜像漏洞，并建立自动化的镜像更新流程。
+
+### 四、 可观测性与监控
+
+1. **构建全面的监控体系**：
+
+    - **Metrics**：使用 Prometheus + Grafana 的黄金组合。部署 `node-exporter`、`kube-state-metrics` 和应用自身的 Prometheus exporter。
+    - **Logs**：建立集中式日志系统。使用 Fluent Bit/Fluentd 收集日志，发送到 Loki/Elasticsearch，并用 Kibana/Grafana 查询。
+    - **Traces**：对于微服务架构，引入 Jaeger 或 Zipkin 进行分布式链路追踪，快速定位性能瓶颈。
+2. **关键监控指标**：
+
+    - **集群层面**：节点资源利用率、Pod 状态分布、etcd 性能。
+    - **应用层面**：QPS、延迟、错误率（SLO/SLI）。
+
+### 五、 成本优化
+
+1. **使用 Cluster Autoscaler**：
+
+    - 自动根据 Pod 的调度需求增减工作节点，实现弹性伸缩，节省成本。
+2. **使用 Spot/Preemptible VMs**：
+
+    - 对于可中断、非核心的批处理任务，使用竞价实例，成本可降低 70-90%。结合 `Cluster Autoscaler` 和 Pod 中断处理程序。
+3. **资源优化**：
+
+    - 使用 `Vertical Pod Autoscaler` (VPA) 自动调整 Pod 的资源请求。
+    - 定期分析未使用的资源，并缩减节点规模。
+
+### 六、 备份与灾难恢复
+
+1. **备份 etcd**：
+
+    - etcd 是集群的状态中心，必须定期备份。使用 `etcdctl snapshot save` 命令，并将备份文件安全存储（如异地对象存储）。
+2. **备份应用数据和持久卷**：
+
+    - 使用 `Velero` 等工具，不仅可以备份和恢复集群资源对象，还可以备份持久卷数据。
 ```

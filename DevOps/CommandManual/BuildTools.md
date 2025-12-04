@@ -1,6 +1,7 @@
 # Build Tools
 
 ## maven
+
 ```bash
 # determine file location
 mvn -X clean | grep "settings"

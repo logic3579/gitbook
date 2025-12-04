@@ -5,11 +5,13 @@ description: Openssl
 # Openssl
 
 ## Introduction
+
 ...
 
 ## How to Use
 
 ### 1. 第三方签发 SSL 证书
+
 ```bash
 # 生成私钥，加密参数 -des3
 openssl genrsa -out a.com.key 2048
@@ -26,6 +28,7 @@ openssl req -noout -text -in a.com.csr
 ### 2. 自签名/自有 CA 签发证书
 
 - 使用自签名方式
+
 ```bash
 # 使用已有私钥和 csr 自签名
 openssl x509 -req -days 3650 -in a.com.csr -extensions v3_ca -signkey a.com.key -out a.com.crt
@@ -41,6 +44,7 @@ openssl x509 -text -noout -in server.crt
 ```
 
 - 使用 CA 签名
+
 ```bash
 # 生成 CA 公私钥
 openssl genrsa -out ca.key 2048
@@ -60,6 +64,7 @@ openssl x509 -noout -issuer -issuer_hash -in a.com.crt
 ```
 
 ### 3. 使用 openssl 加密解密文件
+
 ```bash
 # 生成并验证私钥
 openssl genrsa -out logic.key 2048
@@ -84,7 +89,9 @@ openssl smime -decrypt -in Encrypted.zip -binary -inform DEM -inkey logic.key -o
 ```
 
 ### 4. 证书格式转化
+
 > 一般有以下几种标准格式
+>
 > - .DER .CER ： 二进制格式，只保存证书，不保存私钥。
 > - .PEM ：文本格式，可保存证书，可保存私钥，通常网上的.key 后缀的私钥，其实就是 PEM 格式。
 > - .CRT ：可以是二进制格式，可以是文本格式，只保存证书，不保存私钥。
@@ -110,6 +117,7 @@ openssl pkcs12 -in cert.pkcs -out cert.pem
 ```
 
 ### 5. 其它技巧
+
 ```bash
 # random 32 characters secret key
 openssl rand -hex 32
@@ -150,5 +158,6 @@ openssl s_client -connect www.baidu.com:443 -tls1_2 -cipher 'ECDHE-RSA-AES128-GC
 ```
 
 > Reference:
+>
 > 1. [Official Website](https://www.openssl.org/)
 > 2. [Repository](https://github.com/openssl/openssl)

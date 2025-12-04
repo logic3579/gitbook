@@ -1,18 +1,21 @@
 # Systemd
 
 ## bootctl
+
 ```bash
 bootctl status
 bootctl status --esp-path /mnt/lfs/boot/
 ```
 
 ## hostnamectl
+
 ```bash
 hostnamectl status
 hostnamectl set-hostname east-web-x
 ```
 
 ## journalctl
+
 ```bash
 # specified date log
 -S --since
@@ -58,6 +61,7 @@ journalctl -xe -u nginx.service -u httpd.service -n 10 -f
 ```
 
 ## localectl
+
 ```bash
 localectl status
 localectl list-locales
@@ -65,6 +69,7 @@ localectl set-locale LANG=en_US.UTF-8
 ```
 
 ## loginctl
+
 ```bash
 loginctl list-sessions
 session-status
@@ -75,12 +80,14 @@ loginctl show-user root
 ```
 
 ## networkctl
+
 ```bash
 networkctl list
 networkctl status
 ```
 
 ## timedatectl
+
 ```bash
 timedatectl status
 timedatectl list-timezones
@@ -91,6 +98,7 @@ timedatectl set-timezone Asia/Hong_Kong
 ```
 
 ## systemd-analyze
+
 ```bash
 systemd-analyze
 systemd-analyze blame
@@ -98,6 +106,7 @@ systemd-analyze critical-chain
 ```
 
 ## systemctl
+
 ```bash
 # Unit Commands
 systemctl list-units
@@ -134,7 +143,6 @@ systemctl show-environment
 systemctl set-environment VARIABLE=VALUE
 ```
 
-
-
->Reference:
->1. [Systemd 入门教程](https://ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html)
+> Reference:
+>
+> 1.  [Systemd 入门教程](https://ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html)

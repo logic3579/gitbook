@@ -9,26 +9,18 @@ description: client tool: gcloud / gsutil
 ### Common
 
 ```bash
-# Personalization
-gcloud config set|get|list
-gcloud config configurations create|list|activate
-
 # Authorization and Credentials
 gcloud auth login
 gcloud auth activate-service-default
 gcloud auth list|revoke
 
+# Configuration
+gcloud config set|get|list
+gcloud config configurations create|list|activate
+
 # Projects
 gcloud projects describe
 gcloud projects add-iam-policy-binding
-
-# IAM
-gcloud iam list-grantable-roles
-gcloud iam roles create
-gcloud iam service-accounts create
-gcloud iam service-accounts add-iam-policy-binding
-gcloud iam service-accounts set-iam-policy-binding
-gcloud iam service-accounts keys list
 
 # Global flags
 --help
@@ -39,7 +31,18 @@ gcloud iam service-accounts keys list
 --format
 ```
 
-### GCE
+### Cloud storage
+
+```bash
+gcloud storage buckets describe gs://YOUR_BUCKET_NAME --format="value(uniformBucketLevelAccess.enabled)"
+gcloud storage buckets update gs://YOUR_BUCKET_NAME --uniform-bucket-level-access
+gcloud storage buckets add-iam-policy-binding gs://YOUR_BUCKET_NAME \
+    --member="allUsers" \
+    --role="roles/storage.objectViewer"
+gcloud storage buckets get-iam-policy gs://YOUR_BUCKET_NAME
+```
+
+### Compute Engine
 
 ```bash
 # Virutual machines
@@ -52,13 +55,25 @@ gcloud compute instances list --filter="zone ~ ^asia AND -machineType:e2-standar
 gcloud compute instances update $name --zone $zone --deletion-protection
 gcloud compute ssh
 
-# Storage
+# Disk
 gcloud compute disks snapshot
 gcloud compute snapshots describe
 gcloud compute snapshots delete
 ```
 
-### GKE
+### IAM
+
+```bash
+# IAM
+gcloud iam list-grantable-roles
+gcloud iam roles create
+gcloud iam service-accounts create
+gcloud iam service-accounts add-iam-policy-binding
+gcloud iam service-accounts set-iam-policy-binding
+gcloud iam service-accounts keys list
+```
+
+### Kubernetes Engine
 
 ```bash
 gcloud auth configure-docker
@@ -68,19 +83,34 @@ gcloud container clusters get-credentials
 gcloud container images list-tags
 ```
 
-### Network
+### Network services
+
+```bash
+# Load balancing
+
+# Cloud DNS
+ZONE_NAME=example.com
+gcloud dns record-sets create 'www.example.com' \
+    --type=A \
+    --ttl=300 \
+    --zone="$ZONE_NAME" \
+    --rrdatas="1.1.1.1"
+
+# Cloud CDN
+
+# Cloud NAT
+```
+
+### VPC Network
 
 ```bash
 # VPC networks
 
-# Firewall
-gcloud compute firewall-rules list --filter="network:default"
-
 # IP address
 gcloud compute addresses create test-external --region=asia-southeast1
 
-# Cloud NAT
-
+# Firewall
+gcloud compute firewall-rules list --filter="network:default"
 ```
 
 ## gsutil

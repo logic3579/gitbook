@@ -63,9 +63,9 @@ KUBECTL_VERSION=v1.30.9
 curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
 sudo chmod +x ./kubectl && sudo mv ./kubectl /usr/bin/kubectl
 # Install helm client
-HELM_VERSION=v3.19.0
+HELM_VERSION=v4.0.0
 wget https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz
-tar xf helm-v3.16.2-linux-amd64.tar.gz && rm -f helm-v3.16.2-linux-amd64.tar.gz
+tar xf helm-${HELM_VERSION}-linux-amd64.tar.gz && rm -f helm-${HELM_VERSION}-linux-amd64.tar.gz
 sudo chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/bin/helm && rm -rf ./linux-amd64
 # Auto completion
 sudo apt install bash-completion -y
