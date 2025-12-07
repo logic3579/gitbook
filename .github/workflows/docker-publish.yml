@@ -1,9 +1,20 @@
 name: Publish to Multi-Registry
 
 on:
-  push:
-    branches:
-      - "main"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deploy env"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: "版本号"
+        required: false
+        type: string
 
 env:
   ACR_REGISTRY: crpi-fkl1s7fwluzapj2o.cn-hongkong.personal.cr.aliyuncs.com

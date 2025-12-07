@@ -1936,6 +1936,38 @@ QoS 类（Quality of Service）：
 - BestEffort 类的依据：Pod 不满足 Guaranteed 或 Burstable，没有设置任何 CPU 或 内存的 requests 或 limits。
 ```
 
+#### 什么是 Kubernetes CRD Operator？如何实现自定义的 Operator？
+
+```console
+CRD（CustomResourceDefinition）：自定义资源定义，负责定义数据结构。向 Kubernetes API 中添加新的资源类型。如内置 Pod、Deployment 等。
+- 作用：数据的蓝图，通过 CRD 定义新资源的结构（字段、类型），如定义一个 MyDatabase 资源，包含 version、replicas、storage 等字段。
+- 本质：CRD 只负责声明和存储数据（etc 中），但不包含任何逻辑。创建了 MyDatabase 对象后，Kubernetes 并不知道如何实现它。
+
+Operator：Kubernetes 控制器模式的特定实现，包含业务逻辑的控制循环程序。专门用来管理和持续地观察通过 CRD 定义和创建的自定义资源。
+- 作用：Operator 持续监控（Watch）特定类型的自定义资源对象。当用户创建、更新或删除该对象时，Operator 中的调和循环就会启动，读取对象的期望状态（Spec），然后通过调用 Kubernetes API 或外部接口，驱动集群达到这个状态。
+- 工作原理（核心数据循环）：
+1. 观察：Operator 通过 Kubernetes API 持续监听它所关心的 CRD 资源（如 MyDatabase 对象）的变化。
+2. 比较：当它检测到一个 MyDatabase 对象被创建或更新时，它会读取其 spec 部分定义的期望状态。
+3. 行动：然后 Operator 会执行一系列编码好的逻辑，去操作 Kubernetes 的原生资源（如创建 StatefulSet, Service, PVC 等），来使实际状态无限接近期望状态。
+4. 循环：这个过程会一直持续下去。如果实际状态与期望状态不符（比如一个 Pod 崩溃了），Operator 就会再次行动，使其恢复。
+
+Operator 的组成：
+- CRD：定义 Operator 所管理的自定义资源。
+- 控制器：核心逻辑，含义一个或多个调和循环。
+- API 控制端：通常使用 controller-runtime 或 Operator SDK 框架，简化对 Kubernetes API 的调用。
+- 调和逻辑：比较期望状态与实际状态，并执行具体操作（如 kubectl create, kubectl patch，或调用云服务商 API）。
+- 状态管理：通常会在自定义资源的 status 字段中更新当前状态、条件和错误信息。
+
+Operator 的实现：
+1. 初始化项目：operator-sdk init，选择合适的语言（如 Go）。
+2. 创建 API 和 CRD：operator-sdk create api，定义 CRD 结构体（Spec 和 Status）。
+3. 实现调和逻辑：在生成的控制器文件（如 *_controller.go）的 Reconcile 函数中，编写核心业务逻辑。
+4. 生成代码和清单：运行 make manifests 生成 CRD YAML 文件和 RBAC 配置。
+5. 构建和推送镜像。
+6. 部署到集群：部署 CRD 和 Operator 的 Deployment。
+7. 测试：创建你的自定义资源实例，观察 Operator 是否按预期工作。
+
+```
 #### Rancher 的核心组件是什么？Rancher 导入集群的方式有什么？导入集群的流程原理是什么？
 
 ```console
