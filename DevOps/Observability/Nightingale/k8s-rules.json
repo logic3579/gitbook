@@ -17,7 +17,7 @@
       "inhibit": true,
       "queries": [
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 75",
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 75",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -31,12 +31,16 @@
           "var_enabled": false
         },
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 85",
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 85",
           "severity": 2
         },
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
           "severity": 1
+        },
+        {
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{container=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
+          "severity": 2
         }
       ]
     },
@@ -72,12 +76,12 @@
     "note": "Pod {{ $labels.pod }} Container {{ $labels.container }} in Namespace {{ $labels.namespace }} has memory pressure.",
     "prod": "metric",
     "delay": 0,
-    "prom_for_duration": 600,
+    "prom_for_duration": 300,
     "rule_config": {
-      "inhibit": true,
+      "inhibit": false,
       "queries": [
         {
-          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 75",
+          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached|clickhouse\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 75",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -91,12 +95,16 @@
           "var_enabled": false
         },
         {
-          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 85",
+          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 85",
           "severity": 2
         },
         {
-          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 95",
+          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 95",
           "severity": 1
+        },
+        {
+          "prom_ql": "sum(container_memory_working_set_bytes{image!~\".*pause.*\",container=~\"clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container=~\"clickhouse|kafka\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 85",
+          "severity": 2
         }
       ]
     },

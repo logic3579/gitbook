@@ -54,7 +54,7 @@
     "note": "Container {{ $labels.com_docker_compose_service }} in Node {{ $labels.ident }} has memory pressure.",
     "prod": "metric",
     "delay": 0,
-    "prom_for_duration": 60,
+    "prom_for_duration": 300,
     "rule_config": {
       "queries": [
         {
