@@ -105,6 +105,13 @@ git push origin :refs/tags/v0.9
 # 查看当前版本
 git rev-parse HEAD
 
+# 撤销 commit，但保留修改，修改内容回到暂存区（staged）
+git reset --soft HEAD~1
+# 撤销 commit，并把修改也取消暂存（保留工作区修改），修改仍存在但不在暂存区
+git reset --mixed HEAD~1
+# 彻底撤销 commit，并丢掉所有改动
+git reset --hard HEAD~1
+
 # 回退上一个版本
 git reset --hard HEAD^
 # 回退两个版本

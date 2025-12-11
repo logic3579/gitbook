@@ -1,5 +1,5 @@
 ---
-description: client tool: gcloud / gsutil
+description: gcloud / gsutil
 ---
 
 # Client Tools
