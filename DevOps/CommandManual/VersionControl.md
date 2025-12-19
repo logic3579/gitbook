@@ -90,13 +90,21 @@ git cherry-pick 4c805e2
 ### tag
 
 ```bash
-# 根据版本号打标签
-git tag v1.0 dsv34dsdv
-# 本地删除标签
-git tag -d v0.9
-# 远程删除标签
-git push origin :refs/tags/v0.9
+# tag based on Annotated Tag
+git tag -a v1.0.0 -m "Release v1.0.0"
 
+# show and check tag
+git show v1.0.0
+
+# push tag to remote repository
+git push origin v1.0.0
+
+# show remote tag
+git ls-remote --tags origin
+
+# delete local/remote tag
+git tag -d v1.0.0
+git push origin --delete tag v1.0.0
 ```
 
 ### version control

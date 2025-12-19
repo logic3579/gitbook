@@ -5,6 +5,7 @@
 ## AI
 
 - [Overview](./AI/README.md)
+- [prompt](./AI/prompt/README.md)
 
 ## APP-META
 
