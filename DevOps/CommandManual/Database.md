@@ -253,32 +253,112 @@ SET DEFAULT ROLE 'user_rw_role' TO 'operator'@'%';
 
 ## PostgreSQL
 
-```bash
-# login
+```sql
+--- client command
+--- login
 psql -U user [-d database]
-
-# create user,database and grant privileges
-CREATE USER myuser WITH PASSWORD 'mypassword';
-CREATE DATABASE mydatabase OWNER myuser;
-GRANT ALL PRIVILEGES ON DATABASE mydatabase TO myuser;
-GRANT ALL PRIVILEGES ON all tables in schema public TO mydatabase;
-
-# SELECT all database
-\l
-
-# switch database
-\c database
-
-# SELECT custom table and table schema
-\d
+--- show connect
+\conninfo
+--- switch database
+\c mydb
+\connect mydb
+\c mydb readonly
+--- switch custom table and table schema
 \d table;
+--- show all users
+\du
+--- show roles permission
+\du readonly
+--- show all databases
+\l
+\list
+\l+
+--- show all scheme
+\dn
+\dn+
+--- show database tables
+\dt
+\dt.public.*
+--- show table schema
+\d table_name
+--- show view
+\dv
+--- show meterialized view
+\dm
+--- show index/constraint
+\di
+\d table_name
+--- show table permission
+\z table_name
+--- show schema permission
+\z public.*
+--- show function
+\df
+\df+ func_name
+--- show sequences
+\ds
+--- show current sequences value
+SELECT last_value FROM seq_name;
+--- execute sql
+\i /path/to/file.sql
+--- display
+\x auto
+\t on
+\timing on
 
-# SELECT all scheme
-SELECT * FROM information_schema.schemata;
 
-# SELECT all tables
-SELECT * FROM pg_tables;
+--- create user and role
+--- admin
+CREATE ROLE admin_role NOLOGIN;
+CREATE USER admin WITH PASSWORD 'secure_password_3';
+GRANT admin_role TO admin;
+--- app
+CREATE ROLE app_role NOLOGIN;
+CREATE USER app WITH PASSWORD 'secure_password_2';
+GRANT app_role TO app;
+--- readonly
+CREATE ROLE readonly_role NOLOGIN;
+CREATE USER readonly WITH PASSWORD 'secure_password_1';
+GRANT readonly_role TO readonly;
 
+
+--- create database
+---CREATE DATABASE mydb OWNER app;
+CREATE DATABASE mydb;
+
+
+--- grant current permission
+\c mydb;
+--- admin: DDL
+GRANT ALL PRIVILEGES ON SCHEMA public TO admin_role;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO admin_role;
+--- app: DML
+GRANT CONNECT ON DATABASE mydb TO app_role;
+GRANT USAGE ON SCHEMA public TO app_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_role;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_role;
+--- readonly: SELECT
+GRANT CONNECT ON DATABASE mydb TO readonly_role;
+GRANT USAGE ON SCHEMA public TO readonly_role;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly_role;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO app_role;
+
+
+--- grant future permission
+psql -h YOUR_HOST -U admin_role -d mydb
+--- admin
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON TABLES TO admin_role;
+--- app
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO app_role;
+--- readonly
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT ON TABLES TO readonly_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT ON SEQUENCES TO readonly_role;
 ```
 
 ## Redis
@@ -312,7 +392,7 @@ redis-cli --cluster reshard 127.0.0.1:7001
 redis-cli --cluster rebalance 127.0.0.1:7001
 ```
 
-## tidb
+## TiDB
 
 ```bash
 tiup
