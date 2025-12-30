@@ -3,9 +3,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesContainerCPUPressure",
@@ -17,7 +19,7 @@
       "inhibit": true,
       "queries": [
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 75",
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{env=\"prod\",image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 75",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -31,16 +33,16 @@
           "var_enabled": false
         },
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 85",
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{env=\"prod\",image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 85",
           "severity": 2
         },
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{env=\"prod\",image!~\".*pause.*\",container!=\"\",container!=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
           "severity": 1
         },
         {
-          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{container=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
-          "severity": 2
+          "prom_ql": "sum(rate(container_cpu_usage_seconds_total{env=\"prod\",container=\"clickhouse\"}[2m])) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!=\"\",resource=\"cpu\"}) by (pod,namespace,container) * 100 > 95",
+          "severity": 1
         }
       ]
     },
@@ -67,9 +69,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesContainerMemoryPressure",
@@ -81,7 +85,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached|clickhouse\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 75",
+          "prom_ql": "sum(container_memory_usage_bytes{env=\"prod\",image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!~\"|memcached|clickhouse\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 75",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -95,16 +99,16 @@
           "var_enabled": false
         },
         {
-          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 85",
+          "prom_ql": "sum(container_memory_usage_bytes{env=\"prod\",image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 85",
           "severity": 2
         },
         {
-          "prom_ql": "sum(container_memory_usage_bytes{image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 95",
+          "prom_ql": "sum(container_memory_usage_bytes{env=\"prod\",image!~\".*pause.*\",container!~\"|memcached|clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container!~\"|memcached\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 95",
           "severity": 1
         },
         {
-          "prom_ql": "sum(container_memory_working_set_bytes{image!~\".*pause.*\",container=~\"clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{image!~\".*pause.*\",container=~\"clickhouse|kafka\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 85",
-          "severity": 2
+          "prom_ql": "sum(container_memory_working_set_bytes{env=\"prod\",image!~\".*pause.*\",container=~\"clickhouse|kafka|zookeeper\",namespace!=\"kube-system\"}) by (pod,namespace,container) / max (kube_pod_container_resource_limits{env=\"prod\",image!~\".*pause.*\",container=~\"clickhouse|kafka\",resource=\"memory\",namespace!=\"kube-system\"}) by (pod,namespace,container) * 100 > 95",
+          "severity": 1
         }
       ]
     },
@@ -131,9 +135,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesContainerOomKiller",
@@ -145,7 +151,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "(kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason=\"OOMKilled\"}[10m]) == 1",
+          "prom_ql": "(kube_pod_container_status_restarts_total{env=\"prod\"} - kube_pod_container_status_restarts_total{env=\"prod\"} offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{env=\"prod\",reason=\"OOMKilled\"}[10m]) == 1",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -186,9 +192,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesDeploymentGenerationMismatch",
@@ -202,7 +210,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "kube_deployment_status_observed_generation != kube_deployment_metadata_generation",
+          "prom_ql": "kube_deployment_status_observed_generation{env=\"prod\"} != kube_deployment_metadata_generation{env=\"prod\"}",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -244,9 +252,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesDeploymentReplicasMismatch",
@@ -260,7 +270,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "kube_deployment_spec_replicas != kube_deployment_status_replicas_available",
+          "prom_ql": "kube_deployment_spec_replicas{env=\"prod\"} != kube_deployment_status_replicas_available{env=\"prod\"}",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -302,23 +312,23 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesHpaMetricsUnavailability",
     "note": "",
     "prod": "metric",
     "delay": 0,
-    "prom_for_duration": 60,
+    "prom_for_duration": 300,
     "rule_config": {
-      "algo_params": null,
       "inhibit": false,
-      "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "kube_horizontalpodautoscaler_status_condition{status=\"false\", condition=\"ScalingActive\"} == 1",
+          "prom_ql": "kube_horizontalpodautoscaler_status_condition{env=\"prod\",status=\"false\", condition=\"ScalingActive\"} == 1",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -331,8 +341,7 @@
           },
           "var_enabled": false
         }
-      ],
-      "severity": 0
+      ]
     },
     "event_relabel_config": null,
     "prom_eval_interval": 15,
@@ -343,10 +352,7 @@
     "recover_duration": 0,
     "callbacks": [],
     "append_tags": [],
-    "annotations": {
-      "description": "HPA {{ $labels.namespace }}/{{ $labels.horizontalpodautoscaler }} is unable to collect metrics\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}",
-      "summary": "Kubernetes HPA metrics unavailability (instance {{ $labels.instance }})"
-    },
+    "annotations": {},
     "uuid": 0,
     "cur_event_count": 0,
     "update_by_nickname": "long",
@@ -360,9 +366,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesHpaScaleInability",
@@ -376,7 +384,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "(kube_horizontalpodautoscaler_spec_max_replicas - kube_horizontalpodautoscaler_status_desired_replicas) * on (horizontalpodautoscaler,namespace) (kube_horizontalpodautoscaler_status_condition{condition=\"ScalingLimited\", status=\"true\"} == 1) == 0",
+          "prom_ql": "(kube_horizontalpodautoscaler_spec_max_replicas{env=\"prod\"} - kube_horizontalpodautoscaler_status_desired_replicas{env=\"prod\"}) * on (horizontalpodautoscaler{env=\"prod\"},namespace) (kube_horizontalpodautoscaler_status_condition{env=\"prod\",condition=\"ScalingLimited\", status=\"true\"} == 1) == 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -418,9 +426,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesHpaScaleMaximum",
@@ -434,7 +444,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "(kube_horizontalpodautoscaler_status_desired_replicas >= kube_horizontalpodautoscaler_spec_max_replicas) and (kube_horizontalpodautoscaler_spec_max_replicas > 1) and (kube_horizontalpodautoscaler_spec_min_replicas != kube_horizontalpodautoscaler_spec_max_replicas)",
+          "prom_ql": "(kube_horizontalpodautoscaler_status_desired_replicas{env=\"prod\"} >= kube_horizontalpodautoscaler_spec_max_replicas{env=\"prod\"}) and (kube_horizontalpodautoscaler_spec_max_replicas{env=\"prod\"} > 1) and (kube_horizontalpodautoscaler_spec_min_replicas{env=\"prod\"} != kube_horizontalpodautoscaler_spec_max_replicas{env=\"prod\"})",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -476,9 +486,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesHpaUnderutilized",
@@ -492,7 +504,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "max(quantile_over_time(0.5, kube_horizontalpodautoscaler_status_desired_replicas[1d]) == kube_horizontalpodautoscaler_spec_min_replicas) by (horizontalpodautoscaler) > 3",
+          "prom_ql": "max(quantile_over_time(0.5, kube_horizontalpodautoscaler_status_desired_replicas{env=\"prod\"}[1d]) == kube_horizontalpodautoscaler_spec_min_replicas{env=\"prod\"}) by (horizontalpodautoscaler{env=\"prod\"}) > 3",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -534,9 +546,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesNodeDiskPressure",
@@ -548,7 +562,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "kube_node_status_condition{condition=\"DiskPressure\",status=\"true\"} == 1",
+          "prom_ql": "kube_node_status_condition{env=\"prod\",condition=\"DiskPressure\",status=\"true\"} == 1",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -586,9 +600,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesNodeMemoryPressure",
@@ -600,7 +616,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "kube_node_status_condition{condition=\"MemoryPressure\",status=\"true\"} == 1",
+          "prom_ql": "kube_node_status_condition{env=\"prod\",condition=\"MemoryPressure\",status=\"true\"} == 1",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -638,9 +654,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesNodeNetworkUnavailable",
@@ -652,7 +670,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "kube_node_status_condition{condition=\"NetworkUnavailable\",status=\"true\"} == 1",
+          "prom_ql": "kube_node_status_condition{env=\"prod\",condition=\"NetworkUnavailable\",status=\"true\"} == 1",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -693,9 +711,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesNodeNotReady",
@@ -707,7 +727,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "kube_node_status_condition{condition=\"Ready\",status=\"true\"} == 0",
+          "prom_ql": "kube_node_status_condition{env=\"prod\",condition=\"Ready\",status=\"true\"} == 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -745,9 +765,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesNodeOutOfPodCapacity",
@@ -759,7 +781,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "sum by (node) ((kube_pod_status_phase{phase=\"Running\"} == 1) + on(uid, instance) group_left(node) (0 * kube_pod_info{pod_template_hash=\"\"})) / sum by (node) (kube_node_status_allocatable{resource=\"pods\"}) * 100 > 90",
+          "prom_ql": "sum by (node) ((kube_pod_status_phase{env=\"prod\",phase=\"Running\"} == 1) + on(uid{env=\"prod\"}, instance) group_left(node) (0 * kube_pod_info{env=\"prod\",pod_template_hash=\"\"})) / sum by (node) (kube_node_status_allocatable{env=\"prod\",resource=\"pods\"}) * 100 > 90",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -800,9 +822,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesPersistentvolumeclaimPending",
@@ -814,7 +838,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "kube_persistentvolumeclaim_status_phase{phase=\"Pending\"} == 1",
+          "prom_ql": "kube_persistentvolumeclaim_status_phase{env=\"prod\",phase=\"Pending\"} == 1",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -855,9 +879,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesPersistentvolumeError",
@@ -871,7 +897,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "kube_persistentvolume_status_phase{phase=~\"Failed|Pending\", job=\"kube-state-metrics\"} > 0",
+          "prom_ql": "kube_persistentvolume_status_phase{env=\"prod\",phase=~\"Failed|Pending\", job=\"kube-state-metrics\"} > 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -913,9 +939,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesPodCrashLooping",
@@ -927,7 +955,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "increase(kube_pod_container_status_restarts_total[1m]) > 3",
+          "prom_ql": "increase(kube_pod_container_status_restarts_total{env=\"prod\"}[1m]) > 3",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -965,9 +993,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesPodNotHealthy",
@@ -979,7 +1009,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "sum by (namespace, pod) (kube_pod_status_phase{phase=~\"Pending|Unknown|Failed\"}) > 0",
+          "prom_ql": "sum by (namespace, pod) (kube_pod_status_phase{env=\"prod\",phase=~\"Pending|Unknown|Failed\"}) > 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -1017,73 +1047,23 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
-      }
-    ],
-    "name": "KubernetesReplicasetReplicasMismatch",
-    "note": "Kubernetes ReplicasSet mismatch ({{ $labels.namespace }}/{{ $labels.replicaset }}).",
-    "prod": "metric",
-    "delay": 0,
-    "prom_for_duration": 600,
-    "rule_config": {
-      "inhibit": false,
-      "queries": [
-        {
-          "prom_ql": "kube_replicaset_spec_replicas != kube_replicaset_status_ready_replicas",
-          "recover_config": {
-            "judge_type": 0,
-            "recover_exp": ""
-          },
-          "severity": 2,
-          "unit": "",
-          "var_config": {
-            "child_var_configs": null,
-            "param_val": null
-          },
-          "var_enabled": false
-        }
-      ]
-    },
-    "event_relabel_config": null,
-    "prom_eval_interval": 15,
-    "enable_in_bg": 1,
-    "notify_recovered": 1,
-    "notify_repeat_step": 60,
-    "notify_max_number": 0,
-    "recover_duration": 0,
-    "callbacks": [],
-    "append_tags": [],
-    "annotations": {},
-    "uuid": 0,
-    "cur_event_count": 0,
-    "update_by_nickname": "long",
-    "cron_pattern": "@every 60s",
-    "notify_rule_ids": [
-      1
-    ],
-    "notify_version": 1
-  },
-  {
-    "cate": "prometheus",
-    "datasource_queries": [
-      {
-        "match_type": 2,
-        "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesStatefulsetDown",
     "note": "Kubernetes StatefulSet down ({{ $labels.namespace }}/{{ $labels.statefulset }})",
     "prod": "metric",
     "delay": 0,
-    "prom_for_duration": 120,
+    "prom_for_duration": 300,
     "rule_config": {
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "kube_statefulset_replicas != kube_statefulset_status_replicas_ready > 0",
+          "prom_ql": "kube_statefulset_replicas{env=\"prod\"} != kube_statefulset_status_replicas_ready{env=\"prod\"} > 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -1107,9 +1087,7 @@
     "recover_duration": 0,
     "callbacks": [],
     "append_tags": [],
-    "annotations": {
-      "description": "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} went down\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-    },
+    "annotations": {},
     "uuid": 0,
     "cur_event_count": 0,
     "update_by_nickname": "long",
@@ -1123,125 +1101,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
-      }
-    ],
-    "name": "KubernetesStatefulsetGenerationMismatch",
-    "note": "",
-    "prod": "metric",
-    "delay": 0,
-    "prom_for_duration": 600,
-    "rule_config": {
-      "algo_params": null,
-      "inhibit": false,
-      "prom_ql": "",
-      "queries": [
-        {
-          "prom_ql": "kube_statefulset_status_observed_generation != kube_statefulset_metadata_generation",
-          "recover_config": {
-            "judge_type": 0,
-            "recover_exp": ""
-          },
-          "severity": 1,
-          "unit": "",
-          "var_config": {
-            "child_var_configs": null,
-            "param_val": null
-          },
-          "var_enabled": false
-        }
-      ],
-      "severity": 0
-    },
-    "event_relabel_config": null,
-    "prom_eval_interval": 15,
-    "enable_in_bg": 1,
-    "notify_recovered": 1,
-    "notify_repeat_step": 60,
-    "notify_max_number": 0,
-    "recover_duration": 0,
-    "callbacks": [],
-    "append_tags": [],
-    "annotations": {
-      "description": "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has failed but has not been rolled back.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}",
-      "summary": "Kubernetes StatefulSet generation mismatch ({{ $labels.namespace }}/{{ $labels.statefulset }})"
-    },
-    "uuid": 0,
-    "cur_event_count": 0,
-    "update_by_nickname": "long",
-    "cron_pattern": "@every 60s",
-    "notify_rule_ids": [
-      1
-    ],
-    "notify_version": 1
-  },
-  {
-    "cate": "prometheus",
-    "datasource_queries": [
-      {
-        "match_type": 2,
-        "op": "in",
-        "values": []
-      }
-    ],
-    "name": "KubernetesStatefulsetReplicasMismatch",
-    "note": "",
-    "prod": "metric",
-    "delay": 0,
-    "prom_for_duration": 600,
-    "rule_config": {
-      "algo_params": null,
-      "inhibit": false,
-      "prom_ql": "",
-      "queries": [
-        {
-          "prom_ql": "kube_statefulset_status_replicas_ready != kube_statefulset_status_replicas",
-          "recover_config": {
-            "judge_type": 0,
-            "recover_exp": ""
-          },
-          "severity": 2,
-          "unit": "",
-          "var_config": {
-            "child_var_configs": null,
-            "param_val": null
-          },
-          "var_enabled": false
-        }
-      ],
-      "severity": 0
-    },
-    "event_relabel_config": null,
-    "prom_eval_interval": 15,
-    "enable_in_bg": 1,
-    "notify_recovered": 1,
-    "notify_repeat_step": 60,
-    "notify_max_number": 0,
-    "recover_duration": 0,
-    "callbacks": [],
-    "append_tags": [],
-    "annotations": {
-      "description": "StatefulSet does not match the expected number of replicas.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}",
-      "summary": "Kubernetes StatefulSet replicas mismatch (instance {{ $labels.instance }})"
-    },
-    "uuid": 0,
-    "cur_event_count": 0,
-    "update_by_nickname": "long",
-    "cron_pattern": "@every 60s",
-    "notify_rule_ids": [
-      1
-    ],
-    "notify_version": 1
-  },
-  {
-    "cate": "prometheus",
-    "datasource_queries": [
-      {
-        "match_type": 2,
-        "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesStatefulsetUpdateNotRolledOut",
@@ -1255,7 +1119,7 @@
       "prom_ql": "",
       "queries": [
         {
-          "prom_ql": "max without (revision) (kube_statefulset_status_current_revision unless kube_statefulset_status_update_revision) * (kube_statefulset_replicas != kube_statefulset_status_replicas_updated)",
+          "prom_ql": "max without (revision{env=\"prod\"}) (kube_statefulset_status_current_revision{env=\"prod\"} unless kube_statefulset_status_update_revision{env=\"prod\"}) * (kube_statefulset_replicas{env=\"prod\"} != kube_statefulset_status_replicas_updated{env=\"prod\"})",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -1297,64 +1161,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
-      }
-    ],
-    "name": "KubernetesVolumeFullInFourDays",
-    "note": "Kubernetes Volume {{ $labels.persistentvolumeclaim }} full in four days.",
-    "prod": "metric",
-    "delay": 0,
-    "prom_for_duration": 60,
-    "rule_config": {
-      "inhibit": false,
-      "queries": [
-        {
-          "prom_ql": "predict_linear(kubelet_volume_stats_available_bytes[6h:5m], 4 * 24 * 3600) < 0",
-          "recover_config": {
-            "judge_type": 0,
-            "recover_exp": ""
-          },
-          "severity": 1,
-          "unit": "",
-          "var_config": {
-            "child_var_configs": null,
-            "param_val": null
-          },
-          "var_enabled": false
-        }
-      ]
-    },
-    "event_relabel_config": null,
-    "prom_eval_interval": 15,
-    "enable_in_bg": 1,
-    "notify_recovered": 1,
-    "notify_repeat_step": 60,
-    "notify_max_number": 0,
-    "recover_duration": 0,
-    "callbacks": [],
-    "append_tags": [],
-    "annotations": {
-      "description": "Volume under {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is expected to fill up within four days. Currently {{ $value | humanize }}% is available.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}",
-      "summary": "Kubernetes Volume full in four days (instance {{ $labels.instance }})"
-    },
-    "uuid": 0,
-    "cur_event_count": 0,
-    "update_by_nickname": "long",
-    "cron_pattern": "@every 60s",
-    "notify_rule_ids": [
-      1
-    ],
-    "notify_version": 1
-  },
-  {
-    "cate": "prometheus",
-    "datasource_queries": [
-      {
-        "match_type": 2,
-        "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "KubernetesVolumeOutOfDiskSpace",
@@ -1366,7 +1177,7 @@
       "inhibit": true,
       "queries": [
         {
-          "prom_ql": "kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 20",
+          "prom_ql": "kubelet_volume_stats_available_bytes{env=\"prod\"} / kubelet_volume_stats_capacity_bytes{env=\"prod\"} * 100 < 20",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -1380,11 +1191,11 @@
           "var_enabled": false
         },
         {
-          "prom_ql": "kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 15",
+          "prom_ql": "kubelet_volume_stats_available_bytes{env=\"prod\"} / kubelet_volume_stats_capacity_bytes{env=\"prod\"} * 100 < 15",
           "severity": 2
         },
         {
-          "prom_ql": "kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 10",
+          "prom_ql": "kubelet_volume_stats_available_bytes{env=\"prod\"} / kubelet_volume_stats_capacity_bytes{env=\"prod\"} * 100 < 10",
           "severity": 1
         }
       ]

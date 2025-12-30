@@ -3,9 +3,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Disk - expected to be written full in 4 hours",
@@ -17,7 +19,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "predict_linear(disk_free{device='sda1',path=~\"/|/home\"}[1h], 4*3600) < 0",
+          "prom_ql": "predict_linear(disk_free{env=\"prod\",device='sda1',path=~\"/|/home\"}[1h], 4*3600) < 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -55,9 +57,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Disk - IO is a bit busy",
@@ -69,7 +73,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "rate(diskio_io_time{name='sda1'}[2m])/10 > 99",
+          "prom_ql": "rate(diskio_io_time{env=\"prod\",name='sda1'}[2m])/10 > 99",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -107,9 +111,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Disk - usage percent exceeds",
@@ -121,15 +127,15 @@
       "inhibit": true,
       "queries": [
         {
-          "prom_ql": "disk_used_percent{device=\"sda1\",path=~'/|/home'} > 80",
+          "prom_ql": "disk_used_percent{env=\"prod\",device=\"sda1\",path=~'/|/home'} > 80",
           "severity": 3
         },
         {
-          "prom_ql": "disk_used_percent{device=\"sda1\",path=~'/|/home'} > 85",
+          "prom_ql": "disk_used_percent{env=\"prod\",device=\"sda1\",path=~'/|/home'} > 85",
           "severity": 2
         },
         {
-          "prom_ql": "disk_used_percent{device=\"sda1\",path=~'/|/home'} > 90",
+          "prom_ql": "disk_used_percent{env=\"prod\",device=\"sda1\",path=~'/|/home'} > 90",
           "severity": 1
         }
       ]
@@ -155,7 +161,15 @@
   },
   {
     "cate": "host",
-    "datasource_queries": null,
+    "datasource_queries": [
+      {
+        "match_type": 0,
+        "op": "in",
+        "values": [
+          2
+        ]
+      }
+    ],
     "name": "Lost connection with monitoring target",
     "note": "",
     "prod": "host",
@@ -201,9 +215,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Machine load - high cpu load",
@@ -215,11 +231,7 @@
       "inhibit": true,
       "queries": [
         {
-          "prom_ql": "100 - cpu_usage_idle{cpu=\"cpu-total\"} > 85",
-          "severity": 2
-        },
-        {
-          "prom_ql": "100 - cpu_usage_idle{cpu=\"cpu-total\"} > 95",
+          "prom_ql": "100 - cpu_usage_idle{env=\"prod\",cpu=\"cpu-total\"} > 95",
           "severity": 1
         }
       ]
@@ -247,9 +259,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Machine load - high memory load",
@@ -261,11 +275,7 @@
       "inhibit": true,
       "queries": [
         {
-          "prom_ql": "100 - mem_available_percent > 85",
-          "severity": 2
-        },
-        {
-          "prom_ql": "100 - mem_available_percent > 95",
+          "prom_ql": "100 - mem_available_percent{env=\"prod\"} > 95",
           "severity": 1
         }
       ]
@@ -293,9 +303,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Network - number of TME_WAIT exceeds 20,000",
@@ -307,7 +319,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "netstat_tcp_time_wait > 20000",
+          "prom_ql": "netstat_tcp_time_wait{env=\"prod\"} > 20000",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -345,9 +357,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Network - packet loss in the inbound direction",
@@ -359,7 +373,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "increase(net_drop_in[2m]) > 0",
+          "prom_ql": "increase(net_drop_in{env=\"prod\"}[2m]) > 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -397,9 +411,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "Network - packet loss in the outbound direction",
@@ -411,7 +427,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "increase(net_drop_out[2m]) > 0",
+          "prom_ql": "increase(net_drop_out{env=\"prod\"}[2m]) > 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -449,9 +465,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "System - inode is about to run out",
@@ -463,7 +481,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "disk_inodes_used{device=\"sda1\",path=~\"/|/home\"}/disk_inodes_total{device=\"sda1\",path=~\"/|/home\"} *100 > 95",
+          "prom_ql": "disk_inodes_used{env=\"prod\",device=\"sda1\",path=~\"/|/home\"}/disk_inodes_total{env=\"prod\",device=\"sda1\",path=~\"/|/home\"} *100 > 95",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -501,9 +519,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "System - OOM kill",
@@ -515,7 +535,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "increase(kernel_vmstat_oom_kill[5m]) > 0",
+          "prom_ql": "increase(kernel_vmstat_oom_kill{env=\"prod\"}[5m]) > 0",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
@@ -553,9 +573,11 @@
     "cate": "prometheus",
     "datasource_queries": [
       {
-        "match_type": 2,
+        "match_type": 0,
         "op": "in",
-        "values": []
+        "values": [
+          2
+        ]
       }
     ],
     "name": "System - process too many",
@@ -567,7 +589,7 @@
       "inhibit": false,
       "queries": [
         {
-          "prom_ql": "processes_total > 600",
+          "prom_ql": "processes_total{env=\"prod\"} > 600",
           "recover_config": {
             "judge_type": 0,
             "recover_exp": ""
