@@ -57,7 +57,22 @@ iostat -dhx sda sdb 1 10
 ## iotop
 
 ```bash
-iotop -p xxx
+# args
+  -o, --only            only show processes or threads actually doing I/O
+  -b, --batch           non-interactive mode
+  -n NUM, --iter=NUM    number of iterations before ending [infinite]
+  -d SEC, --delay=SEC   delay between iterations [1 second]
+  -p PID, --pid=PID     processes/threads to monitor [all]
+  -u USER, --user=USER  users to monitor [all]
+  -P, --processes       only show processes, not all threads
+  -a, --accumulated     show accumulated I/O instead of bandwidth
+  -k, --kilobytes       use kilobytes instead of a human friendly unit
+  -t, --time            add a timestamp on each line (implies --batch)
+  -q, --quiet           suppress some lines of header (implies --batch)
+
+# example
+iotop -oPa
+
 ```
 
 ## pidstat
