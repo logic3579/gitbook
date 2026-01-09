@@ -59,7 +59,7 @@ gke-manager init
 ```bash
 
 # Install kubectl client
-KUBECTL_VERSION=v1.30.9
+KUBECTL_VERSION=v1.33.5
 curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
 sudo chmod +x ./kubectl && sudo mv ./kubectl /usr/bin/kubectl
 # Install helm client
