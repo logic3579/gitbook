@@ -397,6 +397,10 @@ helm search repo ingress-nginx
 
 # show
 helm show values [CHART] [flags]
+## example
+crane ls oci://registry-1.docker.io/cloudpirates/zookeeper
+helm show chart oci://registry-1.docker.io/cloudpirates/zookeeper
+helm show values oci://registry-1.docker.io/cloudpirates/zookeeper
 
 # status
 helm status RELEASE_NAME [flags]

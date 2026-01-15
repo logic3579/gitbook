@@ -30,7 +30,6 @@ PrivateKey = "wg0_key_content"
 # PreUp = /bin/example arg1 arg2 %i
 # PreDown = /bin/example arg1 arg2 %i
 PostUp = sysctl -w net.ipv4.ip_forward=1
-PostUp = sysctl -w net.ipv6.ip_forward=1
 #PostUp = iptables -I INPUT -p udp --dport 51820 -j ACCEPT
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
 PostUp = iptables -A FORWARD -o wg0 -j ACCEPT
@@ -65,13 +64,12 @@ sudo cat > /etc/wireguard/client0.conf << "EOF"
 #Address = 10.250.0.1/32
 Address = 10.250.0.2/32
 #DNS = 1.1.1.1,8.8.8.8
-PrivateKey = "wg0_key_content"
+PrivateKey = "client0_key_content"
 
 [Peer]
 AllowedIPs = 10.250.0.0/24
 Endpoint = server_public_ip:51820
-#PublicKey = "client0_pub_content"
-PublicKey = "client1_pub_content"
+PublicKey = "wg0_pub_content"
 PersistentKeepalive = 25
 EOF
 
