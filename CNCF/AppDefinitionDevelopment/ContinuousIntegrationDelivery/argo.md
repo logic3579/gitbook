@@ -24,7 +24,6 @@ helm update
 helm pull argo/argo-workflows --untar
 cd argo-workflows
 
-
 # configure and run
 vim values.yaml
 ...
@@ -42,11 +41,9 @@ curl -sLO https://github.com/argoproj/argo-workflows/releases/download/${ARGO_WO
 gunzip argo-linux-amd64.gz
 install -m 755 argo-linux-amd64 /usr/local/bin/argo && rm -f argo-linux-amd64
 
-
 # access argo-server
 kubectl -n argo port-forward deployment/argo-server --address=0.0.0.0 2746:2746
 # kubectl -n argo apply -f argo-ingress.yaml
-
 
 # switch authentication mode to server
 kubectl patch deployment \
@@ -54,7 +51,6 @@ kubectl patch deployment \
   --namespace argo \
   --type='json' \
   -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/args", "value": ["server","--auth-mode=server"]}]'
-
 
 # Fix argo namespace default serviceaccount permission problem:
 kubectl -n argo create rolebinding argo-cluster-role-default-binding --clusterrole=argo-cluster-role --serviceaccount=argo:default
@@ -101,10 +97,11 @@ helm -n cicd install argocd .
 #### argocd cli
 
 ```bash
-# install argocd cli latest version
-curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-install -m 555 argocd-linux-amd64 /usr/local/bin/argocd && rm -f argocd-linux-amd64
-
+# install latest stable version
+ARGOCD_CLI_VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION) 
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$ARGOCD_CLI_VERSION/argocd-linux-amd64 
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+rm argocd-linux-amd64
 
 # access argocd server
 # development env
@@ -112,12 +109,10 @@ kubectl -n argocd port-forward svc/argocd-server --address=0.0.0.0 8080:443
 # production env
 kubectl -n argocd apply -f argocd-ingress.yaml
 
-
 # argocd server infomation
 ARGOCD_SERVER=argocd.example.com
 ARGOCD_USERNAME=admin
 ARGOCD_PASSWORD=`kubectl -n argocd get secrets argocd-initial-admin-secret -ojsonpath='{.data.password}' |base64 -d`
-
 
 # argocd cli login
 argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD
