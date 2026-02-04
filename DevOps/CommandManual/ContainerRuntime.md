@@ -38,14 +38,14 @@ bin  lib  lib64
 # overwrite the default ENTRYPOINT
 docker run --rm -it --entrypoint sh hashicorp/terraform:latest
 
-# select container ip
+# get container ip
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container
 
-# reverse checking Dockerfile content
+# reverse-engineer Dockerfile content from image history
 docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin/sh -c \#(nop) *##g" |tac
 
 # commit
-docker commmit -m 'commit message' container_id repository/xxx/xxx:tag
+docker commit -m 'commit message' container_id repository/xxx/xxx:tag
 
 # build image
 docker build -t example/container:latest . -f Dockerfile
@@ -143,6 +143,7 @@ kubectl expose service/pod nginx --port=8888 --target-port=8080 --name=myname
 
 # run
 kubectl run busybox --rm -it --image=busybox --restart=Never -- sh
+kubectl run curl-test --rm -it --image=curlimages/curl --command -- sh # replace entrypoint
 
 # set
 kubectl set env deployments/my-app KEY_1=VAL_1 ... KEY_N=VAL_N
@@ -293,7 +294,7 @@ kubectl api-resources
 kubectl api-versions
 
 # config
-# select cluster config
+# view cluster config
 kubectl config current-context
 kubectl config get-clusters
 kubectl config get-contexts

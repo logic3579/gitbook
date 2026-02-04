@@ -33,13 +33,9 @@ docker logs rancher |grep Password
 
 ### Run On Kubernetes
 
-[[cc-k8s|deploy by kubernetes manifest]]
-
 ```bash
 #
 ```
-
-[[cc-helm|deploy by helm]]
 
 ```bash
 # Add and update repo

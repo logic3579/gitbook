@@ -15,7 +15,7 @@ am_i_root() {
         false
     fi
 }
-# Load Kafka environment variables
+# Load environment variables
 . /app/scripts/libenv.sh
 
 

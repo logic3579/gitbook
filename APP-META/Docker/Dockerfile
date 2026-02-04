@@ -1,14 +1,28 @@
-FROM busybox
+FROM ubuntu:latest
 
-# Set an environment variable
-ENV APP /knowledge
+# Switch to root user
+USER root
 
-# Create the directory
+# Do something as root
+RUN apt-get install -y net-tools \
+    curl \
+    wget
+
+# This directory is created by the build step in CICD workflow
+COPY --chown=app:app . .
+
+# Create and switch the work directory
 RUN mkdir $APP
 WORKDIR $APP
 
-# We copy the rest of the codebase into the image
-COPY . .
+# Switch to non-root user
+USER app
 
-#ENTRYPOINT ["/bin/entrypoint.sh"]
-CMD ["echo", "knowledge"]
+# Set environment variables
+ENV PORT=80
+
+# Expose port
+EXPOSE 80
+
+ENTRYPOINT ["/bin/entrypoint.sh"]
+CMD ["echo", "App started"]

@@ -5,46 +5,45 @@
 ### branch
 
 ```bash
-# 查看分支记录
+# get branch logs
 git log --graph --pretty=oneline --abbrev-commit
 
-# 查看所有远程分支
-git branch -r
-# 查看所有分支
+# get all branch
 git branch -a
+# get all remote branch
+git branch -r
 
-# 创建分支
+# create branch
 git branch dev
 
-# 创建并切换分支
-git checkout -b dev
-# 关联本地和远程分支
+# create and switch to branch
+git fetch && git checkout -b dev
+# link local and remote branch
 git branch --set-upstream-to=origin/dev dev
 git push dev
-#git push origin --set-upstream origin/dev dev
 
-# 创建本地分支并关联远程分支
-git fetch
-git checkout -b dev origin/dev
+# create local branch and track remote branch
+git fetch && git switch -c dev origin/dev
+git push dev
 
-# 拉取远程分支并切换到本地分支
-git fetch
-git switch -c dev origin/dev
-
-# 拉取所有远程分支（更新本地索引）
+# fetch all remote branches (update local index)
 git fetch --all
-# 更新远程分支到本地分支
+# update remote branch to local branch
 git pull
 
-# 合并分支到当前分支，fast-forward 模式
+# merge latest remote dev into current main
+git switch main
+git fetch origin dev:dev
 git merge dev
-# 删除分支后保留合并记录
-git merge --no-ff -m "merge with no-ff" dev
 
-# 删除本地分支
+# on dev branch, force update main to match dev
+git fetch origin
+git branch -f main develop
+git push origin main
+
+# delete local branch
 git branch -d --force dev
-git branch -D dev
-# 删除远程分支
+# delete remote branch
 git push origin --delete dev
 
 ```
@@ -52,39 +51,44 @@ git push origin --delete dev
 ### config
 
 ```bash
-# 设置别名
+# set alias
 git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit" [--global]
 
-# 保存认证信息
+# save credentials
 git config credential.helper 'cache --timeout=3600' [--global]
 git config credential.helper store [--global]
 git config user.name logic [--global]
 git config user.email logic3579@duck.com [--global]
 
-# 添加与查看关联远程仓库
+# add and view remote repository
 git remote add origin https://github.com/username/reponame.git
 git remote -v
+```
+
+### cherry-pick
+
+```bash
+# copy a specific commit to the current branch
+# useful for replaying a bug fix from main to dev, or vice versa
+git cherry-pick 4c805e2
 ```
 
 ### rebase
 
 ```bash
-# 分支变基
+# rebase branch
 git rebase
 ```
 
 ### stash
 
 ```bash
-# 暂存工作到堆栈去
+# stash current work to the stack
 git stash save "stash message for log"
-# 查看所有暂存堆栈
+# list all stash entries
 git stash list
-# 恢复暂存堆栈工作并删除 == git stash apply + git stash drop
+# restore stash and remove it from stack (= git stash apply + git stash drop)
 git stash pop
-# 复制某一个特定提交到当前分支，既可在 main 分支上修复 bug 后，在 dev 分支上可以重放这个修复过程
-# 也可以在 dev 分支上修复 bug，然后在 main 分支上重放
-git cherry-pick 4c805e2
 ```
 
 ### tag
@@ -110,30 +114,30 @@ git push origin --delete tag v1.0.0
 ### version control
 
 ```bash
-# 查看当前版本
+# view current version
 git rev-parse HEAD
 
-# 撤销 commit，但保留修改，修改内容回到暂存区（staged）
+# undo commit but keep changes in staging area (staged)
 git reset --soft HEAD~1
-# 撤销 commit，并把修改也取消暂存（保留工作区修改），修改仍存在但不在暂存区
+# undo commit and unstage changes (keep working directory modifications)
 git reset --mixed HEAD~1
-# 彻底撤销 commit，并丢掉所有改动
+# completely undo commit and discard all changes
 git reset --hard HEAD~1
 
-# 回退上一个版本
+# rollback to previous version
 git reset --hard HEAD^
-# 回退两个版本
+# rollback two versions
 git reset --hard HEAD^^
-# 回退10个版本
+# rollback 10 versions
 git reset --hard HEAD~10
-# 指定版本
+# rollback to specific version
 git reset --hard fd301d
 
-# 查看 git 每次执行命令
+# view git command history
 git reflog
-# 撤销修改区回到最新版本
+# discard working directory changes and restore to latest version
 git checkout -- file
-# 撤销添加暂存区回到修改区，撤销add 回到修改区
+# unstage file (undo git add, move back to working directory)
 git reset HEAD file
 ```
 

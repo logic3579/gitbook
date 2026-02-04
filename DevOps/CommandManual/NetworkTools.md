@@ -1,6 +1,6 @@
 # Network Tools
 
-## TCP && UCP
+## TCP & UDP
 
 ### arp && arping
 
@@ -368,6 +368,8 @@ time_total: %{time_total}
 ###
 ```
 
+## DNS
+
 ### dig
 
 ```bash
@@ -379,12 +381,12 @@ dig -t cname www.google.com
 # query dns request from root dns server
 dig +trace www.google.com
 
-# query dns request only ip infomation
+# query dns request only ip information
 dig +short www.google.com
-# query dns request only resolve infomation
+# query dns request only resolve information
 dig +noall +answer www.google.com
 
-# query dns request special dns server
+# query dns request from specific dns server
 dig www.google.com @8.8.8.8
 
 # reverse lookups
@@ -392,13 +394,13 @@ dig -x 8.8.8.8
 
 # get local dns server external ip
 dig +short TXT whoami.ds.akahelp.net
-"ns" "123.126.xx.xx" # ns 是本地机器使用的 DNS 出口IP地址
-"ecs" "120.52.xx.xx/32/24" # ecs（EDNS-client-subnet）记录是查询请求中携带的客户端子网
-"ip" "123.126.xx.xx" # ip 记录由权威名称服务器从 ecs 中选择的客户端代表IP地址，LocalDNS为了保护用户隐私不携带客户端真实IP
+"ns" "123.126.xx.xx" # ns: the DNS egress IP address used by the local machine
+"ecs" "120.52.xx.xx/32/24" # ecs (EDNS-client-subnet): the client subnet carried in the query request
+"ip" "123.126.xx.xx" # ip: the client representative IP selected by the authoritative nameserver from ecs, LocalDNS does not carry the real client IP for privacy
 
 # get local dns server ip address
 dig xxx.debug.danuoyi.tbcache.com
 
-# query dns request special EDNS
+# query dns request with specific EDNS client subnet
 dig www.google.com +subnet=1.1.1.0/24
 ```

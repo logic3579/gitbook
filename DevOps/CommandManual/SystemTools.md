@@ -40,9 +40,9 @@ sar -r 1 10
 
 ```bash
 # install
-apt install sysstat
+apt install strace
 
-#
+# trace system calls
 strace -c ls
 
 ```
@@ -99,14 +99,14 @@ stap -v sg.stp
 ## trap
 
 ```bash
-# 捕获 ctrl+c 信号，执行对应命令，只生效于当前环境
+# catch ctrl+c signal and execute command, only effective in the current shell session
 trap "exit" SIGINT
 trap "echo 'Received SIGINT signal'" SIGINT
 
-# 忽略信号
+# ignore signal
 trap "" SIGINT
 
-# 恢复默认信号处理方式
+# restore default signal handling
 trap - SIGINT
 
 
@@ -141,7 +141,7 @@ vmstat -ant 1
 ## watch
 
 ```bash
-# 查看系统软中断速率
+# monitor system soft interrupt rate
 watch -d cat /proc/softirqs
 ```
 
@@ -150,4 +150,3 @@ watch -d cat /proc/softirqs
 > 1. [Official systemtap Doc](https://sourceware.org/systemtap/documentation.html)
 > 2. [Ubuntu Install systemtap](https://wiki.ubuntu.com/Kernel/Systemtap#Systemtap_Installation)
 > 3. [IBM Documentation](https://www.ibm.com/docs/zh/power9/9080-M9S?topic=commands-vmstat-command)
-> 4. [timeing-with-curl](https://susam.net/blog/timing-with-curl.html)

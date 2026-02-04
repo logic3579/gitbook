@@ -16,12 +16,11 @@ About knowledge record and Technology stack.
 
 <!-- toc -->
 
-- [AI](#)
 - [APP-META](#)
 - [CNCF](#)
-- [Development](#)
+- [DevOps](#)
 - [Environment](#)
-- [Operations](#)
+- [Misc](#)
 - [Platform](#)
 - [Misc](#)
 <!-- tocstop -->

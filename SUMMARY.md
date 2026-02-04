@@ -2,11 +2,6 @@
 
 - [Introduction](./README.md)
 
-## AI
-
-- [Overview](./AI/README.md)
-- [prompt](./AI/prompt/README.md)
-
 ## APP-META
 
 - [Overview](./APP-META/README.md)
@@ -33,8 +28,11 @@
     - [RabbitMQ](./CNCF/AppDefinitionDevelopment/StreamingMessaging/rabbitmq.md)
     - [RocketMQ](./CNCF/AppDefinitionDevelopment/StreamingMessaging/rocketmq.md)
 - [CNAI](./CNCF/CNAI/README.md)
+  - [CICD](./CNCF/CNAI/CICD/README.md)
+    - [MLflow](./CNCF/CNAI/CICD/mlflow.md)
   - [Data Architecture](./CNCF/CNAI/DataArchitecture/README.md)
     - [ClickHouse](./CNCF/CNAI/DataArchitecture/clickhouse.md)
+    - [Flink](./CNCF/CNAI/DataArchitecture/flink.md)
   - [Data Science](./CNCF/CNAI/DataScience/README.md)
     - [PyTorch](./CNCF/CNAI/DataScience/pytorch.md)
     - [TensorFlow](./CNCF/CNAI/DataScience/tensorflow.md)

@@ -167,7 +167,7 @@ vim /etc/fstab
 ### others
 
 ```bash
-# 无需重启服务器,通过刷新磁盘数据总线方式获取新加磁盘
+# detect newly added disks by rescanning the SCSI bus without restarting the server
 for host in $(ls /sys/class/scsi_host);
 do
   echo "- - -" > /sys/class/scsi_host/$host/scan

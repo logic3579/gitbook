@@ -2,7 +2,7 @@
 
 ## awk
 
-### 基本语法
+### Basic Syntax
 
 ```bash
 awk [POSIX or GNU style options] -f progfile [--] file
@@ -11,9 +11,9 @@ POSIX options:          GNU long options: (standard)
         -F fs                   --field-separator=fs
         -v var=val              --assign=var=val
 
--F fs          # fs指定输入分隔符，fs 可以是字符串或正则表达式，如-F:
--v var=val     # 赋值一个用户定义变量，将外部变量传递给awk
--f progfile    # 从脚本文件中读取awk命令
+-F fs          # fs specifies the input field separator, can be a string or regex, e.g. -F:
+-v var=val     # assign a user-defined variable, pass external variables to awk
+-f progfile    # read awk commands from a script file
 
 
 # example
@@ -21,75 +21,73 @@ awk -F':' '{print $1}' /etc/passwd
 awk 'BEGIN { print "Don\47t Panic!" }'
 
 
-# 运行 awk 程序，打印每行输入流的第一列
+# run awk program, print the first column of each input line
 awk '{print $1}'
 
 
-# awk 文件方式执行
+# execute awk from file
 cat > demo.awk << "EOF"
 #! /bin/awk -f
 BEGIN { print "Don't Panic!" }
 EOF
-# 运行
+# run
 awk -f demo.awk top.txt
 chmod +x demo.awk && ./demo.awk
 ```
 
-### 变量
+### Variables
 
-| 变量        | 说明                                       |     |
-| ----------- | ------------------------------------------ | --- |
-| ARGC        | 命令行参数数量                             |     |
-| ARGIND      | 命令行中当前文件的位置（从0开始算）        |     |
-| ARGV        | 包含命令行参数的数组                       |     |
-| CONVFMT     | 数字转换格式（默认值为%.6g）               |     |
-| ENVIRON     | 环境变量关联数组                           |     |
-| ERRNO       | 最后一个系统错误的描述                     |     |
-| FIELDWIDTHS | 字段宽度列表（用空格键分隔）               |     |
-| FILENAME    | 当前输入文件的名称                         |     |
-| FNR         | 同NR，但相对于当前文件                     |     |
-| FS          | 字段分隔符（默认是任何空格）               |     |
-| IGNORECASE  | 如果为真，则进行忽略大小写的匹配           |     |
-| NF          | 表示字段数，在执行过程中对应于当前的字段数 |     |
-| NR          | 表示记录数，在执行过程中对应于当前的行号   |     |
-| FILENAME    | 当前输入文件的名                           |     |
-| OFMT        | 数字的输出格式（默认值是%.6g）             |     |
-| OFS         | 输出字段分隔符（默认值是一个空格）         |     |
-| ORS         | 输出记录分隔符（默认值是一个换行符）       |     |
-| RS          | 记录分隔符（默认是一个换行符）             |     |
-| RSTART      | 由match函数所匹配的字符串的第一个位置      |     |
-| RLENGTH     | 由match函数所匹配的字符串的长度            |     |
-| SUBSEP      | 当前输入文件的名                           |     |
-| FILENAME    | 数组下标分隔符（默认值是34）               |     |
+| Variable    | Description                                                    |
+| ----------- | -------------------------------------------------------------- |
+| ARGC        | Number of command-line arguments                               |
+| ARGIND      | Index of the current file in the command line (starts from 0)  |
+| ARGV        | Array containing command-line arguments                        |
+| CONVFMT     | Number conversion format (default: %.6g)                       |
+| ENVIRON     | Associative array of environment variables                     |
+| ERRNO       | Description of the last system error                           |
+| FIELDWIDTHS | Field width list (space-separated)                             |
+| FILENAME    | Name of the current input file                                 |
+| FNR         | Same as NR, but relative to the current file                   |
+| FS          | Field separator (default: any whitespace)                      |
+| IGNORECASE  | If true, perform case-insensitive matching                     |
+| NF          | Number of fields in the current record                         |
+| NR          | Number of records processed (current line number)              |
+| OFMT        | Output format for numbers (default: %.6g)                      |
+| OFS         | Output field separator (default: a space)                      |
+| ORS         | Output record separator (default: a newline)                   |
+| RS          | Record separator (default: a newline)                          |
+| RSTART      | Start position of the string matched by match()                |
+| RLENGTH     | Length of the string matched by match()                        |
+| SUBSEP      | Array subscript separator (default: \034)                      |
 
-### 函数 && 条件
+### Functions & Conditions
 
 ```bash
-# 常用函数
-# tolower()：字符转为小写。
-# length()：返回字符串长度。
-# substr()：返回子字符串。
-# sin()：正弦。
-# cos()：余弦。
-# sqrt()：平方根。
-# rand()：随机数。
+# common functions
+# tolower(): convert string to lowercase
+# length(): return string length
+# substr(): return substring
+# sin(): sine
+# cos(): cosine
+# sqrt(): square root
+# rand(): random number
 
-# 转换大写示例
+# convert to uppercase example
 awk -F ':' '{ print toupper($1) }' /etc/passwd
 
 
-# if 条件语句
+# if conditional statement
 awk -F ':' '{if ($1 > "m") print $1; else print "---"}' /etc/passwd
 
 ```
 
-### 常用用法
+### Common Usage
 
 ```bash
 awk 'BEGIN{ commands } pattern{ commands } END{ commands }'
-首先执行 BEGIN 语句块，只会执行一次。通常用于变量初始化，头行打印一些表头信息，在通过stdin读入数据前就被执行。
-每读取一行数据使用 pattern{ commands }循环处理数据。
-最后执行 END 语句块，只会执行一次，通常用于统计结果。
+# BEGIN block executes once before reading input, typically used for variable initialization and printing headers.
+# pattern{ commands } block executes for each input line.
+# END block executes once after all input is processed, typically used for summary statistics.
 
 # example
 cat /etc/passwd |awk  -F ':'  'BEGIN {print "name,shell"}  {print $1","$7} END {print "blue,/bin/nosh"}'
@@ -104,66 +102,66 @@ tee top.txt << "EOF"
       1 systemd   20   0    777    1884   6596 S   0.0   0.1  43:55.21  systemd
 EOF
 
-# 格式化输出
-# - 左对齐
-# %s 字符串
-# %d 十进制有符号整数
-# %u 十进制无符号整数
+# formatted output
+# - left-align
+# %s string
+# %d signed decimal integer
+# %u unsigned decimal integer
 awk '{printf "%-8s %-8s %-8s %-18s\n",NR, $1,$2,$12}' top.txt
 
-# 计算结果
+# calculate result
 awk 'BEGIN {sum=0} {printf "%-8s %-8s %-18s\n", $1, $9, $11; sum+=$9} END {print "cpu sum:"sum}' top.txt
 
-# 外部引用变量
+# reference external variable
 awk -v sum=0 '{printf "%-8s %-8s %-18s\n", $1, $9, $11; sum+=$9} END {print "cpu sum:"sum}' top.txt
 
-# 筛选
+# filtering
 awk 'NR>1 && $9>0 {printf "%-8s %-8s %-18s\n",$1,$9,$12}' top.txt
 awk 'NR==1 || $2~/tomcat/ {printf "%-8s %-8s %-8s %-18s\n",$1,$2,$9,$12}' top.txt
 
-# action 块筛选
+# action block filtering
 awk '{if($9>0){printf "%-8s %-8s %-8s %-18s\n",$1,$2,$9,$12}}' top.txt
 
-# 数组计算第二列的用户进程数量
+# array: count process number per user in column 2
 awk 'NR!=1{a[$2]++;} END {for (i in a) print i ", " a[i];}' top.txt
 
 
-# 数组操作
-# 获取长度
+# array operations
+# get length
 awk 'BEGIN{info="it is a test";lens=split(info,tA," ");print length(tA),lens;}'
-# 循环输出，下标从1开始
+# loop output, index starts from 1
 awk 'BEGIN{info="it is a test";split(info,tA," ");for(k in tA){print k,tA[k];}}'
 awk 'BEGIN{info="it is a test";tlen=split(info,tA," ");for(k=1;k<=tlen;k++){print k,tA[k];tlen;}}'
-# 判断 key in array（判断语法为 key in array）
+# check key in array (syntax: key in array)
 awk 'BEGIN{tB["a"]="a1";tB["b"]="b1";if("c" in tB){print "ok";};for(k in tB){print k,tB[k];}}'
-# 删除 key
+# delete key
 awk 'BEGIN{tB["a"]="a1";tB["b"]="b1";delete tB["a"];for(k in tB){print k,tB[k];}}'
 
 
-# 判断字符拆分输出文件
+# split output to different files based on pattern matching
 awk 'NR>1 {if($0~/tomcat/){printf "%-8s %-8s %-8s %-18s\n",$1,$2,$9,$12 > "1.txt"}else if($0~/root/){printf "%-8s %-8s %-8s %-18s\n",$1,$2,$9,$12 > "2.txt"}else{printf "%-8s %-8s %-8s %-18s\n",$1,$2,$9,$12 > "3.txt"}}' top.txt
 
 
-# 删除关键字 memory 的重复行
+# remove duplicate lines containing keyword "memory"
 awk '!seen[$0]++ || !/memory/' values.yaml
-# 删除并修改原文件
+# remove duplicates and modify original file
 awk '!seen[$0]++ || !/memory/' values.yaml > tmp && mv -v tmp values.yaml
 
 
-# 替换 ORS, 去除换行符
+# replace ORS, remove newlines
 awk 'BEGIN{ORS=""};{print $0}' x.txt
 
 ```
 
 ## grep
 
-### 基本语法
+### Basic Syntax
 
 ```bash
 
 ```
 
-### 常用用法
+### Common Usage
 
 ```bash
 
@@ -171,7 +169,7 @@ awk 'BEGIN{ORS=""};{print $0}' x.txt
 
 ## sed
 
-### 基本语法
+### Basic Syntax
 
 ```bash
 sed [OPTION]... {script-only-if-no-other-script} [input-file]...
@@ -184,20 +182,20 @@ sed [OPTION]... {script-only-if-no-other-script} [input-file]...
   -i[SUFFIX] edit files in place (makes backup if SUFFIX supplied)
 
 # action
-a\：追加行，a\的后面跟上字符串s(多行字符串可以用\n分隔)，则会在当前选择的行的后面都加上字符串s
-c\：替换行，c\后面跟上字符串s(多行字符串可以用\n分隔)，则会将当前选中的行替换成字符串s
-i\：插入行，i\后面跟上字符串s(多行字符串可以用\n分隔)，则会在当前选中的行的前面都插入字符串s
-d：删除行，该命令会将当前选中的行删除
-p：打印，该命令会打印当前选择的行到屏幕上
-y：替换字符，用法：y/Source-chars/Dest-chars/，分割字符/可以用任意单字符代替，用Dest-chars中对应位置的字符替换掉Soutce-chars中对应位置的字符
-s：替换字符串，用法：s/Regexp/Replacement/Flags，分隔字符/可以用其他任意单字符代替，用Replacement替换掉匹配字符串
+a\: append line after the current selected line
+c\: replace the current selected line with the given string
+i\: insert line before the current selected line
+d: delete the current selected line
+p: print the current selected line to stdout
+y: transliterate characters, usage: y/Source-chars/Dest-chars/, replace each character in Source-chars with the corresponding character in Dest-chars
+s: substitute string, usage: s/Regexp/Replacement/Flags, the delimiter / can be replaced with any single character
 
 # flags
-g：将用Replacement替换模版空间中所有匹配Regexp的部分，则不仅仅是第一个匹配部分
-digit：只用Replacement替换模版空间中第digit(digit是1至9)个匹配Regexp的部分
-p：若发生了替换操作，指示显示模版空间中新的数据
-w file-name：若发生了替换操作，指示将模版空间中新的数据写入指定的文件file-name中
-i：表示进行Regexp匹配时，是不区分大小写字母的
+g: replace all matches in the pattern space, not just the first
+digit: replace only the Nth match (digit is 1-9)
+p: if a substitution was made, print the pattern space
+w file-name: if a substitution was made, write the result to the specified file
+i: perform case-insensitive matching
 
 
 # example
@@ -228,7 +226,7 @@ sed -r 's/xxx[[::space::]]/root/' top.txt
 sed -i_bk_xx 's/tomcat/fff/p' top.txt
 ```
 
-### 常用用法
+### Common Usage
 
 ```bash
 # file
