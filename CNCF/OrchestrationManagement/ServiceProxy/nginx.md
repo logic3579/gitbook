@@ -64,7 +64,7 @@ cd /opt/nginx
 ```
 
 ### Config and Boot
-#### [[sc-nginx|Config]]
+#### [Config](/DevOps/ServiceConf/nginx.md)
 
 #### Boot(systemd)
 ```bash
@@ -182,7 +182,7 @@ docker run xxx
 ```
 
 ### Run On Kubernetes
-> k8s 集群建议使用 ingress-nginx-controller
+> For Kubernetes clusters, it is recommended to use ingress-nginx-controller
 ```bash
 ### for Nginx
 # add and update repo

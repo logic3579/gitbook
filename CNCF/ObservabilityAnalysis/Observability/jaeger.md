@@ -10,7 +10,7 @@ description: Jaeger
 
 ### Run On Docker
 
-all-in-one 部署，用于测试环境
+All-in-one deployment, for testing environments
 
 ```bash
 docker run -d --name jaeger \

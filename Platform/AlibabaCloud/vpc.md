@@ -1,89 +1,89 @@
 ---
-title: VPC 网络规划案例
+title: VPC Network Planning Guide
 categories:
   - Alicloud
 ---
 
-## 网段规划概述
+## CIDR Block Planning Overview
 
-### 1）规划网段的目的
+### 1) Purpose of CIDR Block Planning
 
-- 方便查看管理，相当于对某一个/多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。
-- 便于同集群/VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。
-- 区分多VPC/网络 环境，方便在打通网络时区分子网网段。
+- Easy to view and manage, similar to IP planning for one or more IDC data centers -- you can immediately identify ownership based on IP addresses.
+- Facilitates network and routing determination within the same cluster/VPC, as well as network isolation policies (whitelists).
+- Distinguishes multiple VPC/network environments, making it easy to differentiate subnet CIDR blocks when establishing network connectivity.
 
-### 2）规范化设计的方式
+### 2) Standardized Design Approach
 
-首先需要分清两类，是否有ACK 等集群类资源单独规划：
+First, you need to distinguish between two categories -- whether there are cluster-type resources such as ACK that require separate planning:
 
-1. 如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可
-1. 有集群资源，最好划分单独交换机部署常规资源，**独立交换机**部署集群资源。
+1. If there are no cluster resources (i.e., only conventional resources like RDS, ECS, etc.), simply define the VPC and vSwitches using standard private network CIDR blocks.
+2. If there are cluster resources, it is best to allocate separate vSwitches for deploying conventional resources and **dedicated vSwitches** for deploying cluster resources.
 
-由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。
-网段设计规范：
+Since production deployments, and the future trend in general, will mostly exist in cluster form on the cloud, we only discuss the second approach.
+CIDR block design specifications:
 
-- VPC可使用的私网网段：192.168.0.0/16、10.0.0.0/8、172.16.0.0/12及其子网，每个专有网络只能指定一个网段。
-- 交换机可使用的网段：需要<= VPC网段（子集）
+- Private CIDR blocks available for VPC: 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12 and their subnets. Each VPC can only specify one CIDR block.
+- CIDR blocks available for vSwitches: must be a subset of (<=) the VPC CIDR block.
 
 <!-- {% asset_img vpc1.png%} -->
 
-- VPC数量：创建多个VPC 时尽量使用不同网段
-- 集群数量：同账号下部署多集群时尽量使用不同网段
-- 如有ACK 集群资源时，需判断集群网络插件模式
-  - 非Terway 插件时，需要三个私网网段，如：10.1.0.0/16（VPC-vswitch）、192.168.0.0/24（Pod 使用）、192.168.10.0/24（Service 使用）
-  - 使用Terway 插件时，需要两个私网网段，如：10.16.0.0/8（VPC-vswitch + Pod）、192.168.0.0/24（Service 使用）
+- Number of VPCs: Use different CIDR blocks when creating multiple VPCs.
+- Number of clusters: Use different CIDR blocks when deploying multiple clusters under the same account.
+- When ACK cluster resources exist, determine the cluster network plugin mode:
+  - When not using the Terway plugin, three private CIDR blocks are needed, e.g.: 10.1.0.0/16 (VPC-vswitch), 192.168.0.0/24 (for Pods), 192.168.10.0/24 (for Services).
+  - When using the Terway plugin, two private CIDR blocks are needed, e.g.: 10.16.0.0/8 (VPC-vswitch + Pod), 192.168.0.0/24 (for Services).
 
-### 个人建议
+### Personal Recommendations
 
-- 同账号下（同环境）选择 192.168.0.0/16、10.0.0.0/0、172.16.0.0/12 进行VPC 创建组网。
-  - 不同集群与云产品资源之间使用子交换机分割。
-  - 使用云产品白名单或其他网络插件做网络隔离策略。
-- 不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。
+- Under the same account (same environment), use 192.168.0.0/16, 10.0.0.0/0, 172.16.0.0/12 to create VPCs and build the network.
+  - Use sub-vSwitches to separate different clusters and cloud product resources.
+  - Use cloud product whitelists or other network plugins for network isolation policies.
+- Different accounts (e.g., development, production) can reuse the same CIDR blocks for networking (cross-environment calls generally do not exist).
 
-- 当前环境网络组网信息（建议后续都使用Terway 插件）：
+- Current environment networking information (it is recommended to use the Terway plugin going forward):
 
-  - 日常环境网络架构
+  - Development environment network architecture
     <!-- {% asset_img vpc2.png %} -->
 
-  - 线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）
+  - Production network architecture (isolation between clusters and between clusters and cloud products is achieved through private vSwitch CIDR blocks)
     <!-- {% asset_img vpc3.png %} -->
 
-## 线上实际案例
+## Production Case Studies
 
-### 1）案例1
+### 1) Case 1
 
 <!-- {% asset_img vpc4.png %} -->
 
-- VPC：10.0.0.0/8 （复用线上VPC）
-- 交换机：新建4 台交换机
-  - test-swc-10_200_0_0_20 （可用区 1）
-  - test-swc-10_200_16_0_20 （可用区 2）
-  - test-swc-10_200_64_0_19 （可用区 1）
-  - test-swc-10_200_96_0_19 （可用区 2）
-- 集群CIDR规划
-  - Node CIDR：
+- VPC: 10.0.0.0/8 (reusing the production VPC)
+- vSwitches: Create 4 new vSwitches
+  - test-swc-10_200_0_0_20 (Availability Zone 1)
+  - test-swc-10_200_16_0_20 (Availability Zone 2)
+  - test-swc-10_200_64_0_19 (Availability Zone 1)
+  - test-swc-10_200_96_0_19 (Availability Zone 2)
+- Cluster CIDR Planning
+  - Node CIDR:
     - 10.200.0.0/20
     - 10.200.16.0/20
-  - Pod CIDR：
+  - Pod CIDR:
     - 10.200.64.0/19
     - 10.200.96.0/19
-  - Service CIDR：- 172.31.0.0/16
-    > 注意：
+  - Service CIDR: - 172.31.0.0/16
+    > Note:
     >
-    > - Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。
-    > - Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。
+    > - If high availability across different availability zones is required for Node and Pod vSwitches, each availability zone must have vSwitches available for both Nodes and Pods.
+    > - The Service CIDR block must not overlap with the VPC CIDR block or CIDR blocks used by existing Kubernetes clusters within the VPC.
 
-### 2）相关文档与工具
+### 2) Related Documentation and Tools
 
-- [云企业网工作原理与操作](https://help.aliyun.com/document_detail/189596.html)
+- [Cloud Enterprise Network (CEN) Working Principles and Operations](https://help.aliyun.com/document_detail/189596.html)
 
-- VPN网关原理与操作：
+- VPN Gateway Principles and Operations:
 
-  - [IPSec VPN 技术原理](https://cloud.tencent.com/developer/article/1824924)
-  - [Alicloud官方操作文档](https://help.aliyun.com/document_detail/65072.html)
+  - [IPSec VPN Technical Principles](https://cloud.tencent.com/developer/article/1824924)
+  - [Alicloud Official Operations Documentation](https://help.aliyun.com/document_detail/65072.html)
 
-- [子网计算在线工具](https://www.bejson.com/convert/subnetmask/)
+- [Subnet Calculator Online Tool](https://www.bejson.com/convert/subnetmask/)
 
-- 架构图
+- Architecture Diagram
 
-![总体网络架构.png](https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec)
+![Overall Network Architecture](https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec)

@@ -32,7 +32,7 @@ cd grafana-10.0.3
 
 ### Config and Boot
 
-[Grafana Config](/Operations/ServiceConf/grafana.md)
+[Grafana Config](/DevOps/ServiceConf/grafana.md)
 
 #### Boot(systemd)
 
@@ -133,7 +133,7 @@ persistence:
 imageRenderer:
   enabled: true
 ...
-helm -n monitorning install grafana .
+helm -n monitoring install grafana .
 ```
 
 ## Grafana Labs dashboards
@@ -216,51 +216,51 @@ curl "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<ms
 ### alerting config
 
 1. Dashboard --> edit panel --> create alert rule from this panel
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114504.png]]
+   ![Pasted image 20230821114504](./attachements/Pasted%20image%2020230821114504.png)
 
 2. Notifications --> add Labels(related Contact points)
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114732.png]]
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821114429.png]]
+   ![Pasted image 20230821114732](./attachements/Pasted%20image%2020230821114732.png)
+   ![Pasted image 20230821114429](./attachements/Pasted%20image%2020230821114429.png)
 
 3. Contact points --> Add template --> create notification template
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821143025.png]]
+   ![Pasted image 20230821143025](./attachements/Pasted%20image%2020230821143025.png)
 
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230822100216.png]]
+![Pasted image 20230822100216](./attachements/Pasted%20image%2020230822100216.png)
 
 ```html
 {{ define "tg_alert_template" -}} {{/* firing info */}} {{- if gt (len
 .Alerts.Firing) 0 -}} {{ range $index, $alert := .Alerts }} =========={{
-$alert.Status }}========== 告警名称: {{ $alert.Labels.alertname }} 告警级别: {{
-$alert.Labels.severity }} 告警详情: {{ $alert.Annotations.summary }};{{
-$alert.Annotations.description }} 故障时间: {{ ($alert.StartsAt.Add
-28800e9).Format "2006-01-02 15:04:05" }} 实例信息: {{ $alert.Labels.instance }}
-当前数值: {{ $alert.Values.B }} 静默告警: {{ .SilenceURL }} 告警大盘: {{
+$alert.Status }}========== Alert Name: {{ $alert.Labels.alertname }} Severity: {{
+$alert.Labels.severity }} Details: {{ $alert.Annotations.summary }};{{
+$alert.Annotations.description }} Fired At: {{ ($alert.StartsAt.Add
+28800e9).Format "2006-01-02 15:04:05" }} Instance: {{ $alert.Labels.instance }}
+Current Value: {{ $alert.Values.B }} Silence Alert: {{ .SilenceURL }} Dashboard: {{
 .DashboardURL }} ============END============ {{- end -}} {{- end }} {{/*
 resolved info */}} {{- if gt (len .Alerts.Resolved) 0 -}} {{ range $index,
-$alert := .Alerts }} =========={{ $alert.Status }}========== 告警名称: {{
-$alert.Labels.alertname }} 告警级别: {{ $alert.Labels.severity }} 告警详情: {{
-$alert.Annotations.summary }};{{ $alert.Annotations.description }} 故障时间: {{
-($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }} 恢复时间: {{
-($alert.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }} 实例信息: {{
-$alert.Labels.instance }} 当前数值: {{ $alert.Values.B }} 静默告警: {{
-.SilenceURL }} 告警大盘: {{ .DashboardURL }} ============END============ {{- end
+$alert := .Alerts }} =========={{ $alert.Status }}========== Alert Name: {{
+$alert.Labels.alertname }} Severity: {{ $alert.Labels.severity }} Details: {{
+$alert.Annotations.summary }};{{ $alert.Annotations.description }} Fired At: {{
+($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }} Resolved At: {{
+($alert.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }} Instance: {{
+$alert.Labels.instance }} Current Value: {{ $alert.Values.B }} Silence Alert: {{
+.SilenceURL }} Dashboard: {{ .DashboardURL }} ============END============ {{- end
 -}} {{- end }} {{- end -}}
 ```
 
 4. Contact points --> Add contact point --> create telegram contact point
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115559.png]]
+   ![Pasted image 20230821115559](./attachements/Pasted%20image%2020230821115559.png)
 
 ```html
 # Message {{ template "tg_alert_template" . }}
 ```
 
-![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230822100054.png]]
+![Pasted image 20230822100054](./attachements/Pasted%20image%2020230822100054.png)
 
 5. Notification policies --> New nested policy --> create new notification policy
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230821115717.png]]
+   ![Pasted image 20230821115717](./attachements/Pasted%20image%2020230821115717.png)
 
 6. Check alert notification
-   ![[/CNCF/ObservabilityAnalysis/Monitoring/attachements/Pasted image 20230823080802.png]]
+   ![Pasted image 20230823080802](./attachements/Pasted%20image%2020230823080802.png)
 
 > Reference:
 >

@@ -47,35 +47,35 @@ net.ipv4.tcp_mem = 786432 1048576 1572864
 net.ipv4.tcp_rmem = 4096 87380 4194304
 net.ipv4.tcp_wmem = 4096 16384 4194304
 net.ipv4.tcp_window_scaling = 1
-net.ipv4.tcp_sack = 1     # SACK 方法 = 默认为1，开启
-net.ipv4.tcp_dsack = 1    # D-SACK 方法 = 默认为1，开启
+net.ipv4.tcp_sack = 1     # SACK method = default is 1, enabled
+net.ipv4.tcp_dsack = 1    # D-SACK method = default is 1, enabled
 # socket buffer
 net.core.wmem_default = 8388608
 net.core.rmem_default = 8388608
 net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
 net.core.netdev_max_backlog = 262144
-net.ipv4.tcp_abort_on_overflow = 0    # 全连接队列满时内核行为 = 0为丢弃，1为reset
-net.core.somaxconn = 65535    # 全连接队列 = min(backlog, somaxconn)
+net.ipv4.tcp_abort_on_overflow = 0    # kernel behavior when accept queue is full = 0 means drop, 1 means reset
+net.core.somaxconn = 65535    # accept queue = min(backlog, somaxconn)
 net.core.optmem_max = 81920
 # TCP conn
-net.ipv4.tcp_max_syn_backlog = 262144    # 半连接队列 = (backlog, tcp_max_syn_backlog, somaxconn)
-net.ipv4.tcp_timestamps = 0    # 启用 RFC1323 中定义的时间戳，0为禁用，1为启用且随机偏移时间戳，2为启用但不使用随机偏移
-net.ipv4.tcp_tw_reuse = 0    # 允许内核重用处理 TIME_WAIT 状态的 TCP 连接
-net.ipv4.tcp_tw_recycle = 0    # 4.12以上版本内核已移除
-net.ipv4.tcp_fin_timeout = 1    # FIN_WAIT_2 TIME_WAIT 孤立连接状态超时时间
-net.ipv4.tcp_max_tw_buckets = 180000   # TIME_WAIT 状态最大数量
+net.ipv4.tcp_max_syn_backlog = 262144    # SYN backlog queue = (backlog, tcp_max_syn_backlog, somaxconn)
+net.ipv4.tcp_timestamps = 0    # enable timestamps defined in RFC1323, 0 means disabled, 1 means enabled with random offset, 2 means enabled without random offset
+net.ipv4.tcp_tw_reuse = 0    # allow kernel to reuse TCP connections in TIME_WAIT state
+net.ipv4.tcp_tw_recycle = 0    # removed in kernel version 4.12 and above
+net.ipv4.tcp_fin_timeout = 1    # timeout for orphaned connections in FIN_WAIT_2 and TIME_WAIT states
+net.ipv4.tcp_max_tw_buckets = 180000   # maximum number of TIME_WAIT state connections
 net.ipv4.tcp_max_orphans = 3276800
-net.ipv4.tcp_syn_retries = 1    # SYN_SENT 状态 SYN 包重试次数
-net.ipv4.tcp_synack_retries = 1    # SYN_RECV 状态 SYN+ACK 包重传次数
-net.ipv4.tcp_syncookies = 1    # 不使用半连接队列建立连接 = 0为不开启，1为仅半连接队列满时启用，2为直接启用
+net.ipv4.tcp_syn_retries = 1    # SYN packet retry count in SYN_SENT state
+net.ipv4.tcp_synack_retries = 1    # SYN+ACK packet retransmission count in SYN_RECV state
+net.ipv4.tcp_syncookies = 1    # establish connections without using SYN backlog queue = 0 means disabled, 1 means enabled only when SYN backlog queue is full, 2 means always enabled
 # keepalive conn
 net.ipv4.tcp_keepalive_time = 300
 net.ipv4.tcp_keepalive_intvl = 30
 net.ipv4.tcp_keepalive_probes = 3
 net.ipv4.ip_local_port_range = 10001 65000
 
-# 拥塞算法
+# congestion control algorithm
 net.ipv4.tcp_allowed_congestion_control = reno cubic bbr
 net.ipv4.tcp_available_congestion_control = reno cubic bbr
 net.ipv4.tcp_congestion_control = bbr
@@ -125,11 +125,11 @@ fs.file-max = 65535000
 # HTTP Headers，connection set to keep-alive，http/1.1 default os keep-alive
 Connection: keep-alive
 
-# server 端
-net.ipv4.tcp_fin_timeout = 1 # 缩减 time_wait 时间，设置为1s
-net.ipv4.tcp_max_tw_buckets = 180000   # TIME_WAIT 状态最大数量
-# 允许内核重用处理 TIME_WAIT 状态的 TCP 连接，两个必须同时开启
-net.ipv4.tcp_timestamps = 1    # 需要双方都启用
+# server side
+net.ipv4.tcp_fin_timeout = 1 # reduce time_wait duration, set to 1s
+net.ipv4.tcp_max_tw_buckets = 180000   # maximum number of TIME_WAIT state connections
+# allow kernel to reuse TCP connections in TIME_WAIT state, both must be enabled together
+net.ipv4.tcp_timestamps = 1    # must be enabled on both sides
 net.ipv4.tcp_tw_reuse = 1
 
 ```
@@ -141,9 +141,9 @@ net.ipv4.tcp_tw_reuse = 1
 CONNTRACK_MAX = RAMSIZE (in bytes) / 16384 / (ARCH / 32)
 size_of_mem_used_by_conntrack (in bytes) = CONNTRACK_MAX * sizeof(struct ip_conntrack) + HASHSIZE * sizeof(struct list_head)
 sizeof(struct ip_conntrack) = 352
-sizeof(struct list_head) = 2 * size_of_a_pointer（32 位系统的指针大小是 4 字节，64 位是 8 字节）
+sizeof(struct list_head) = 2 * size_of_a_pointer (pointer size is 4 bytes on 32-bit systems, 8 bytes on 64-bit)
 
-# 测试方法：压测工具不用 keep-alive 发请求，调大 nf_conntrack_tcp_timeout_time_wait，单机跑一段时间就能填满哈希表。观察响应时间的变化和服务器内存的使用情况。
+# Testing method: use a load testing tool to send requests without keep-alive, increase nf_conntrack_tcp_timeout_time_wait, run on a single machine for a period of time to fill up the hash table. Observe changes in response time and server memory usage.
 
 sysctl -p /etc/sysctl.d/90-conntrack.conf
 # select used conntrack count
@@ -152,12 +152,12 @@ sysctl net.netfilter.nf_conntrack_count
 # select conntrack info: apt install conntrack
 conntrack -L
 ipv4     2 tcp      6 26 TIME_WAIT src=172.28.2.2 dst=172.30.10.16 sport=35998 dport=443 src=172.30.10.16 dst=172.28.2.2 sport=443 dport=35998 [ASSURED] mark=0 use=1
-# 记录格式：
-# 网络层协议名、网络层协议编号、传输层协议名、传输层协议编号、记录失效前剩余秒数、连接状态、
-# 源地址、目标地址、源端口、目标端口： 第一次请求，第二次响应
-# flag：
-# [ASSURED]  请求和响应都有流量
-# [UNREPLIED]  没收到响应，哈希表满的时候这些连接先扔掉
+# record format:
+# network layer protocol name, network layer protocol number, transport layer protocol name, transport layer protocol number, seconds remaining before record expires, connection state,
+# source address, destination address, source port, destination port: first is the request, second is the response
+# flags:
+# [ASSURED]  traffic seen in both request and response directions
+# [UNREPLIED]  no response received, these connections are dropped first when hash table is full
 # network protocol
 conntrack -L -o extended | awk '{sum[$1]++} END {for(i in sum) print i, sum[i]}'
 # transport protocol
@@ -190,10 +190,10 @@ net.netfilter.nf_conntrack_tcp_timeout_last_ack = 30
 
 # unconntrack
 iptables -I INPUT 1 -m state --state UNTRACKED -j ACCEPT
-# 不跟踪本地连接：nginx 与应用都在本机时收益明显
+# do not track local connections: significant benefit when nginx and the application are on the same machine
 iptables -t raw -A PREROUTING -i lo -j NOTRACK
 iptables -t raw -A OUTPUT -o lo -j NOTRACK
-# 不跟踪其他端口连接
+# do not track connections on other ports
 iptables -t raw -A PREROUTING -p tcp -m multiport --dports 80,443 -j NOTRACK
 iptables -t raw -A OUTPUT -p tcp -m multiport --sports 80,443 -j NOTRACK
 
@@ -207,23 +207,23 @@ iptables -t raw -A OUTPUT -p tcp -m multiport --sports 80,443 -j NOTRACK
 ```bash
 # arp table cache full
 # kernel error message = arp_cache: neighbor table overflow!
-net.ipv4.neigh.default.gc_thresh1 = 128    # 超过此阈值时按 gc_interval 定期启动回收
-net.ipv4.neigh.default.gc_thresh2 = 512    # 超过此阈值每5s启动回收
-net.ipv4.neigh.default.gc_thresh3 = 1024   # 立即回收 arp 表
-net.ipv4.neigh.default.gc_interval = 30    # arp 表 gc 启动周期
-net.ipv4.neigh.default.gc_stale_time = 60  # stale 状态过期时间
+net.ipv4.neigh.default.gc_thresh1 = 128    # start periodic garbage collection per gc_interval when exceeding this threshold
+net.ipv4.neigh.default.gc_thresh2 = 512    # start garbage collection every 5s when exceeding this threshold
+net.ipv4.neigh.default.gc_thresh3 = 1024   # immediately garbage collect the arp table
+net.ipv4.neigh.default.gc_interval = 30    # arp table gc cycle interval
+net.ipv4.neigh.default.gc_stale_time = 60  # stale state expiration time
 
-# 0 （默认）响应任意接口上接收到的对本机IP地址（包括 lo 网卡）的 arp 请求
-# 1 仅当目标 IP 地址是传入接口上配置的本地地址时回复 arp 请求
-# 2 仅当目标 IP 地址是传入接口上配置的本地地址，并且两者与发送者的 IP 地址属于该接口上的同一子网时回复 arp 请求
+# 0 (default) respond to arp requests for any local IP address (including lo interface) received on any interface
+# 1 only reply to arp requests when the target IP address is a local address configured on the incoming interface
+# 2 only reply to arp requests when the target IP address is a local address configured on the incoming interface, and both the target and sender IP addresses belong to the same subnet on that interface
 # 4-7 reserved
-# 8 不回复任何 arp 请求
+# 8 do not reply to any arp requests
 net.ipv4.conf.all.arp_ignore = 0
 net.ipv4.conf.default.arp_ignore = 0
 
-# 0 （默认）使用任意接口配置的任意地址发送 ARP 响应
-# 1 发送 ARP 响应时，尽量使用本机所有接口上配置的 IP 地址中与目标 IP 在同一子网的地址作为源 IP 地址。如果没有这样的子网，根据级别2规则选择源地址
-# 2 发送 ARP 响应时，使用本机所有接口上配置的 IP 地址中最接近目标 IP 的地址作为源 IP 地址。
+# 0 (default) send ARP responses using any address configured on any interface
+# 1 when sending ARP responses, prefer using an IP address configured on any local interface that is in the same subnet as the target IP. If no such subnet exists, select the source address based on level 2 rules
+# 2 when sending ARP responses, use the IP address configured on any local interface that is closest to the target IP as the source IP address.
 net.ipv4.conf.all.arp_announce = 0             
 net.ipv4.conf.default.arp_announce = 0
 

@@ -40,7 +40,7 @@ apt install salt-master salt-minion [salt-api...]
 
 #### Config
 
-[[sc-saltstack|Salt Config]]
+[Salt Config](/DevOps/ServiceConf/saltstack.md)
 
 #### Boot(systemd)
 
@@ -89,7 +89,7 @@ salt-call pip.list
 salt-pip install <package name>
 ```
 
-## [How To Use](../../../../Operations/CommandManual/Automation.md#saltstack)
+## [How To Use](../../../../DevOps/CommandManual/Automation.md#saltstack)
 
 ### minion keys
 
@@ -135,6 +135,6 @@ salt-ssh '*' test.ping
 >
 > 1.  [Official Website](https://docs.saltproject.io/salt/user-guide/en/latest/topics/overview.html)
 > 2.  [Repository](https://github.com/saltstack/salt)
-> 3.  [saltstack 中文文档](https://docs.saltstack.cn/topics/tutorials/starting_states.html)
-> 4.  [saltstack 中文手册](https://github.com/watermelonbig/SaltStack-Chinese-ManualBook/blob/master/chapter05/05-11.Salt-Best-Practices.md)
+> 3.  [SaltStack Chinese Documentation](https://docs.saltstack.cn/topics/tutorials/starting_states.html)
+> 4.  [SaltStack Chinese Manual](https://github.com/watermelonbig/SaltStack-Chinese-ManualBook/blob/master/chapter05/05-11.Salt-Best-Practices.md)
 > 5.  [saltstack-formulas](https://github.com/saltstack-formulas)

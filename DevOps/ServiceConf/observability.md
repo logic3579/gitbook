@@ -40,14 +40,14 @@ templates:
 {{ define "email.html" }} {{ range .Alerts }}
 <pre>
 	========start==========
-   告警程序: prometheus_alert_email
-   告警级别: {{ .Labels.severity }} 级别
-   告警类型: {{ .Labels.alertname }}
-   故障主机: {{ .Labels.instance }}
-   告警主题: {{ .Annotations.summary }}
-   告警详情: {{ .Annotations.description }}
-   处理方法: {{ .Annotations.console }}
-   触发时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+   Alert Program: prometheus_alert_email
+   Alert Level: {{ .Labels.severity }}
+   Alert Type: {{ .Labels.alertname }}
+   Affected Host: {{ .Labels.instance }}
+   Alert Subject: {{ .Annotations.summary }}
+   Alert Details: {{ .Annotations.description }}
+   Resolution: {{ .Annotations.console }}
+   Trigger Time: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
    ========end==========
 </pre>
 {{ end }} {{ end }}
@@ -420,7 +420,7 @@ scrape_configs:
       refresh_interval: 5s
       port: 80
 
-  # 将 Docker Compose 的服务名作为 'app' 标签
+  # Use the Docker Compose service name as the 'app' label
   relabel_configs:
   - source_labels: [__meta_docker_container_label_com_docker_compose_service]
     target_label: app
@@ -429,13 +429,13 @@ scrape_configs:
     target_label: container_name
     replacement: '$1'
 
-  # 添加静态标签
+  # Add static labels
   - target_label: namespace
     replacement: 'revosurge'
   - target_label: node_name
     replacement: '${HOSTNAME:-unknow_node}'
 
-  # 过滤掉 Promtail 自己的日志，防止循环
+  # Filter out Promtail's own logs to prevent loops
   - source_labels: [__meta_docker_container_name]
     regex: '.*promtail.*'
     action: drop

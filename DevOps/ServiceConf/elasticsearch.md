@@ -14,38 +14,38 @@ xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: false
 
 # cluster node mode
-# 数据与日志目录
+# Data and log directories
 path.data: /opt/elasticsearch/data/
 path.logs: /opt/elasticsearch/logs/
-# 集群名称，同一集群必须相同
+# Cluster name, must be the same for all nodes in the same cluster
 cluster.name: es-cluster
-# 节点名称，不同节点使用不同名称
+# Node name, each node must use a different name
 node.name: node-1
-# 节点角色
+# Node roles
 node.roles: [master, data]
-# 监听端口
+# Listening port
 http.port: 9200
-# 监听地址，如果存在 docker 网卡时使用固定网卡地址
+# Listening address; use a fixed network interface address when a Docker network interface exists
 network.host: 0.0.0.0
-# 允许跨域
+# Enable CORS (Cross-Origin Resource Sharing)
 http.cors.enabled: true
 http.cors.allow-origin: "*"
-# xpack 安全功能配置
+# X-Pack security feature configuration
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: false
-# es7.x 版本以上集群发现
+# Cluster discovery for ES 7.x and above
 discovery.seed_hosts: ["1.1.1.1", "2.2.2.2", "3.3.3.3"]
-# 是否锁定内存，建议设置为 true
+# Whether to lock memory, recommended to set to true
 bootstrap.memory_lock: true
-# 启动全新的集群时需要此参数，再次重新启动时此参数可免。集群初始化master节点
+# This parameter is required when starting a brand new cluster; it can be omitted on subsequent restarts. Initial master nodes for cluster bootstrapping
 cluster.initial_master_nodes: ["node-1", "node-2", "node-3"]
 
-# es7.x 旧版本配置
-# 集群发现
+# Legacy configuration for older ES 7.x versions
+# Cluster discovery
 # discovery.zen.ping.unicast.hosts: ["1.1.1.1", "2.2.2.2", "3.3.3.3"]
 # discovery.zen.minimum_master_nodes: 2
 # cluster.initial_master_nodes: ["node-1", "node-2", "node-3"]
-# 集群角色
+# Cluster roles
 # node.master: true
 # node.data: true
 ```

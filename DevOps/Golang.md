@@ -543,7 +543,7 @@ type Student struct {
     dsli    []string  // default: nil
     dmap    map[string]int  // default: nil
 }
-var s1,s2,s3 Stuent
+var s1,s2,s3 Student
 // option1
 s1.dstr = "xxx"
 s1.dint = 11
@@ -1100,7 +1100,7 @@ func FunctionName(p1 paramType, p2 paramType) (returnType, returnType) {
 
 // positional parameter
 func add_cal(x int, y int) {
-    fmt.Pringln(x+y)
+    fmt.Println(x+y)
 }
 
 // indefinite length parameter
@@ -1525,7 +1525,7 @@ func main() {
 
     // others
     os.Remove(fname)
-    os.Mkdir(dname, os.ModelDir|os.ModePerm)
+    os.Mkdir(dname, os.ModeDir|os.ModePerm)
     os.Stat(fname)
 }
 ```

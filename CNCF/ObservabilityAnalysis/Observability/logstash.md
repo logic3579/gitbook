@@ -26,7 +26,7 @@ bin/logstash -f logstash.conf
 
 ### Config and Boot
 
-[Logstash config](/Operations/ServiceConf/logstash.md)
+[Logstash config](/DevOps/ServiceConf/observability.md)
 
 ```bash
 # boot

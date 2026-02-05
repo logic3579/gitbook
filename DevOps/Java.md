@@ -36,7 +36,7 @@ rainbow brackets # json
 
 ## 2. ProjectManage
 
-### [maven](../../Operations/CommandManual/BuildTools.md#maven)
+### [maven](./CommandManual/BuildTools.md#maven)
 
 ### gradle
 
@@ -71,41 +71,41 @@ $JAVA_ARGS
 
 ```
 
-### jvm 容器参数
+### JVM Container Parameters
 
-| 参数                                                                 | 说明                                                                                                                                                                                                                  |
+| Parameter                                                            | Description                                                                                                                                                                                                           |
 | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -XX:+UseContainerSupport                                             | <p>设置JVM检测所处容器的内存大小和处理器数量，而不是检测整个操作系统的。<br><br>JVM会使用上述检测到的信息进行资源分配，例如：-XX:InitialRAMPercentage和-XX:MaxRAMPercentage所设置的百分比就是基于此信息进行计算的</p> |
-| -XX:InitialRAMPercentage                                             | 设置JVM使用容器内存的初始百分比。建议与-XX:MaxRAMPercentage保持一致，推荐设置为70.0，代表JVM初始使用容器内存的70%                                                                                                     |
-| -XX:MaxRAMPercentage                                                 | 设置JVM使用容器内存的最大百分比。由于存在系统组件开销，建议最大不超过75.0，推荐设置为70.0，代表JVM最大使用容器内存的70%                                                                                               |
-| -XX:+PrintGCDetails                                                  | 输出GC详细信息                                                                                                                                                                                                        |
-| -XX:+PrintGCDateStamps                                               | 输出GC时间戳。日期形式，例如2019-12-24T21:53:59.234+0800                                                                                                                                                              |
-| -Xloggc:/home/admin/nas/gc-${POD\_IP}-$(date '+%s').log              | GC日志文件路径。需保证Log文件所在容器路径已存在，建议您将该容器路径挂载到NAS目录或收集到SLS，以便自动创建目录以及实现日志的持久化存储                                                                                 |
-| -XX:+HeapDumpOnOutOfMemoryError                                      | JVM发生OOM时，自动生成Dump文件。                                                                                                                                                                                      |
-| -XX:HeapDumpPath=/home/admin/nas/dump-${POD\_IP}-$(date '+%s').hprof | Dump文件路径。需保证Dump文件所在容器路径已存在，建议您将该容器路径挂载到NAS目录，以便自动创建目录以及实现日志的持久化存储                                                                                             |
+| -XX:+UseContainerSupport                                             | <p>Configures the JVM to detect the memory size and number of processors of the container it runs in, rather than detecting those of the entire operating system.<br><br>The JVM uses the detected information for resource allocation. For example, the percentages set by -XX:InitialRAMPercentage and -XX:MaxRAMPercentage are calculated based on this information.</p> |
+| -XX:InitialRAMPercentage                                             | Sets the initial percentage of container memory used by the JVM. It is recommended to keep this consistent with -XX:MaxRAMPercentage. The recommended value is 70.0, meaning the JVM initially uses 70% of container memory. |
+| -XX:MaxRAMPercentage                                                 | Sets the maximum percentage of container memory used by the JVM. Due to system component overhead, it is recommended not to exceed 75.0. The recommended value is 70.0, meaning the JVM uses at most 70% of container memory. |
+| -XX:+PrintGCDetails                                                  | Outputs detailed GC information.                                                                                                                                                                                      |
+| -XX:+PrintGCDateStamps                                               | Outputs GC timestamps in date format, e.g., 2019-12-24T21:53:59.234+0800.                                                                                                                                            |
+| -Xloggc:/home/admin/nas/gc-${POD\_IP}-$(date '+%s').log              | GC log file path. Ensure the container path where the log file resides already exists. It is recommended to mount this container path to a NAS directory or collect logs to SLS, to enable automatic directory creation and persistent log storage. |
+| -XX:+HeapDumpOnOutOfMemoryError                                      | Automatically generates a dump file when the JVM encounters an OOM error.                                                                                                                                             |
+| -XX:HeapDumpPath=/home/admin/nas/dump-${POD\_IP}-$(date '+%s').hprof | Dump file path. Ensure the container path where the dump file resides already exists. It is recommended to mount this container path to a NAS directory, to enable automatic directory creation and persistent log storage. |
 
-> \[!NOTE] 注意 Contents 使用-XX:+UseContainerSupport参数需JDK 8u191+、JDK 10及以上版本。 -XX:+UseContainerSupport参数仅在部分操作系统上支持，具体支持情况请查阅您所使用的Java版本的官方文档。 在JDK 11及之后的版本中，日志相关的参数-XX:+PrintGCDetails、-XX:+PrintGCDateStamps、-Xloggc:$LOG\_PATH/gc.log已被废弃，请使用参数-Xlog:gc:$LOG_PATH/gc.log代替。 Dragonwell 11不支持${POD_IP}变量。 如果您没有将/home/admin/nas容器路径挂载到NAS目录，则必须保证该目录在应用启动前已存在，否则将不会产生日志文件。
+> \[!NOTE] Note: Using the -XX:+UseContainerSupport parameter requires JDK 8u191+, JDK 10, or later versions. The -XX:+UseContainerSupport parameter is only supported on certain operating systems; please refer to the official documentation of your Java version for specific support details. In JDK 11 and later versions, the logging-related parameters -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, and -Xloggc:$LOG\_PATH/gc.log have been deprecated. Please use -Xlog:gc:$LOG_PATH/gc.log instead. Dragonwell 11 does not support the ${POD_IP} variable. If you have not mounted the /home/admin/nas container path to a NAS directory, you must ensure that the directory exists before the application starts; otherwise, no log files will be generated.
 
-### jvm 堆参数
+### JVM Heap Parameters
 
-| 参数                                                                 | 说明                                                                                                                                      |
+| Parameter                                                            | Description                                                                                                                               |
 | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| -Xms                                                                 | 设置JVM初始内存大小。建议与-Xmx相同，避免每次垃圾回收完成后JVM重新分配内存                                                                |
-| -Xmx                                                                 | 设置JVM最大可用内存大小。为避免容器OOM，请为系统预留足够的内存大小。                                                                      |
-| -XX:+PrintGCDetails                                                  | 输出GC详细信息                                                                                                                            |
-| -XX:+PrintGCDateStamps                                               | 输出GC时间戳。日期形式，例如2019-12-24T21:53:59.234+0800                                                                                  |
-| -Xloggc:/home/admin/nas/gc-${POD\_IP}-$(date '+%s').log              | GC日志文件路径。需保证Log文件所在容器路径已存在，建议您将该容器路径挂载到NFS\&NAS目录&收集到SLS，以便自动创建目录以及实现日志的持久化存储 |
-| -XX:+HeapDumpOnOutOfMemoryError                                      | JVM发生OOM时，自动生成Dump文件                                                                                                            |
-| -XX:HeapDumpPath=/home/admin/nas/dump-${POD\_IP}-$(date '+%s').hprof | Dump文件路径。需保证Dump文件所在容器路径已存在，建议您将该容器路径挂载到NAS目录，以便自动创建目录以及实现日志的持久化存储                 |
+| -Xms                                                                 | Sets the initial JVM memory size. It is recommended to set this the same as -Xmx to avoid JVM memory reallocation after each garbage collection. |
+| -Xmx                                                                 | Sets the maximum available JVM memory size. To avoid container OOM, reserve sufficient memory for the system.                             |
+| -XX:+PrintGCDetails                                                  | Outputs detailed GC information.                                                                                                          |
+| -XX:+PrintGCDateStamps                                               | Outputs GC timestamps in date format, e.g., 2019-12-24T21:53:59.234+0800.                                                                |
+| -Xloggc:/home/admin/nas/gc-${POD\_IP}-$(date '+%s').log              | GC log file path. Ensure the container path where the log file resides already exists. It is recommended to mount this container path to an NFS/NAS directory and collect logs to SLS, to enable automatic directory creation and persistent log storage. |
+| -XX:+HeapDumpOnOutOfMemoryError                                      | Automatically generates a dump file when the JVM encounters an OOM error.                                                                 |
+| -XX:HeapDumpPath=/home/admin/nas/dump-${POD\_IP}-$(date '+%s').hprof | Dump file path. Ensure the container path where the dump file resides already exists. It is recommended to mount this container path to a NAS directory, to enable automatic directory creation and persistent log storage. |
 
-| 内存规格大小 | JVM堆大小 |
-| ------------ | --------- |
-| 1GB          | 600 MB    |
-| 2GB          | 1434 MB   |
-| 3GB          | 2867 MB   |
-| 4GB          | 5734 MB   |
+| Memory Specification | JVM Heap Size |
+| -------------------- | ------------- |
+| 1GB                  | 600 MB        |
+| 2GB                  | 1434 MB       |
+| 3GB                  | 2867 MB       |
+| 4GB                  | 5734 MB       |
 
-> \[!NOTE] 内存规格参数说明 在JDK 11及之后的版本中，日志相关的参数-XX:+PrintGCDetails、-XX:+PrintGCDateStamps、-Xloggc:$LOG\_PATH/gc.log已被废弃，请使用参数-Xlog:gc:$LOG_PATH/gc.log代替。 Dragonwell 11不支持${POD_IP}变量。 如果您没有将/home/admin/nas容器路径挂载到NAS目录，则必须保证该目录在应用启动前已存在，否则将不会产生日志文件。
+> \[!NOTE] Memory specification parameter notes: In JDK 11 and later versions, the logging-related parameters -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, and -Xloggc:$LOG\_PATH/gc.log have been deprecated. Please use -Xlog:gc:$LOG_PATH/gc.log instead. Dragonwell 11 does not support the ${POD_IP} variable. If you have not mounted the /home/admin/nas container path to a NAS directory, you must ensure that the directory exists before the application starts; otherwise, no log files will be generated.
 
 > Reference:
 >

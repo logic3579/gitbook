@@ -4,60 +4,60 @@ description: jiracdflow
 
 # jiracdflow
 
-## 1. 简述
+## 1. Overview
 
-### a）流程介绍
+### a) Process Introduction
 
-#### 流程目的
+#### Process Purpose
 
-将 SQL、配置、代码使用工作流方式自动化升级，目前实现 UAT 环境走自动化流程升级。
+Automate the upgrade of SQL, configuration, and code using a workflow approach. Currently implemented for UAT environment automated upgrade process.
 
-#### 主要逻辑
+#### Main Logic
 
-1. 测试在发包后台系统填入升级数据，点击发布按钮会触发提交镜像 + 触发 jiracdflow 程序 /cicdflow/ 接口。
+1. Testers enter upgrade data in the release management system. Clicking the publish button triggers image submission + triggers the jiracdflow program's /cicdflow/ API endpoint.
 
-2. jiracdflow 程序 /cicdflow/ 接口与 Jira 交互逻辑
-   接口获取到发包系统 request_data 数据，根据 json 数据中的邮件标题字段是否存在触发对应操作：
+2. jiracdflow program /cicdflow/ API interaction logic with Jira
+   The API receives request_data from the release system and triggers corresponding operations based on whether the email title field exists in the JSON data:
 
-- 邮件不存在时：升级为首次升级，创建 Jira 工单，Jira webhook 触发 jiracdflow 程序 /cicdflow/jira/ 接口运行程序升级逻辑。
-- 邮件存在时：升级为 UAT 迭代升级，更新 Jira 工单数据，Jira webhook 触发 jiracdflow 程序 /cicdflow/jira/ 接口运行程序升级逻辑。
+- When email does not exist: This is a first-time upgrade. A Jira ticket is created, and the Jira webhook triggers the jiracdflow program's /cicdflow/jira/ API to run the upgrade logic.
+- When email exists: This is a UAT iterative upgrade. The Jira ticket data is updated, and the Jira webhook triggers the jiracdflow program's /cicdflow/jira/ API to run the upgrade logic.
 
-3. jiracdflow 程序 /cicdflow/jira 接口升级逻辑
-   > 以下字段数据新数据都从发包系统提交的 json 数据中获取，旧数据从上次升级 DB 保存数据获取
+3. jiracdflow program /cicdflow/jira API upgrade logic
+   > New field data is obtained from the JSON data submitted by the release system; old data is retrieved from the database saved during the last upgrade
 
-- sql_info 字段数据不为空或与上次升级存在差值时，Jira 工单状态进入 <SQL待执行> ，将 sql_info 数据提交到 Archery 后台，DBA 审核执行（审核执行权限可分离，后续执行交由运维或测试执行？）。Jira 流程触发 <提交SQL> 进入 <SQL执行中> 状态，等待 SQL 执行成功人工点击触发 <SQL执行成功> 进入下一流程。
-  ![[/Misc/attachements/Pasted image 20230316145506.png]]
+- When sql_info field data is not empty or differs from the last upgrade, the Jira ticket status enters <Pending SQL Execution>. The sql_info data is submitted to the Archery backend for DBA review and execution (review and execution permissions can be separated; subsequent execution can be delegated to ops or testers). The Jira workflow triggers <Submit SQL> to enter <SQL Executing> status, waiting for SQL execution success to be manually confirmed via <SQL Execution Successful> to proceed to the next step.
+  ![Pasted image 20230316145506](../attachements/Pasted%20image%2020230316145506.png)
 
-- apollo_info 或 config_info 字段数据不为空或与上次升级存在差值时，Jira 流程状态进入 <CONFIG执行中>，等待人工更新完配置后手动触发 <配置升级成功> 进入 <CODE执行中> 状态。
-  ![[/Misc/attachements/Pasted image 20230317165145.png]]
+- When apollo_info or config_info field data is not empty or differs from the last upgrade, the Jira workflow status enters <CONFIG Executing>, waiting for manual configuration updates and then manually triggering <Config Upgrade Successful> to enter <CODE Executing> status.
+  ![Pasted image 20230317165145](../attachements/Pasted%20image%2020230317165145.png)
 
-- code_info 字段数据不为空或与上次升级存在差值时，Jira 流程状态进入 <CODE执行中> 状态，程序调用 cmdb_api 执行升级代码操作，升级成功时自动触发 <代码升级成功> 进入 <UAT升级完成> 状态。
-  ![[/Misc/attachements/Pasted image 20230317170610.png]]
+- When code_info field data is not empty or differs from the last upgrade, the Jira workflow status enters <CODE Executing>. The program calls cmdb_api to execute the code upgrade operation. Upon successful upgrade, it automatically triggers <Code Upgrade Successful> to enter <UAT Upgrade Complete> status.
+  ![Pasted image 20230317170610](../attachements/Pasted%20image%2020230317170610.png)
 
-### b）使用前提
+### b) Prerequisites
 
-- Archery 后台部署配置
-  部署主机：172.22.1.69
-  部署路径：/opt/Archery-1.9.1/src/docker-compose
+- Archery Backend Deployment Configuration
+  Deployment host: 172.22.1.69
+  Deployment path: /opt/Archery-1.9.1/src/docker-compose
 
-- Jira 后台部署配置
-  部署主机：172.30.2.51
-  部署路径：/opt/py-project/jira-docker
+- Jira Backend Deployment Configuration
+  Deployment host: 172.30.2.51
+  Deployment path: /opt/py-project/jira-docker
 
-- jiracdflow 程序运行
-  部署主机：172.30.2.51
-  部署路径：/opt/py-project/jiracdflow
+- jiracdflow Program Deployment
+  Deployment host: 172.30.2.51
+  Deployment path: /opt/py-project/jiracdflow
 
-## 2. 部署和配置介绍
+## 2. Deployment and Configuration Guide
 
-> 应用启动没有顺序依赖，但相互之间调用存在依赖
+> Application startup has no order dependency, but there are dependencies between their API calls
 
-### a）接口应用：jiracdflow
+### a) API Application: jiracdflow
 
-#### 应用操作
+#### Application Operations
 
 ```bash
-# 启动 mysql
+# Start MySQL
 mkdir -p /opt/docker_volume
 docker run --name devops-mysql \
 -e MYSQL_ROOT_PASSWORD=123qwe \
@@ -67,26 +67,26 @@ docker run --name devops-mysql \
 -p 3306:3306 \
 -d mysql --character-set-server=utf8mb4
 
-# 配置文件调整
+# Configuration file adjustments
 vim jiracdflow/settings/dev.py
 vim uwsgi.ini
 
-# 进入应用家目录切换 Python 沙盒环境
+# Enter application home directory and activate Python virtual environment
 cd /opt/py-project/jiracdflow
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-# 启动/重启应用
+# Start/restart application
 uwsgi --ini uwsgi.ini
 uwsgi --reload logs/uwsgi.pid
 
-# 日志信息
-tail -f logs/app.log     # 应用日志输出
-tail -f logs/uwsgi.log   # console 输出
+# Log information
+tail -f logs/app.log     # Application log output
+tail -f logs/uwsgi.log   # Console output
 
 ```
 
-#### 接口操作
+#### API Operations
 
 ```bash
 /cicdflow/ 接口
@@ -327,32 +327,32 @@ vim ./jira/atlassian/dbconfig.xml
 ##### 系统配置
 
 - baseUrl：修改为与前台访问地址一致
-  ![[/Misc/attachements/Pasted image 20230809165349.png]]
+  ![Pasted image 20230809165349](../attachements/Pasted%20image%2020230809165349.png)
 - 添加电子邮件
-  ![[/Misc/attachements/Pasted image 20230320172954.png]]
+  ![Pasted image 20230320172954](../attachements/Pasted%20image%2020230320172954.png)
 - 添加 webhook：问题类型选择已新建与已更新，JQL 过滤工作流的事件
   AC webhook：project = AC and issuetype in (升级) and status in (SQL待执行, SQL执行中, CONFIG执行中,CODE执行中,"开发/运维修改")
 
 QC webhook：project = QC and issuetype in (升级) and status in (SQL待执行, SQL执行中, CONFIG执行中,CODE执行中,"开发/运维修改")
-![[/Misc/attachements/Pasted image 20230321082706.png]]
+![Pasted image 20230321082706](../attachements/Pasted%20image%2020230321082706.png)
 
 > 清理 webhook：delete from ao_4aeacd_webhook_dao;
 
 #### 问题配置
 
 - 问题类型：新建升级类型，关联问题类型方案到项目。问题类型方案设置 升级 为默认问题
-  ![[/Misc/attachements/Pasted image 20230321083556.png]]
+  ![Pasted image 20230321083556](../attachements/Pasted%20image%2020230321083556.png)
 - 工作流：新建 cdflow 工作流，关联工作流方案到项目
-  ![[/Misc/attachements/Pasted image 20230321084354.png]]
+  ![Pasted image 20230321084354](../attachements/Pasted%20image%2020230321084354.png)
 - 界面：修改界面字段配置，关联界面方案到项目
-  ![[/Misc/attachements/Pasted image 20230321084438.png]]
+  ![Pasted image 20230321084438](../attachements/Pasted%20image%2020230321084438.png)
 - 字段 + 自定义字段：新增字段，将字段关联到问题类型、项目、界面
-  ![[/Misc/attachements/Pasted image 20230413143904.png]] + 新增字段配置与字段配置方案，进行关联
-  ![[/Misc/attachements/Pasted image 20230321090812.png]]
+  ![Pasted image 20230413143904](../attachements/Pasted%20image%2020230413143904.png) + 新增字段配置与字段配置方案，进行关联
+  ![Pasted image 20230321090812](../attachements/Pasted%20image%2020230321090812.png)
 - 通知方案：新建通知方案，关联项目到通知方案中（通知方案通知组为新增 notice 组）
-  ![[/Misc/attachements/Pasted image 20230321093338.png]]
+  ![Pasted image 20230321093338](../attachements/Pasted%20image%2020230321093338.png)
 - 权限方案：新建权限方案，根据需求设置用户与组对项目操作的权限，关联权限方案到项目中
-  ![[/Misc/attachements/Pasted image 20230321093710.png]]
+  ![Pasted image 20230321093710](../attachements/Pasted%20image%2020230321093710.png)
 
 > cdflow 工作流：
 > 转换配置后处理功能：环境更改为 UAT 或 PRO

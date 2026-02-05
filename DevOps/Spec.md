@@ -5,10 +5,10 @@ description: Specification
 
 # Specification
 
-## 命名规范
+## Naming Conventions
 
 ```console
-<项目/业务线>-<应用/服务>-<环境>-<区域>-<资源类型/实例>
+<project/business-line>-<application/service>-<environment>-<region>-<resource-type/instance>
 
 myproject-myapp-prod-region-vm/db/mysql/lb
 algorithm-dev-asia-vm
@@ -19,4 +19,4 @@ platform-prod-euw1-mysql-master
 platform-prod-euw1-mysql-slave-01
 ```
 
-## GitHub 规范
+## GitHub Conventions

@@ -63,7 +63,7 @@ parted /dev/sda -- set 1 boot on
 parted /dev/sda -- mkpart primary linux-swap -2GB 100%
 ```
 
-![[/DevOps/System/attachements/nix-1.png]]
+![nix-1](./attachements/nix-1.png)
 
 ##### Formatting
 
@@ -348,7 +348,7 @@ cat > /etc/nixos/flake.nix << "EOF"
       system = "x86_64-linux";
       modules = [
         ./configuration.nix
-        # 将所有 inputs 参数设为所有子模块的特殊参数，子模块直接引用 inputs 中所有依赖项
+        # Set all inputs as special arguments for all submodules, allowing submodules to directly reference all dependencies in inputs
 		{ _module.args = { inherit inputs; };}
       ];
     };
@@ -428,30 +428,30 @@ cat > /etc/nixos/home.nix << "EOF"
   home.username = "logic";
   home.homeDirectory = "/home/logic";
 
-  # 直接将当前文件夹的配置文件，链接到 Home 目录下的指定位置
+  # Directly symlink config files from the current folder to the specified location under the Home directory
   # home.file.".config/i3/wallpaper.jpg".source = ./wallpaper.jpg;
 
-  # 递归将某个文件夹中的文件，链接到 Home 目录下的指定位置
+  # Recursively symlink files from a folder to the specified location under the Home directory
   # home.file.".config/i3/scripts" = {
   #   source = ./scripts;
-  #   recursive = true;   # 递归整个文件夹
-  #   executable = true;  # 将其中所有文件添加「执行」权限
+  #   recursive = true;   # Recurse into the entire folder
+  #   executable = true;  # Add execute permission to all files
   # };
 
-  # 直接以 text 的方式，在 nix 配置文件中硬编码文件内容
+  # Directly hardcode file contents as text in the nix config file
   # home.file.".xxx".text = ''
   #     xxx
   # '';
 
-  # 设置鼠标指针大小以及字体 DPI（适用于 4K 显示器）
+  # Set cursor size and font DPI (for 4K displays)
   # xresources.properties = {
   #   "Xcursor.size" = 16;
   #   "Xft.dpi" = 172;
   # };
 
-  # 通过 home.packages 安装一些常用的软件
-  # 这些软件将仅在当前用户下可用，不会影响系统级别的配置
-  # 建议将所有 GUI 软件，以及与 OS 关系不大的 CLI 软件，都通过 home.packages 安装
+  # Install common software via home.packages
+  # These packages will only be available for the current user and will not affect system-level configuration
+  # It is recommended to install all GUI software and CLI software not closely related to the OS via home.packages
   home.packages = with pkgs;[
     # archives
     zip
@@ -508,17 +508,17 @@ cat > /etc/nixos/home.nix << "EOF"
     usbutils # lsusb
   ];
 
-  # git 相关配置
+  # git configuration
   programs.git = {
     enable = true;
     userName = "Logic";
     userEmail = "logic3579@duck.com";
   };
 
-  # 启用 starship，这是一个漂亮的 shell 提示符
+  # Enable starship, a beautiful shell prompt
   programs.starship = {
     enable = true;
-    # 自定义配置
+    # Custom configuration
     settings = {
       add_newline = false;
       aws.disabled = true;
@@ -527,10 +527,10 @@ cat > /etc/nixos/home.nix << "EOF"
     };
   };
 
-  # alacritty - 一个跨平台终端，带 GPU 加速功能
+  # alacritty - a cross-platform terminal with GPU acceleration
   programs.alacritty = {
     enable = true;
-    # 自定义配置
+    # Custom configuration
     settings = {
       env.TERM = "xterm-256color";
       font = {
@@ -545,12 +545,12 @@ cat > /etc/nixos/home.nix << "EOF"
   programs.bash = {
     enable = true;
     enableCompletion = true;
-    # TODO 在这里添加你的自定义 bashrc 内容
+    # TODO add your custom bashrc content here
     bashrcExtra = ''
       export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
     '';
 
-    # TODO 设置一些别名方便使用，你可以根据自己的需要进行增删
+    # TODO set some aliases for convenience, you can add or remove based on your needs
     shellAliases = {
       k = "kubectl";
       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
@@ -586,7 +586,7 @@ vim /etc/nixos/flake.nix
         modules = [
           ./configuration.nix
 
-          # 将 home-manager 配置为 nixos 的一个 module
+          # Configure home-manager as a NixOS module
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -605,13 +605,13 @@ nixos-rebuild switch
 
 
 # all configuration
-# 自动生成的版本锁文件，它记录了整个 flake 所有输入的数据源、hash 值、版本号，确保系统可复现
+# Auto-generated version lock file, records all input data sources, hash values, and version numbers for the entire flake, ensuring system reproducibility
 /etc/nixos/flake.lock
-# flake 的入口文件，执行 sudo nixos-rebuild switch 时会识别并部署它
+# Entry file for the flake, recognized and deployed when running sudo nixos-rebuild switch
 /etc/nixos/flake.nix
-# 在 flake.nix 中被作为系统模块导入，目前所有系统级别的配置都写在此文件中
+# Imported as a system module in flake.nix, all system-level configuration is currently written in this file
 /etc/nixos/configuration.nix
-# 在 flake.nix 中被 home-manager 作为用户的配置导入，包含了用户的所有 Home Manager 配置，负责管理其 Home 文件夹
+# Imported by home-manager in flake.nix as the user configuration, contains all Home Manager settings for the user, responsible for managing the Home directory
 /etc/nixos/home.nix
 # hardware configuration
 /etc/nixos/hardware-configuration.nix
@@ -626,11 +626,11 @@ tree /etc/nixos
 ├── flake.lock
 ├── flake.nix
 ├── home
-│   ├── default.nix         # 在这里通过 imports = [...] 导入所有子模块
-│   ├── fcitx5              # fcitx5 中文输入法设置，我使用了自定义的小鹤音形输入法
+│   ├── default.nix         # Import all submodules here via imports = [...]
+│   ├── fcitx5              # fcitx5 Chinese input method settings, using a custom Xiaohe Shuangpin input method
 │   │   ├── default.nix
 │   │   └── rime-data-flypy
-│   ├── i3                  # i3wm 桌面配置
+│   ├── i3                  # i3wm desktop configuration
 │   │   ├── config
 │   │   ├── default.nix
 │   │   ├── i3blocks.conf
@@ -639,12 +639,12 @@ tree /etc/nixos
 │   ├── programs
 │   │   ├── browsers.nix
 │   │   ├── common.nix
-│   │   ├── default.nix   # 在这里通过 imports = [...] 导入 programs 目录下的所有 nix 文件
+│   │   ├── default.nix   # Import all nix files under the programs directory via imports = [...]
 │   │   ├── git.nix
 │   │   ├── media.nix
 │   │   ├── vscode.nix
 │   │   └── xdg.nix
-│   ├── rofi              # rofi 应用启动器配置，通过 i3wm 中配置的快捷键触发
+│   ├── rofi              # rofi application launcher configuration, triggered by shortcuts configured in i3wm
 │   │   ├── configs
 │   │   │   ├── arc_dark_colors.rasi
 │   │   │   ├── arc_dark_transparent_colors.rasi
@@ -653,7 +653,7 @@ tree /etc/nixos
 │   │   │   ├── rofidmenu.rasi
 │   │   │   └── rofikeyhint.rasi
 │   │   └── default.nix
-│   └── shell             # shell 终端相关配置
+│   └── shell             # shell terminal related configuration
 │       ├── common.nix
 │       ├── default.nix
 │       ├── nushell
@@ -663,16 +663,16 @@ tree /etc/nixos
 │       ├── starship.nix
 │       └── terminals.nix
 ├── hosts
-│   ├── msi-rtx4090      # PC 主机的配置
-│   │   ├── default.nix  # 之前的 configuration.nix，大部分内容都拆出到 modules
-│   │   └── hardware-configuration.nix  # 与系统硬件相关的配置，安装 nixos 时自动生成的
-│   └── my-nixos       # 测试用的虚拟机配置
+│   ├── msi-rtx4090      # PC host configuration
+│   │   ├── default.nix  # Former configuration.nix, most content has been split out to modules
+│   │   └── hardware-configuration.nix  # Hardware-related configuration, auto-generated during NixOS installation
+│   └── my-nixos       # Virtual machine configuration for testing
 │       ├── default.nix
 │       └── hardware-configuration.nix
-├── modules          # 从 configuration.nix 中拆分出的一些通用配置
+├── modules          # Common configuration split out from configuration.nix
 │   ├── i3.nix
 │   └── system.nix
-└── wallpaper.jpg    # 桌面壁纸，在 i3wm 配置中被引用
+└── wallpaper.jpg    # Desktop wallpaper, referenced in the i3wm configuration
 
 
 # repl lib
@@ -689,8 +689,8 @@ lib.mkAfter
 > Reference:
 >
 > 1. [NixOS Official Manual](https://nixos.org/manual/nix/stable/language/)
-> 2. [NixOS 与 Flakes](https://nixos-and-flakes.thiscute.world/)
-> 3. [NixOS 中文文档](https://nixos-cn.org/tutorials/lang/)
+> 2. [NixOS and Flakes](https://nixos-and-flakes.thiscute.world/)
+> 3. [NixOS Chinese Documentation](https://nixos-cn.org/tutorials/lang/)
 > 4. [NixOS Packages Search](https://search.nixos.org/packages)
 > 5. [NixOS Options Search](https://search.nixos.org/options)
 > 6. [Nix Home Manager Manual](https://nix-community.github.io/home-manager/index.xhtml)

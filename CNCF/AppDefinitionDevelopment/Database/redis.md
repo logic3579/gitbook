@@ -116,7 +116,7 @@ systemctl enable redis.service
 ```
 
 ### Verify
-[[Database#redis|Redis Command]]
+[Redis Command](/DevOps/CommandManual/Database.md#redis)
 
 ### Troubleshooting
 ```bash
@@ -199,4 +199,4 @@ kubectl -n middleware get service |grep redis
 > 1. [Official Website](https://redis.io/docs/getting-started/)
 > 2. [Repository](https://github.com/redis/redis)
 > 3. [Redis Download Releases](https://download.redis.io/releases/)
-> 4. [Redis 集群方案](https://segmentfault.com/a/1190000022028642)
+> 4. [Redis Cluster Solutions](https://segmentfault.com/a/1190000022028642)

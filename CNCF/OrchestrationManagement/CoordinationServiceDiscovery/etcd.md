@@ -132,7 +132,7 @@ docker exec etcd-gcr-v3.4.26 /usr/local/bin/etcdctl get foo
 
 ### Run On Kubernetes
 
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 
 ```bash
 # static pod
@@ -142,7 +142,7 @@ docker exec etcd-gcr-v3.4.26 /usr/local/bin/etcdctl get foo
 # https://www.zhaowenyu.com/etcd-doc/ops/etcd-install-k8s-daemon-set.html
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 
 ```bash
 # Add and update repo
@@ -169,4 +169,4 @@ OUE0bUVabWtqVQ==
 >
 > 1. [Official Website](https://etcd.io/)
 > 2. [Repository](https://github.com/etcd-io/etcd)
-> 3. [中文文档](https://www.zhaowenyu.com/etcd-doc/ops/etcd-install-k8s-static-pod.html)
+> 3. [Chinese Documentation](https://www.zhaowenyu.com/etcd-doc/ops/etcd-install-k8s-static-pod.html)

@@ -38,7 +38,7 @@ chown postgres:postgres /opt/pgsql -R
 
 ### Config and Boot
 
-[[sc-mysqld|Postgresql Config]]
+[Postgresql Config](/DevOps/ServiceConf/postgresql.md)
 
 ```bash
 # boot

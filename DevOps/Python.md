@@ -18,17 +18,17 @@ apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev l
 
 # build
 ./configure --prefix=/usr/local/python3_11_1 --enable-loadable-sqlite-extensions --enable-shared --enable-optimizations
-# 常用的编译参数
---enable-shared                         # 开启动态链接库支持，允许其他程序链接 Python 库
---enable-optimizations                  # 开启编译优化
---enable-ipv6                           # 开启 IPv6 支持
---enable-loadable-sqlite-extensions     # 允许动态加载 SQLite 扩展
---with-system-expat                     # 使用系统的 expat 库
---with-system-ffi                       # 使用系统的 ffi 库
---with-openssl=/usr/local/openssl1.11u  # 指定 OpenSSL 库的路径
---with-zlib=/usr/local/zlib             # 指定 zlib 库的路径
---with-bz2=/usr/local/bz2               # 指定 bzip2 库的路径
---with-tcltk=/usr/local/tcltk           # 指定 Tcl/Tk 库的路径
+# Common build parameters
+--enable-shared                         # Enable shared library support, allowing other programs to link against the Python library
+--enable-optimizations                  # Enable build optimizations
+--enable-ipv6                           # Enable IPv6 support
+--enable-loadable-sqlite-extensions     # Allow dynamically loading SQLite extensions
+--with-system-expat                     # Use the system expat library
+--with-system-ffi                       # Use the system ffi library
+--with-openssl=/usr/local/openssl1.11u  # Specify the path to the OpenSSL library
+--with-zlib=/usr/local/zlib             # Specify the path to the zlib library
+--with-bz2=/usr/local/bz2               # Specify the path to the bzip2 library
+--with-tcltk=/usr/local/tcltk           # Specify the path to the Tcl/Tk library
 
 # install
 make && make install

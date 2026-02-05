@@ -14,12 +14,12 @@ description: Portainer
 ```
 
 ### Run On Kubernetes
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 ```bash
 # 
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 ```bash
 ```
 

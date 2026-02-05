@@ -46,13 +46,13 @@ curl -v 127.0.0.1:80
 
 ### Run On Kubernetes
 
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 
 ```bash
 #
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 
 ```bash
 #

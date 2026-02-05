@@ -1,106 +1,106 @@
 ---
-title: Alicloud-RAM 与 STS 权限
+title: Alicloud RAM and STS Permissions
 categories:
   - Alicloud
 ---
 
-## 前言
+## Introduction
 
-当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：
+When calling cloud resources through OpenAPI interfaces (i.e., as an alternative to console operations), there are currently two approaches:
 
-- 通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）
-- Alicloud账号（RAM用户）/Alicloud服务（ECS等）/身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源
+- Direct invocation using AK+SK: as long as the account associated with the AK has the relevant permissions, it can call the corresponding resources (authorization is divided into system policies and custom policies).
+- Alicloud accounts (RAM users) / Alicloud services (ECS, etc.) / Identity providers (SSO) can assume a role to obtain temporary credentials for that role (by calling the AssumeRole API). Through these temporary credentials (with a configurable session duration), the temporary AK + temporary SK + temporary STS Token obtained via the STS API can be used to call the corresponding resources.
 
-## 官方概念介绍
+## Official Concepts
 
-1. STS概念
+1. STS Concept
 
-AlicloudSTS（Security Token Service）是Alicloud提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）
+Alicloud STS (Security Token Service) is a temporary access permission management service provided by Alicloud. RAM provides two types of identities: RAM users and RAM roles. RAM roles do not have permanent identity credentials and can only obtain temporary identity credentials with customizable validity periods and access permissions through STS, known as Security Tokens (STS Token).
 
-> [阿里云文档](https://help.aliyun.com/document_detail/28756.html)
+> [Alicloud Documentation](https://help.aliyun.com/document_detail/28756.html)
 
-2. RAM概念
+2. RAM Concept
 
-- RAM用户：身份实体，可访问Alicloud资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。
-- **RAM角色** 虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循Alicloudarn命名规范）。
-- RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。
+- RAM User: An identity entity, an account or program that can access Alicloud resources. When creating one, you can choose between console login or AccessKey scenarios (calling APIs programmatically).
+- **RAM Role**: A virtual user that grants authorization to trusted RAM entity accounts (issuing short-lived temporary access tokens based on STS tokens). After creating a role, an ARN descriptor is generated (the role descriptor: each RAM role has a unique value and follows the Alicloud ARN naming convention).
+- RAM Permission Policy: A set of permissions described using simple Policy syntax (divided into system policies and custom policies). A permission policy is the actual fine-grained description of authorized resource sets, operation sets, and authorization conditions.
 
 <!-- {% asset_img ram1.png %} -->
 
-> 创建RAM角色时有三种类型：
+> There are three types when creating a RAM role:
 >
-> - **Alicloud账号**：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的Alicloud账号，也可以属于其他Alicloud账号。此类角色主要用来解决跨账号访问和临时授权问题
-> - **Alicloud服务**：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）
->   - 普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略
->   - 服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略
->   - 两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户Alicloud跨服务间的调用，例如ECS的授予/收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）
+> - **Alicloud Account**: Roles that RAM users are allowed to assume. The RAM user assuming the role can belong to their own Alicloud account or to another Alicloud account. This type of role is mainly used to solve cross-account access and temporary authorization problems.
+> - **Alicloud Service**: Roles that cloud services are allowed to assume. This type of role is mainly used to authorize cloud services to perform resource operations on your behalf (services are further divided into two types):
+>   - Normal Service Role: You need to customize the role name, select the trusted service, and customize the permission policy.
+>   - Service-Linked Role: You only need to select the trusted cloud service; the cloud service comes with a preset role name and permission policy.
+>   - There is not much difference between the two service role types. Service-linked roles have an additional preset configuration (service roles are generally used for cross-service calls within Alicloud, such as ECS granting/revoking RAM role functionality, RDS cloud service calling KMS role encryption, etc. -- authorizing one cloud product to call another).
 
 <!-- {% asset_img ram2.png %} -->
 
-> - **身份提供商**：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与Alicloud的单点登录（SSO）
+> - **Identity Provider**: Roles that users under a trusted identity provider are allowed to assume. This type of role is mainly used to implement Single Sign-On (SSO) with Alicloud.
 >
-> **常用的RAM角色一般为创建 Alicloud账号 方式（OSS官方推荐使用）**
+> **The most commonly used RAM role type is the Alicloud Account method (officially recommended by OSS)**
 >
-> - 授权RAM角色介绍：[https://help.aliyun.com/document_detail/116819.html](https://help.aliyun.com/document_detail/116819.html)
-> - OSS官方推荐使用 Alicloud账号 方式：[https://help.aliyun.com/document_detail/100624.html](https://help.aliyun.com/document_detail/100624.html)
+> - RAM Role Authorization Introduction: [https://help.aliyun.com/document_detail/116819.html](https://help.aliyun.com/document_detail/116819.html)
+> - OSS officially recommends using the Alicloud Account method: [https://help.aliyun.com/document_detail/100624.html](https://help.aliyun.com/document_detail/100624.html)
 
-## 创建STS角色，自定义授权OSS功能测试
+## Creating an STS Role and Testing Custom OSS Authorization
 
-1）测试账号信息
-账号：devops_test@xxx.onaliyun.com
-AK：xxxxx
-SK：xxxxx
-ARN：acs:ram::xxxxx:role/xxx-sts
-OSS Bucket名称：oss-test
-OSS授权目录：dir111/dir111_secondline1/
+1) Test Account Information
+Account: devops_test@xxx.onaliyun.com
+AK: xxxxx
+SK: xxxxx
+ARN: acs:ram::xxxxx:role/xxx-sts
+OSS Bucket Name: oss-test
+OSS Authorized Directory: dir111/dir111_secondline1/
 
-2）进行授权
+2) Granting Authorization
 
-- 创建RAM用户（子账号），生成AK SK （此步骤忽略）
-- 测试账号添加STS权限
+- Create a RAM user (sub-account) and generate AK SK (this step is omitted)
+- Add STS permissions to the test account
 
 <!-- {% asset_img ram3.png %} -->
 
-- 添加权限策略，使用自定义策略授权（OSS官方示例Policy：[https://help.aliyun.com/document_detail/266627.html](https://help.aliyun.com/document_detail/266627.html)）
+- Add a permission policy using custom policy authorization (OSS official example Policy: [https://help.aliyun.com/document_detail/266627.html](https://help.aliyun.com/document_detail/266627.html))
 
 <!-- {% asset_img ram4.png %} -->
 
-- 添加RAM角色并授权Policy
+- Add a RAM role and authorize the Policy
 
 <!-- {% asset_img ram5.png %} -->
 
 <!-- {% asset_img ram6.png %} -->
 
-3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）
+3) Testing and Verification (when you cannot log in to the RAM account via the console to verify permissions, you can use ossutil or ossbrowser tools for verification)
 
-- ossutil使用：[https://help.aliyun.com/document_detail/50451.html](https://help.aliyun.com/document_detail/50451.html)
+- ossutil Usage: [https://help.aliyun.com/document_detail/50451.html](https://help.aliyun.com/document_detail/50451.html)
 
 <!-- {% asset_img ram7.png %} -->
 
-- ossbrowser使用：[https://help.aliyun.com/document_detail/92268.html](https://help.aliyun.com/document_detail/92268.html)
+- ossbrowser Usage: [https://help.aliyun.com/document_detail/92268.html](https://help.aliyun.com/document_detail/92268.html)
 
-4）验证列举和其他相关权限无误后，将ARN信息提供研发即可
+4) After verifying that listing and other related permissions are correct, provide the ARN information to the development team
 
-> 权限流程：
+> Permission Flow:
 >
-> 客户端程序/调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要**AliyunSTSAssumeRoleAccess**权限，因此对应RAM账号需要授权该系统策略）
-> 通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用
-> 客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）
+> The client program/caller initiates role assumption. Before obtaining the actual role permissions, it needs to call the AssumeRole API to return STS credentials (calling the STS API requires the **AliyunSTSAssumeRoleAccess** permission, so the corresponding RAM account must be authorized with this system policy).
+> The returned STS temporary credentials (temporary AK + temporary SK + temporary token) are used to call the relevant cloud resource APIs.
+> When the client uses STS to make calls, two permission policy sets are verified (Note: the final permission is the intersection of these two policies):
 
-> STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）
-> SDK/API调用时传入的policy_text参数值，在构造调用请求时传入（[阿里云文档](https://help.aliyun.com/document_detail/100624.html)
+> Whether the permission policy authorized to the role assumed by STS has permission for the corresponding cloud resources (system or custom Policy).
+> The policy_text parameter value passed in during SDK/API calls, included when constructing the call request ([Alicloud Documentation](https://help.aliyun.com/document_detail/100624.html))
 
 <!-- {% asset_img ram8.png %} -->
 
-## 结合实际需求
+## Practical Requirements
 
-1. 开发提出需求：需要某一个oss bucket的STS ARN信息
+1. Developer request: Need STS ARN information for a specific OSS bucket.
 
-2. 需要相关信息：
+2. Required information:
 
-- oss bucket具体需授权目录，必须
-- endpoint: oss bucket所属区域，非必须
-- bucket-name: oss bucket名称，必须
-- 调用OSS RAM账号，必须
+- The specific directory to authorize in the OSS bucket (required)
+- endpoint: The region of the OSS bucket (optional)
+- bucket-name: The OSS bucket name (required)
+- The RAM account used to call OSS (required)
 
-3. 通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。
+3. Based on the provided information, create a RAM role, create a new Policy (pay attention to fine-grained OSS policies), authorize the policy to the RAM role, and finally provide the ARN descriptor of the newly created RAM role to the development team.

@@ -65,14 +65,14 @@ export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 
 ```bash
 cat > config/zookeeper.properties << "EOF"
-# 初始延迟时间（心跳时间单位）
+# initial delay time (in heartbeat time units)
 tickTime=2000
 initLimit=10
 syncLimit=5
-# 集群时需配置 zk 数据与日志目录（单点伪集群使用不同目录）
+# cluster mode requires configuring zk data and log directories (pseudo-cluster on single node uses different directories)
 dataDir=/opt/kafka/zk-data
 dataLogDir=/opt/kafka/zk-logs
-# 集群时需配置服务通信与选举用端口（单点伪集群使用不同端口）
+# cluster mode requires configuring service communication and election ports (pseudo-cluster on single node uses different ports)
 server.0=192.168.1.1:2888:3888
 server.1=192.168.1.2:2888:3888
 server.2=192.168.1.3:2888:3888
@@ -294,7 +294,7 @@ systemctl enable kafka.service
 
 ### Verify
 
-[Kafka Command](/Operations/CommandManual/StreamingMessaging.md#kafka)
+[Kafka Command](/DevOps/CommandManual/StreamingMessaging.md#kafka)
 
 ## Deploy By Container
 
@@ -354,6 +354,6 @@ helm install -n middleware kafka . --create-namespace
 >
 > 1.  [Official Website](https://kafka.apache.org/documentation/)
 > 2.  [Repository](https://github.com/apache/kafka)
-> 3.  [storageclass 存储类官方说明](https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/)
-> 4.  [kafka kraft protocol](https://www.infoq.cn/article/j1jm5qehr1jiequby0ot)
-> 5.  [nfs-server 部署](/Operations/Network/nfs.md#csi-driver-nfs)
+> 3.  [StorageClass Official Documentation](https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/)
+> 4.  [Kafka KRaft Protocol](https://www.infoq.cn/article/j1jm5qehr1jiequby0ot)
+> 5.  [NFS Server Deployment](/DevOps/Network/nfs.md#csi-driver-nfs)

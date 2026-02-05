@@ -22,7 +22,7 @@ description: Fluentd and Fluent Bit
 
 #### Config and Boot
 
-[Fluentd Config](/Operations/ServiceConf/fluentd.md)
+[Fluentd Config](/DevOps/ServiceConf/observability.md)
 
 ```bash
 # change storage permission
@@ -77,19 +77,19 @@ helm -n logging install fluentd .
 
 ### Introduction
 
-**Fluent Bit** 是一个开源的多平台日志处理器工具，它旨在成为用于日志处理和分发的通用利器。
-如今，系统中信息源数量正在不断增加。处理大规模数据非常复杂，收集和汇总各种数据需要一种专门的工具，该工具可以解决如下问题:
+**Fluent Bit** is an open-source, multi-platform log processor tool designed to be a versatile solution for log processing and distribution.
+Today, the number of information sources in systems is continuously increasing. Handling large-scale data is complex, and collecting and aggregating various data requires a specialized tool that can address the following challenges:
 
-- 不同的数据源
-- 不同的数据格式
-- 数据可靠性
-- 安全性
-- 灵活的路由
-- 多目的地
-  Fluent Bit 在设计时就考虑了高性能和低资源消耗。
+- Different data sources
+- Different data formats
+- Data reliability
+- Security
+- Flexible routing
+- Multiple destinations
+  Fluent Bit was designed with high performance and low resource consumption in mind.
 
-**Fluent Bit & Fluentd 区别**
-Fluentd 和 Fluent Bit 都可以充当聚合器或转发器，它们可以互补使用或单独用作为解决方案。[详情](https://hulining.gitbook.io/fluentbit/about/fluentd-and-fluent-bit)
+**Differences between Fluent Bit & Fluentd**
+Both Fluentd and Fluent Bit can serve as aggregators or forwarders, and they can be used complementarily or independently as solutions. [Details](https://hulining.gitbook.io/fluentbit/about/fluentd-and-fluent-bit)
 
 ### Deploy By Binary
 
@@ -123,10 +123,10 @@ systemctl enable td-agent-bit.service
 
 ### Deploy By Container
 
-#### 相关概念
+#### Related Concepts
 
-Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每个节点上运行以从每个 POD 收集日志，因此 Fluent Bit 被部署为 DaemonSet(在集群的每个 node 上运行的 POD)。
-当 Fluent Bit 运行时，它将读取，解析和过滤每个 POD 的日志，并将使用以下信息(元数据)丰富每条数据:
+Kubernetes manages a cluster of nodes, so our log agent tool needs to run on every node to collect logs from each POD. Therefore, Fluent Bit is deployed as a DaemonSet (a POD that runs on every node in the cluster).
+When Fluent Bit runs, it reads, parses, and filters logs from each POD, and enriches each record with the following metadata:
 
 - Pod Name
 - Pod ID
@@ -135,21 +135,21 @@ Kubernetes 管理 nodes 集群，因此我们的日志代理工具需要在每�
 - Labels
 - Annotations
 
-#### 日志输出方式
+#### Log Output Methods
 
-当前集群环境容器日志都为 console 输出，分为两部分：
+Container logs in the current cluster environment are all console output, divided into two parts:
 
-- 输出到 Elasticsearch，用于 Kibana 前台搜索日志。
-- 输出到 forward 接口，接口由 fluentd 服务提供并持久化日志，本地存储15天，归档3个月日志到云存储（如 S3、GCS、OSS 等）。
+- Output to Elasticsearch, for searching logs via the Kibana frontend.
+- Output to the forward interface, provided by the fluentd service for log persistence, with 15 days of local storage and 3 months of log archiving to cloud storage (e.g., S3, GCS, OSS).
 
-#### helm 下载 charts 包
+#### Download Helm Charts Package
 
 ```bash
-# 创建可观测性 chart 包目录
+# create observability chart package directory
 mkdir /opt/helm-charts/logging
 cd /opt/helm-charts/logging
 
-# 添加 helm 仓库，下载 fluent-bit charts 包
+# add helm repository, download fluent-bit charts package
 helm repo add fluent https://fluent.github.io/helm-charts
 helm update
 helm pull fluent/fluent-bit --untar
@@ -165,7 +165,7 @@ vim values.yaml
         Exclude_path *fluent-bit-*,*fluentbit-*,*rancher-*,*cattle-*,*sysctl-*
         multiline.parser docker, cri
         Tag kube.*
-        # 指定tail插件使用的最大内存，如果达到限制，插件会停止采集，刷新数据后会恢复
+        # specify the maximum memory used by the tail plugin; if the limit is reached, the plugin stops collecting and resumes after flushing data
         Mem_Buf_Limit 15MB
         Buffer_Chunk_Size 1M
         Buffer_Max_Size 5M
@@ -177,14 +177,14 @@ vim values.yaml
         Name kubernetes
         Match kube.*
         Kube_Tag_Prefix kube.var.log.containers.
-        # 解析log字段的json内容，提取到根层级, 附加到Merge_Log_Key指定的字段上
+        # parse JSON content in the log field, extract to root level, append to the field specified by Merge_Log_Key
         Merge_Log Off
         Keep_Log Off
         K8S-Logging.Parser Off
         K8S-Logging.Exclude Off
         Labels Off
         Annotations Off
-    # nest过滤器主要是对包含pod_name的日志，在其字段中追加kubernetes_前缀
+    # nest filter adds kubernetes_ prefix to fields of logs containing pod_name
     [FILTER]
         Name         nest
         Match        kube.*
@@ -192,22 +192,22 @@ vim values.yaml
         Operation    lift
         Nested_under kubernetes
         Add_prefix   kubernetes_
-    # modify过滤器主要是调整部分kubernetes元数据字段名，同时追加一些额外的字段
+    # modify filter adjusts some kubernetes metadata field names and appends additional fields
     [FILTER]
         Name modify
         Match kube.*
-        # 将log字段重命名为message
+        # rename the log field to message
         Rename log message
-        # 移除冗余 kubernetes 字段数据
+        # remove redundant kubernetes field data
         Remove kubernetes_container_image
         Remove kubernetes_container_hash
-    # 将错误日志由多行转为一行
+    # convert multiline error logs into a single line
     [FILTER]
         name multiline
         match kube.*
         multiline.key_content message
         multiline.parser multiline_stacktrace_parser
-    # 自定义lua函数过滤，设置 es 索引名称字段
+    # custom lua function filter to set the ES index name field
     [FILTER]
         Name    lua
         Match   kube.*
@@ -244,7 +244,7 @@ vim values.yaml
         rule "cont"             "/^\s+at.*/"                               "cont"
 
   extraFiles:
-      # 自定义 lua 文件
+      # custom lua file
       fluentbit.lua: |
         function set_index(tag, timestamp, record)
             prefix = "logstash-uat"
@@ -258,7 +258,7 @@ vim values.yaml
         end
 ```
 
-#### 配置启动
+#### Configuration and Startup
 
 ```bash
 # config
@@ -282,39 +282,39 @@ config:
         Exclude_path *fluent-bit-*,*fluentbit-*,*rancher-*,*cattle-*,*sysctl-*
         multiline.parser docker, cri
         Tag kube.*
-        # 指定tail插件使用的最大内存，如果达到限制，插件会停止采集，刷新数据后会恢复
+        # specify the maximum memory used by the tail plugin; if the limit is reached, the plugin stops collecting and resumes after flushing data
         Mem_Buf_Limit 15MB
-        # 初始buffer size
+        # initial buffer size
         Buffer_Chunk_Size 1M
-        # 每个文件的最大buffer size
+        # maximum buffer size per file
         Buffer_Max_Size 5M
-        # 跳过长度大于 Buffer_Max_Size 的行，Skip_Long_Lines 若设为Off遇到超过长度的行会停止采集
+        # skip lines longer than Buffer_Max_Size; if Skip_Long_Lines is set to Off, collection stops when encountering oversized lines
         Skip_Long_Lines On
-        # 跳过空行
+        # skip empty lines
         Skip_Empty_Lines On
-        # 监控日志文件 refresh 间隔
+        # log file monitoring refresh interval
         Refresh_Interval 10
-        # 采集文件没有数据库偏移位置记录的，从文件的头部开始读取，日志文件较大时会导致fluent内存占用率升高出现oomkill
+        # for files without a database offset position record, read from the beginning of the file; large log files may cause high fluent memory usage and OOMKill
         #Read_from_Head On
   filters: |
     [FILTER]
         Name kubernetes
         Match kube.*
-        # 当源日志来自tail插件，用于指定tail插件使用的前缀值
+        # when source logs come from the tail plugin, specify the prefix value used by the tail plugin
         Kube_Tag_Prefix kube.var.log.containers.
-        # 解析log字段的json内容，提取到根层级, 附加到Merge_Log_Key指定的字段上
+        # parse JSON content in the log field, extract to root level, append to the field specified by Merge_Log_Key
         Merge_Log Off
-        # 合并log字段后是否保持原始log字段
+        # whether to keep the original log field after merging
         Keep_Log Off
-        # 允许Kubernetes Pod 建议预定义的解析器
+        # allow Kubernetes Pods to suggest predefined parsers
         K8S-Logging.Parser Off
-        # 允许Kubernetes Pod 从日志处理器中排除其日志
+        # allow Kubernetes Pods to exclude their logs from the log processor
         K8S-Logging.Exclude Off
-        # 是否在额外的元数据中包含 Kubernetes 资源标签信息
+        # whether to include Kubernetes resource label information in additional metadata
         Labels Off
-        # 是否在额外的元数据中包括 Kubernetes 资源信息
+        # whether to include Kubernetes resource information in additional metadata
         Annotations Off
-    # nest过滤器主要是对包含pod_name的日志，在其字段中追加kubernetes_前缀
+    # nest filter adds kubernetes_ prefix to fields of logs containing pod_name
     [FILTER]
         Name         nest
         Match        kube.*
@@ -322,39 +322,39 @@ config:
         Operation    lift
         Nested_under kubernetes
         Add_prefix   kubernetes_
-    # modify过滤器主要是调整部分kubernetes元数据字段名，同时追加一些额外的字段
+    # modify filter adjusts some kubernetes metadata field names and appends additional fields
     [FILTER]
-        # 使用modify过滤器
+        # use modify filter
         Name modify
         Match kube.*
-        # 将log字段重命名为message
+        # rename the log field to message
         Rename log message
-        # 将kubernetes_host字段重命名为host_ip
+        # rename the kubernetes_host field to host_ip
         Rename kubernetes_host host_ip
-        # 将kubernetes_pod_name字段重命名为host
+        # rename the kubernetes_pod_name field to host
         Rename kubernetes_pod_name host
-        # 移除所有匹配kubernetes_的字段
+        # remove all fields matching kubernetes_
         # Remove_wildcard kubernetes_
-    # 将错误日志由多行转为一行
+    # convert multiline error logs into a single line
     [FILTER]
         name multiline
         match kube.*
         multiline.key_content message
         multiline.parser multiline_stacktrace_parser
-    # 自定义lua函数过滤，设置 es 索引名称字段
+    # custom lua function filter to set the ES index name field
     [FILTER]
         Name    lua
         Match   kube.*
         script  /fluent-bit/etc/fluentbit.lua
         call    set_index
-    # 自定义lua函数过滤，新增local_time字段，用于es查询
+    # custom lua function filter to add local_time field for ES queries
     [FILTER]
         Name    lua
         Match   kube.*
         script  /fluent-bit/etc/add_local_time.lua
         call    add_local_time
   outputs: |
-    # 输出到 ES 相关配置
+    # output to ES configuration
     [OUTPUT]
         Name es
         Match kube.*
@@ -429,25 +429,25 @@ EOF
 helm -n logging install fluent-bit-uat .
 ```
 
-**快速部署 fluent-bit & es 服务（仅用于测试环境）**
+**Quick deployment of fluent-bit & ES services (for testing environments only)**
 
 ```bash
 kubectl create -f https://raw.githubusercontent.com/fluent/fluent-bit-kubernetes-logging/master/output/elasticsearch/fluent-bit-ds.yaml
 ```
 
-### OUTPUT 插件服务相关配置
+### OUTPUT Plugin Service Configuration
 
-#### Elasticsearch 配置
+#### Elasticsearch Configuration
 
 ```bash
-# elasticsearch 部署配置：略
+# elasticsearch deployment configuration: omitted
 
 
-# ES 调整配置
-# 1、写入的索引名称定义，通过 fluent-bit 写入前定义好 index 名称
-# 2、分词器安装
+# ES tuning configuration
+# 1. define the index name for writes; the index name is defined in fluent-bit before writing
+# 2. install tokenizer plugin
 ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v8.4.3/elasticsearch-analysis-ik-8.4.3.zip
-# 3、索引模板创建：副本数、分片、生命周期策略设置
+# 3. create index template: set replicas, shards, and lifecycle policy
 curl -X PUT 'http://elasticsearch:9200/_template/logstash_template' \
 -H 'Content-Type: application/json' \
 -d '{
@@ -528,15 +528,15 @@ curl -X PUT 'http://elasticsearch:9200/_template/logstash_template' \
 
 ```
 
-#### Logstash 配置
+#### Logstash Configuration
 
 ```bash
-# 下载解压
+# download and decompress
 cd /opt
 wget https://artifacts.elastic.co/downloads/logstash/logstash-8.4.3-linux-x86_64.tar.gz
 tar xf logstash-8.4.3-linux-x86_64.tar.gz && rm -f logstash-8.4.3-linux-x86_64.tar.gz
 
-# 配置
+# configure
 mkdir -p config/conf.d/
 cat > config/conf.d/logstash.conf << "EOF"
 # filebeat input

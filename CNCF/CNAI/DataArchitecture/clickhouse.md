@@ -84,68 +84,68 @@ vim /etc/clickhouse-backup/config.yml
 Command
 
 ```bash
-# 备份所有表
+# backup all tables
 clickhouse-backup create backup_$(date +%Y%m%d_%H%M%S)
-# 备份指定表
+# backup specific tables
 clickhouse-backup create --tables="mydb.mytable" backup_mytable_$(date +%Y%m%d)
-# 仅备份 schema
+# backup schema only
 clickhouse-backup create --schema backup_schema_$(date +%Y%m%d)
-# 备份 RBAC 对象
+# backup RBAC objects
 clickhouse-backup create --rbac backup_with_rbac
-# 备份特定分区
+# backup specific partitions
 clickhouse-backup create --partitions="202401,202402" backup_partitions
 
-# 上传指定备份
+# upload specific backup
 clickhouse-backup upload backup_20250101_120000
-# 上传增量备份（基于之前的备份）
+# upload incremental backup (based on a previous backup)
 clickhouse-backup upload --diff-from-remote=backup_20250101 backup_20250102
-# 可恢复上传（支持断点续传）
+# resumable upload (supports resuming interrupted transfers)
 clickhouse-backup upload --resumable backup_20250101_120000
 
-# 创建备份并直接上传到远程
+# create backup and upload directly to remote
 clickhouse-backup create_remote backup_$(date +%Y%m%d_%H%M%S)
-# 创建增量备份
+# create incremental backup
 clickhouse-backup create_remote --diff-from-remote=backup_20250101 backup_$(date +%Y%m%d_%H%M%S)
 
-# 查看所有备份
+# list all backups
 clickhouse-backup list
-# 仅查看本地备份
+# list local backups only
 clickhouse-backup list local
-# 仅查看远程备份
+# list remote backups only
 clickhouse-backup list remote
 
-# 删除本地备份
+# delete local backup
 clickhouse-backup delete local backup_name
-# 删除远程备份
+# delete remote backup
 clickhouse-backup delete remote backup_name
-# 清理损坏的本地备份
+# clean up corrupted local backups
 clickhouse-backup clean_local_broken
-# 清理损坏的远程备份
+# clean up corrupted remote backups
 clickhouse-backup clean_remote_broken
 
-# 下载指定备份
+# download specific backup
 clickhouse-backup download backup_20250101_120000
-# 下载时仅下载 schema
+# download schema only
 clickhouse-backup download --schema backup_20250101_120000
-# 可恢复下载
+# resumable download
 clickhouse-backup download --resumable backup_20250101_120000
 
-# 恢复所有数据
+# restore all data
 clickhouse-backup restore backup_20250101_120000
-# 仅恢复 schema
+# restore schema only
 clickhouse-backup restore --schema backup_20250101_120000
-# 仅恢复数据
+# restore data only
 clickhouse-backup restore --data backup_20250101_120000
-# 删除现有表后恢复
+# drop existing tables before restore
 clickhouse-backup restore --rm backup_20250101_120000
-# 恢复到不同数据库
+# restore to a different database
 clickhouse-backup restore --restore-database-mapping=old_db:new_db backup_20250101_120000
-# 恢复 RBAC 对象
+# restore RBAC objects
 clickhouse-backup restore --rbac backup_20250101_120000
 
-# 从远程直接恢复
+# restore directly from remote
 clickhouse-backup restore_remote backup_20250101_120000
-# 恢复特定表
+# restore specific tables
 clickhouse-backup restore_remote --tables="mydb.mytable" backup_20250101_120000
 ```
 

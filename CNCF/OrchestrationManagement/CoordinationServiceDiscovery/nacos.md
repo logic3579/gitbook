@@ -43,13 +43,13 @@ sh startup.sh
 
 ### Run On Kubernetes
 
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 
 ```bash
 #
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 
 ```bash
 # https://artifacthub.io/packages/helm/ygqygq2/nacos

@@ -6,22 +6,22 @@ description: Containerd
 
 ## Introduction
 
-![[/CNCF/Runtime/ContainerRuntime/attachementsdocker-fsdfsolnn.webp]]
+![docker-fsdfsolnn](./attachements/docker-fsdfsolnn.webp)
 
 
-![[/CNCF/Runtime/ContainerRuntime/attachementsdocker-fsdsdf.webp]]
+![docker-fsdsdf](./attachements/docker-fsdsdf.webp)
 
 
-![[/CNCF/Runtime/ContainerRuntime/attachementsdocker-fdsfcv.webp]]
+![docker-fdsfcv](./attachements/docker-fdsfcv.webp)
 
 
-![[/CNCF/Runtime/ContainerRuntime/attachementsdocker-fsdfsobgb.webp]]
+![docker-fsdfsobgb](./attachements/docker-fsdfsobgb.webp)
 
 
-![[/CNCF/Runtime/ContainerRuntime/attachementsdocker-fsdfdfsckl.webp]]
+![docker-fsdfdfsckl](./attachements/docker-fsdfdfsckl.webp)
 
 
-![[/CNCF/Runtime/ContainerRuntime/attachementsdocker-fsdfsoasdaw.webp]]
+![docker-fsdfsoasdaw](./attachements/docker-fsdfsoasdaw.webp)
 
 
 

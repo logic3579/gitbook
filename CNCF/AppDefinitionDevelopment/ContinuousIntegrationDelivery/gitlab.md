@@ -61,7 +61,7 @@ gitlab/gitlab-ee
 
 ### Run On Kubernetes
 
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 
 ```bash
 # manifest resource yaml
@@ -70,7 +70,7 @@ service = redis, postgresql, gitlab
 ingress = gitlab
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 
 ```bash
 # Add and update repo

@@ -59,18 +59,18 @@ systemctl enable coredns.service
 
 ## Deploy By Container
 ### Run On Docker
-[[cc-docker|Docker常用命令]]
+#### Run on Docker
 ```bash
 # https://hub.docker.com/r/coredns/coredns/tags
 ```
 
 ### Run On Kubernetes
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 ```bash
 #
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 ```bash
 # Add and update repo
 helm repo add coredns https://coredns.github.io/helm

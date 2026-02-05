@@ -11,12 +11,12 @@ apt install iptables
 
 # iptables
 
-内核模块 ip_tables，查看内核信息 modinfo ip_tables
-user space 下的工具，调用 netfilter
+Kernel module ip_tables, view kernel info with modinfo ip_tables
+User space tool that calls netfilter
 
 # netfilter
 
-kernel space 下的 webhook 点
+Webhook points in kernel space
 ```
 
 ### iptables tables
@@ -26,32 +26,32 @@ kernel space 下的 webhook 点
 ```markdown
 # raw
 
-内核模块 iptable_raw
-决定数据包状态跟踪机制处理
+Kernel module iptable_raw
+Determines packet state tracking mechanism handling
 
 # mangle
 
-内核模块 iptable_mangle
-修改数据包 TOS、TTL、MARK 标记，实现 QOS 调整与策略路由。需要路由设备支持
+Kernel module iptable_mangle
+Modifies packet TOS, TTL, MARK tags to enable QOS adjustments and policy routing. Requires router device support
 
 # nat
 
-内核模块 iptable_nat
-修改数据包 IP 地址、端口等信息。属于一个流的包只会经过一次
+Kernel module iptable_nat
+Modifies packet IP address, port, and other information. Packets belonging to the same flow are processed only once
 
 # filter
 
-内核模块 iptable_filter
-过滤数据包，根据规则是否放行等
+Kernel module iptable_filter
+Filters packets, decides whether to allow or block based on rules
 ```
 
 - Data packet connection state
 
 ```markdown
-NEW：发起新连接的包
-ESTABLISHED：发送并接到应答后，连接建立成为 EATAB 状态，匹配该连接后续所有数据包
-RELATED：已建立连接相关的包。如 FTP 数据传输连接，--icmp-type 0 应答包
-INVALID：无法连接或没有状态的包，如未知的 ICMP 错误信息包
+NEW: Packet initiating a new connection
+ESTABLISHED: After sending and receiving a reply, the connection is established and enters the ESTABLISHED state, matching all subsequent packets of this connection
+RELATED: Packets related to an established connection. e.g. FTP data transfer connections, --icmp-type 0 reply packets
+INVALID: Packets that cannot be connected or have no state, such as unknown ICMP error messages
 ```
 
 - tables chain
@@ -98,12 +98,12 @@ OUTPUT -> POSTROUTING
 
 # Packet flow direction
 
-1. 入站数据包走向
-   PREROUTING 链处理（是否修改数据包地址等），路由选择 routing decision 为本地，则内核将其传给 INPUT 链处理，如果通过则交给系统上层的应用程序。
-2. 转发数据包走向
-   PREROUTING 链处理，路由选择 routing decision 是其它外部地址，则内核将其传递给 FORWARD 链处理（是否转发或拦截），然后再交给 POSTROUTING 链（是否修改数据包的地址等）处理。
-3. 出站数据包走向
-   本机向外部地址发送的数据包，首先被 OUTPUT 链处理，路由选择 routing decision 后传递给 POSTROUTING 链（是否修改数据包的地址等）进行处理。
+1. Inbound packet flow
+   Processed by the PREROUTING chain (whether to modify packet addresses, etc.). If the routing decision determines the destination is local, the kernel passes it to the INPUT chain for processing. If it passes, it is delivered to the upper-layer application.
+2. Forwarded packet flow
+   Processed by the PREROUTING chain. If the routing decision determines the destination is another external address, the kernel passes it to the FORWARD chain (whether to forward or block), then to the POSTROUTING chain (whether to modify packet addresses, etc.) for processing.
+3. Outbound packet flow
+   Packets sent from the local machine to external addresses are first processed by the OUTPUT chain. After the routing decision, they are passed to the POSTROUTING chain (whether to modify packet addresses, etc.) for processing.
 ```
 
 ### iptables rules
@@ -148,25 +148,25 @@ OUTPUT -> POSTROUTING
 - target and rule
 
 ```markdown
-# 匹配到规则后，继续匹配当前链下一条规则
+# After matching a rule, continue matching the next rule in the current chain
 
-LOG：记录数据包日志，取决于 rsyslog
-MARK：标记数据包，为后续的过滤提供条件
-REDIRECT：重定向数据包到另一个端口
+LOG: Log packet information, depends on rsyslog
+MARK: Mark the packet, providing conditions for subsequent filtering
+REDIRECT: Redirect the packet to another port
 
-# 匹配到规则后，终止当前队列规则，转到下一规则链（nat -> filter）
+# After matching a rule, terminate current chain rules and move to the next rule chain (nat -> filter)
 
-ACCEPT: 放行数据包
-SNAT：源地址转换
-MASQUERADE：SNAT 的特殊方式，伪装为自动获取网卡的 IP
-DNAT：目的地址转换
-RETURN：结束规则链的过滤程序，返回主规则链（自定义链中使用）
+ACCEPT: Allow the packet through
+SNAT: Source address translation
+MASQUERADE: A special form of SNAT, masquerades as the automatically obtained IP of the network interface
+DNAT: Destination address translation
+RETURN: End the filter processing of the rule chain and return to the main rule chain (used in user-defined chains)
 
-# 终止匹配，退出过滤程序
+# Terminate matching and exit the filter processing
 
-DROP：丢弃数据包
-REJECT：拒绝数据包，响应拒绝信息
-MIRROR：镜像数据包，调换源 IP 与目的 IP
+DROP: Drop the packet
+REJECT: Reject the packet and send a rejection response
+MIRROR: Mirror the packet, swap source IP and destination IP
 ```
 
 ## Command

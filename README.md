@@ -22,7 +22,6 @@ About knowledge record and Technology stack.
 - [Environment](#)
 - [Misc](#)
 - [Platform](#)
-- [Misc](#)
 <!-- tocstop -->
 
 ## Using with `gitbook`

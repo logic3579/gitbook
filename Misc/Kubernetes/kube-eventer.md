@@ -4,53 +4,53 @@ description: kube-eventer
 
 # kube-eventer
 
-## kube-eventer 获取 K8S 集群事件
+## Collecting K8S Cluster Events with kube-eventer
 
-### 1. 背景
+### 1. Background
 
-#### 概述
+#### Overview
 
-- 什么是事件：Kubernetes 的架构设计基于状态机，不同的状态之间进行转换则会生成相应的事件，正常的状态之间转换会生成 Normal 等级的事件，正常状态与异常状态之间的转换会生成Warning等级的事件。
+- What are events: Kubernetes architecture is designed based on a state machine. State transitions generate corresponding events. Transitions between normal states generate Normal-level events, while transitions between normal and abnormal states generate Warning-level events.
 
-- kube-eventer 组件：阿里云开源组件，用于获取 K8S 集群中事件消息，并转存至自定义中间件或存储中。（K8S 集群默认只保存1小时内事件)
+- kube-eventer component: An open-source component by Alibaba Cloud, used to collect event messages from K8S clusters and store them in custom middleware or storage. (K8S clusters only retain events for 1 hour by default)
 
-- 组件官方地址：https://github.com/AliyunContainerService/kube-eventer
+- Official repository: https://github.com/AliyunContainerService/kube-eventer
 
-#### 部署前提与软件
+#### Prerequisites and Software
 
-| 名称                             | 功能                                       | 备注                   |
-| -------------------------------- | ------------------------------------------ | ---------------------- |
-| K8S 集群                         | 应用集群                                   | 使用 minikube 测试集群 |
-| kube-eventer                     | 收集 K8S 集群事件                          | 集群第三方组件         |
-| Kafka / Elasticsearch / influxDB | 中间件：存储事件消息                       | 存储组件（选型 Kafka)  |
-| kube-eventer-py                  | 从队列获取事件消息发送至 telegram 告警群组 | 事件消费者             |
+| Name                             | Function                                          | Notes                         |
+| -------------------------------- | ------------------------------------------------- | ----------------------------- |
+| K8S Cluster                      | Application cluster                               | Using minikube test cluster   |
+| kube-eventer                     | Collect K8S cluster events                        | Third-party cluster component |
+| Kafka / Elasticsearch / influxDB | Middleware: store event messages                  | Storage component (Kafka selected) |
+| kube-eventer-py                  | Retrieve event messages from queue and send to Telegram alert group | Event consumer |
 
-### 2. 安装部署步骤
+### 2. Installation and Deployment Steps
 
-#### a) minikube 集群部署
+#### a) minikube Cluster Deployment
 
-参考：https://minikube.sigs.k8s.io/docs/start/
+Reference: https://minikube.sigs.k8s.io/docs/start/
 
-#### b) 存储中间件部署
+#### b) Storage Middleware Deployment
 
 ##### Kafka
 
-使用 helm 部署 Kafka
+Deploy Kafka using Helm
 
 ```bash
-# 添加 helm 仓库
+# Add Helm repository
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
-# 拉取 Kafka chart 包并解压
+# Pull Kafka chart and extract
 mkdir /opt/helm_chats && cd /opt/helm_chats
 helm pull bitnami/kafka && tar xf kafka-18.2.0.tgz && rm -rf kafka-18.2.0.tgz
 
-# 修改关键配置信息，启动 Kafka
-# 展示部分关键配置
+# Modify key configuration and start Kafka
+# Showing key configuration excerpts
 cat ./values.yaml
 ...
 ...
-# Kafka 启动配置文件，通过 Configmap 挂载
+# Kafka startup configuration file, mounted via ConfigMap
 config: |-
   broker.id=0
   listeners=INTERNAL://:9093,CLIENT://:9092
@@ -69,7 +69,7 @@ config: |-
   transaction.state.log.min.isr=1
   log.flush.interval.messages=10000
   log.flush.interval.ms=1000
-  log.retention.hours=168   # 保留队列数据时间，默认为7天
+  log.retention.hours=168   # Queue data retention time, default is 7 days
   log.retention.bytes=1073741824
   log.segment.bytes=1073741824
   log.retention.check.interval.ms=300000
@@ -79,7 +79,7 @@ config: |-
   allow.everyone.if.no.acl.found=true
   auto.create.topics.enable=true
   default.replication.factor=1
-  delete.topic.enable=true   # 超时时间后是否自动删除 topic 数据
+  delete.topic.enable=true   # Whether to automatically delete topic data after timeout
   inter.broker.listener.name=INTERNAL
   log.retention.check.intervals.ms=300000
   max.partition.fetch.bytes=1048576
@@ -93,7 +93,7 @@ config: |-
 persistence:
   enabled: true
   existingClaim: ""
-  storageClass: "standard"   # 挂载持久化存储类
+  storageClass: "standard"   # Persistent storage class
 ...
 ...
 zookeeper:
@@ -108,12 +108,12 @@ zookeeper:
       serverPasswords: ""
   persistence:
     enabled: true
-    storageClass: "standard"   # 挂载持久化存储类，miniku 默认已有。
+    storageClass: "standard"   # Persistent storage class, available by default in minikube.
 
 
-# 部署与验证
+# Deploy and verify
 helm install kafka .
-# 验证部署状态，查看是否为正常 Running 状态
+# Verify deployment status, check if pods are in Running state
 kubectl get pod
 NAME                                  READY   STATUS    RESTARTS       AGE
 kafka-0                         1/1     Running   0              171m
@@ -122,9 +122,9 @@ kafka-zookeeper-0               1/1     Running   6 (168m ago)   10d
 
 ##### elasticsearch
 
-#### c) kube-eventer 部署
+#### c) kube-eventer Deployment
 
-- 获取官方 YAML 资源文件进行部署
+- Deploy using official YAML resource files
 
 ```bash
 cat > kube-eventer.yaml << "EOF"
@@ -221,28 +221,28 @@ metadata:
   namespace: kube-system
 EOF
 
-# 部署资源，默认部署至 kube-system namespace 中
+# Deploy resources, deployed to kube-system namespace by default
 kubectl apply -f kube-eventer.yaml
-# 验证部署状态
+# Verify deployment status
 kubectl get pod -n kube-system
 NAME                               READY   STATUS    RESTARTS        AGE
 kube-eventer-69455778cd-cvr9w      1/1     Running   0               8d
 ```
 
-#### d) 从消息队列获取事件，发送至 telegram
+#### d) Retrieve Events from Message Queue and Send to Telegram
 
-- telegram 机器人以及告警群组创建
+- Create Telegram bot and alert group
 
-> 参考
+> References
 >
-> 1、机器人创建：https://cloud.tencent.com/developer/article/1835051
+> 1. Bot creation: https://cloud.tencent.com/developer/article/1835051
 >
-> 2、telegram python SDK：https://github.com/python-telegram-bot/python-telegram-bot
+> 2. Telegram Python SDK: https://github.com/python-telegram-bot/python-telegram-bot
 
-- Python 脚本信息
+- Python script details
 
 ```python
-# telegrambot.py 文件
+# telegrambot.py file
 import asyncio
 import telegram
 import json
@@ -309,7 +309,7 @@ if __name__ == '__main__':
     send_result = asyncio.run(send_message(text))
     print(send_result)
 
-# get_events.py 文件
+# get_events.py file
 from kafka import KafkaConsumer, TopicPartition
 from telegrambot import send_message
 import asyncio
@@ -335,7 +335,7 @@ class KConsumer(object):
     def start_consumer(self):
         while True:
             try:
-                # 手动拉取消息，间隔时间30s，然后手动 commit 提交当前 offset
+                # Manually pull messages with 30s interval, then manually commit the current offset
                 msg_list_dict = self.consumer.poll(timeout_ms=30000)
                 for tp, msg_list in msg_list_dict.items():
                     for msg in msg_list:
@@ -355,7 +355,7 @@ class KConsumer(object):
             print("consumer stop failed,please check.")
 
 if __name__ == '__main__':
-    # env，中间件配置信息
+    # env, middleware configuration
     topic = 'test_topic'
     bootstrap_servers = 'kafka-headless:9092'
     group_id = 'test.group'
@@ -369,7 +369,7 @@ if __name__ == '__main__':
     #consumer.close_consumer()
 ```
 
-- Dockerfile 配置
+- Dockerfile Configuration
 
 ```dockerfile
 FROM python:3.8
@@ -395,16 +395,16 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 CMD ["python", "get_events.py"]
 ```
 
-- 打包镜像，启动验证
+- Build Image and Verify Startup
 
 ```bash
-# 编译源码打包镜像步骤
+# Steps to compile source code and build image
 cd /app/kube-eventer-py/ && mkdir APP-META
 rm -f APP-META/*.py && cp *.py APP-META/
 
 cd APP-META && build -t kube-eventer-telegrambot:latest .
 
-# 启动镜像（docker 或 kubectl)
+# Start image (docker or kubectl)
 cat > kube-eventer-telegrambot.yaml << "EOF"
 apiVersion: apps/v1
 kind: Deployment
@@ -435,11 +435,11 @@ spec:
           hostPath:
             path: /usr/share/zoneinfo
 EOF
-# 验证启动结果
+# Verify startup result
 kubectl apply -f kube-eventer-telegrambot.yaml
 kubectl get pod
 NAME                                  READY   STATUS    RESTARTS        AGE
 kube-eventer-589bf867bc-tgs5l   1/1     Running   0               27
 ```
 
-- 事件消息接收验证
+- Event Message Reception Verification

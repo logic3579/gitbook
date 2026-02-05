@@ -210,9 +210,9 @@ EOF
 
 ## third iplib
 
-[[IPV6-COUNTRY-REGION-CITY.BIN.gz|ip2location]]
+ip2location (IPV6-COUNTRY-REGION-CITY.BIN.gz)
 
-[[GeoLite2-City.mmdb.gz|Geoip2]]
+Geoip2 (GeoLite2-City.mmdb.gz)
 
 ## virtual host conf
 

@@ -79,7 +79,7 @@ exec 9</tmp/t.log
 exec 9>/tmp/t.log
 # open file descriptor with read and write mode
 exec 9<>/tmp/t.log
-# close file desciptor
+# close file descriptor
 exec 9>&-
 ###
 # operate file descriptors redirect stdin/stdout/stderr
@@ -90,7 +90,7 @@ exec 2>&1
 echo "This is stdin line"
 eho "This line has an error and is logged as stderr"
 EOF
-./test.sh && cat /tmp/consile.log
+./test.sh && cat /tmp/console.log
 # custom file descriptors
 tee > test.sh << "EOF"
 echo "Open file descriptor 3(overwrite mode)"
@@ -136,11 +136,11 @@ ${[@]}
 
 # define local variable
 # option1: use local
-fuction test() {
+function test() {
     local my_key=my_value
     echo $my_key
 }
-# option2: use (), function will be executed in chirl process
+# option2: use (), function will be executed in child process
 function test() (
     my_key=my_value
     echo $my_key
@@ -160,7 +160,7 @@ set -o errexit
 # return the value of pipline rightmost command if it non-zero status
 set -o pipefail
 
-# cancle to use wildcards
+# cancel to use wildcards
 set -f
 set -o noglob
 
@@ -218,5 +218,5 @@ result="${variable%%/*}"   # longest match from end, get: path
 > 1. [Official Website](https://www.gnu.org/software/bash/)
 > 2. [Repository](https://git.savannah.gnu.org/cgit/bash.git)
 > 3. [Shell command official manual](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
-> 4. [关于 Bash 的 10 个常见误解](https://xie.infoq.cn/article/247481c8dc6dc4607c1d7515e)
+> 4. [10 Common Misconceptions About Bash](https://xie.infoq.cn/article/247481c8dc6dc4607c1d7515e)
 > 5. [Advanced Shell Scripting Techniques](https://omid.dev/2024/06/19/advanced-shell-scripting-techniques-automating-complex-tasks-with-bash/)

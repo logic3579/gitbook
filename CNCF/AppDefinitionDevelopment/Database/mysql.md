@@ -45,7 +45,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '123qwe';
 
 ### Config and Boot
 
-[[sc-mysqld|Mysqld Config]]
+[Mysqld Config](/DevOps/ServiceConf/mysql.md)
 
 ```bash
 # boot

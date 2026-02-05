@@ -69,7 +69,7 @@ Counter
 
 Gauge
 
-Historam
+Histogram
 
 Summary
 
@@ -93,7 +93,7 @@ chown prometheus:prometheus /opt/prometheus -R
 
 # startup
 ./prometheus --config.file=prometheus.yml [--web.enable-lifecycle]
-# prometheus metris
+# prometheus metrics
 curl 127.0.0.1:9090/metrics
 # dynamics reload
 curl 127.0.0.1:9090/-/reload -X POST
@@ -102,7 +102,7 @@ curl 127.0.0.1:9090/-/reload -X POST
 
 ### Config and Boot
 
-[Prometheus Config](/Operations/ServiceConf/prometheus.md)
+[Prometheus Config](/DevOps/ServiceConf/observability.md)
 
 #### Boot(systemd)
 
@@ -215,7 +215,7 @@ helm -n monitoring install prometheus .
 ### Quick Start
 
 ```bash
-# baniry
+# binary
 cd /opt/prometheus
 wget https://github.com/prometheus/alertmanager/releases/download/v0.25.0/alertmanager-0.25.0.linux-amd64.tar.gz
 tar xf alertmanager-0.25.0.linux-amd64.tar.gz && rm -f alertmanager-0.25.0.linux-amd64.tar.gz
@@ -225,7 +225,7 @@ mv alertmanager-0.25.0.linux-amd64 alertmanager
 # include prometheus chart package
 ```
 
-### [[sc-monitoring#Alertmanager|Alert Config]]
+### [Alert Config](/DevOps/ServiceConf/observability.md#alertmanager)
 
 ```bash
 cat > /opt/prometheus/alertmanager/alertmanager.yml << "EOF"
@@ -243,7 +243,7 @@ cd /opt/prometheus/alertmanager/
 Download and Install
 
 ```bash
-# baniry
+# binary
 cd /opt/prometheus
 wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.24.0/blackbox_exporter-0.24.0.linux-amd64.tar.gz
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
@@ -254,7 +254,7 @@ tar xf node_exporter-1.6.1.linux-amd64.tar.gz && rm -f node_exporter-1.6.1.linux
 
 # helm
 # node_exporter: include prometheus chart package
-# black_exporter
+# blackbox_exporter
 helm pull --untar prometheus-community/prometheus-blackbox-exporter
 ```
 
@@ -386,7 +386,7 @@ metadata:
 > 1. [Official Website](https://prometheus.io/docs/introduction/overview/)
 > 2. [Repository](https://github.com/prometheus/prometheus)
 > 3. [Download](https://prometheus.io/download/)
-> 4. [中文社区文档](https://icloudnative.io/prometheus/)
+> 4. [Chinese Community Documentation](https://icloudnative.io/prometheus/)
 > 5. [InfluxDB Doc](https://docs.influxdata.com/influxdb/v1.8/introduction/get-started/)
 > 6. [redis-exporter](https://github.com/oliver006/redis_exporter)
 > 7. [kafka-exporter](https://github.com/danielqsj/kafka_exporter)

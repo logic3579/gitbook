@@ -37,7 +37,7 @@ curl 127.0.0.1:9200 -u 'elastic:elastic_password'
 ./bin/elasticsearch -d # daemon
 ```
 
-### [[sc-elasticsearch|Config]] and Boot
+### [Config](/DevOps/ServiceConf/elasticsearch.md) and Boot
 
 #### Config
 
@@ -128,7 +128,7 @@ cd elasticsearch
 
 # create storageclass
 # nfs-server or others
-[[nfs-server]]
+# see: /DevOps/Network/nfs.md
 
 # configure and run
 vim values.yaml

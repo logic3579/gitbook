@@ -69,7 +69,7 @@ ssh-copy-id -i /opt/ansible/keys/ansible.key root@192.168.1.2
 ssh-copy-id -i /opt/ansible/keys/ansible.key root@192.168.1.3
 ```
 
-## [How To Use](../../../../Operations/CommandManual/Automation.md#ansible)
+## [How To Use](../../../../DevOps/CommandManual/Automation.md#ansible)
 
 ### inventory
 
@@ -107,7 +107,7 @@ inventories/prod.host
 >
 > 1. [Official Website](https://docs.ansible.com/ansible)
 > 2. [Repository](https://github.com/ansible/ansible)
-> 3. [Ansible 中文文档](https://ansible-tran.readthedocs.io/en/latest/docs/intro.html)
+> 3. [Ansible Chinese Documentation](https://ansible-tran.readthedocs.io/en/latest/docs/intro.html)
 > 4. [Ansible Galaxy](https://galaxy.ansible.com/)
 > 5. [Ansible CN Wiki](https://ansible.leops.cn/basic/Introduction/)
 > 6. [Ansible Conditional Judgment Grammar](https://www.ityoudao.cn/posts/ansible-conditionals/)

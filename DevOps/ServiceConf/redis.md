@@ -10,7 +10,7 @@
 bind 127.0.0.1 -::1
 protected-mode yes
 port 6379
-# 半连接数量，与操作系统配置取小值
+# Half-open connection queue size, takes the minimum of this and the OS configuration
 tcp-backlog 511
 timeout 0
 tcp-keepalive 300
@@ -55,7 +55,7 @@ replica-priority 100
 ################################## SECURITY ###################################
 acllog-max-len 128
 # aclfile /etc/redis/users.acl
-# 密码设置，redis6 以上兼容
+# Password setting, compatible with Redis 6 and above
 requirepass foobared
 # Command renaming (DEPRECATED)
 rename-command FLUSHALL ""
@@ -95,12 +95,12 @@ appendfilename "appendonly.aof"
 appenddirname "appendonlydir"
 # appendfsync always/everysec/no
 appendfsync everysec
-# aof 重写时是否同步
+# Whether to sync during AOF rewrite
 no-appendfsync-on-rewrite no
-# 重写触发机制
+# Rewrite trigger mechanism
 auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 64mb
-# 加载 aof 错误行为：写入日志继续执行/中止
+# Behavior on AOF load error: log and continue / abort
 aof-load-truncated yes
 aof-use-rdb-preamble yes
 aof-timestamp-enabled no
@@ -155,9 +155,9 @@ client-output-buffer-limit replica 256mb 64mb 60
 client-output-buffer-limit pubsub 32mb 8mb 60
 hz 10
 dynamic-hz yes
-# aof 文件重写策略是否启用
+# Whether AOF file rewrite incremental fsync strategy is enabled
 aof-rewrite-incremental-fsync yes
-# rdb 自动触发策略是否启用
+# Whether RDB incremental fsync on auto-trigger is enabled
 rdb-save-incremental-fsync yes
 
 ########################### ACTIVE DEFRAGMENTATION #######################

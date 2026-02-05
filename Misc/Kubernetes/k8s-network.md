@@ -6,114 +6,114 @@ categories:
 
 ## Introduction
 
-### 1) 容器网络基本概念
+### 1) Basic Concepts of Container Networking
 
 Linux Network Namespace
 
-- linux 网络设备：network interface device，loopback device，bridge device，veth device，tun/tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备
-- linux 路由表（三层 ip 包路由寻址功能) ，arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等
-- linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp/udp 包等
-- linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等
+- Linux network devices: network interface device, loopback device, bridge device, veth device, tun/tap device, vxlan device, ip tunnel device, etc. These devices can send and receive network packets and provide additional packet modification capabilities
+- Linux routing table (Layer 3 IP packet routing and addressing), ARP table (provides MAC address information corresponding to IP addresses), FDB (provides network interfaces corresponding to MAC addresses for MAC-based forwarding), etc.
+- Linux protocol stack: encapsulation and parsing of network protocol packets, such as Layer 2 ethernet packets, Layer 3 IP/ICMP packets, Layer 4 TCP/UDP packets, etc.
+- Linux iptables: based on the kernel module netfilter, manages the Linux firewall, e.g., controlling ingress and egress, NAT address translation, port mapping, etc.
 
 <!-- {% asset_img k8s-nw1.png %} -->
 
-> linux 不仅仅只有 network namespace 用来进行网络隔离，还有 pid namespace 用来隔离进程，user namespace 用来隔离用户，mount namespace 用来隔离挂载点，ipc namespace 用来隔离信号量和共享内存等，uts namespace 用来隔离主机名和域名。
-> 配合 cgroup 控制组，限制 cpu，memory，io 等资源。构成容器的底层实现
+> Linux has more than just network namespaces for network isolation. There are also pid namespaces for process isolation, user namespaces for user isolation, mount namespaces for mount point isolation, ipc namespaces for semaphore and shared memory isolation, and uts namespaces for hostname and domain name isolation.
+> Combined with cgroup control groups that limit CPU, memory, IO, and other resources, these form the underlying implementation of containers
 
 - Linux Bridge Device
 
-linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一个内部虚拟二层交换机，可以进行二层数据包广播。但是注意的是linux bridge设备可以有自己的ip地址。也就是说，多个linux网络设备attach到一个bridge上，那么这些网络设备的ip地址将会失效(只有二层功能)，当一个设备收到数据包的时候，bridge会把数据包转发到其它所有attach到bridge上的从设备，从而实现广播的效果。
+A Linux bridge device can attach multiple Linux slave devices. It functions like an internal virtual Layer 2 switch that can broadcast Layer 2 packets. Note that a Linux bridge device can have its own IP address. When multiple Linux network devices are attached to a bridge, their IP addresses become ineffective (only Layer 2 functionality remains). When one device receives a packet, the bridge forwards the packet to all other devices attached to the bridge, achieving a broadcast effect.
 
 <!-- {% asset_img k8s-nw2.png %} -->
 
 - Linux Veth Device
 
-总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。
+Always appears in pairs with two endpoints. Packets flow in from one peer and out to the other peer. A veth pair can span across network namespaces.
 
 <!-- {% asset_img k8s-nw3.png %} -->
 
-### 2) k8s 集群容器网络通讯方式
+### 2) K8s Cluster Container Network Communication Methods
 
-- 网络负载方式
+- Network Load Balancing Mode
 
-kube-proxy 组件启动参数控制（--proxy-module=ipvs)
-iptables：默认
-ipvs：v1.11 版本及之后
+Controlled by kube-proxy component startup parameters (--proxy-module=ipvs)
+iptables: default
+ipvs: v1.11 and later
 
-- 网络通讯方式
+- Network Communication Methods
 
-underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数)
-overlay：flannel vxlan，calico ipip，flannel udp（一般不使用) 等
+underlay: flannel host-gw, calico bgp, etc. (requires enabling the ip_forward kernel parameter)
+overlay: flannel vxlan, calico ipip, flannel udp (generally not used), etc.
 
-### 3) 测试环境主机信息
+### 3) Test Environment Host Information
 
-| 宿主机 IP     | 角色   | 容器 CIDR    | CNI 网卡地址 | Flannel.1 vtep 设备 |
+| Host IP       | Role   | Container CIDR | CNI Interface Address | Flannel.1 vtep Device |
 | ------------- | ------ | ------------ | ------------ | ------------------- |
 | 192.168.205.4 | master | 10.42.0.0/24 | 10.42.0.1    | 10.42.0.0           |
 | 192.168.205.3 | node1  | 10.42.1.0/24 | 10.42.1.1    | 10.42.1.0           |
 | 192.168.205.5 | node2  | 10.42.2.0/24 | 10.42.2.1    | 10.42.2.0           |
 
-## 宿主机内网络
+## Intra-Host Networking
 
-### 1) docker 容器的四种网络类型
+### 1) Four Network Types of Docker Containers
 
-- bridge 模式（默认) ：--net=bridge
+- bridge mode (default): --net=bridge
 
-宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机)
+The host creates a docker0 network interface with an independent IP range, assigning an IP from this range to each container. Containers communicate through this bridge (similar to a Layer 2 switch)
 
-> 自定义 bridge 网络：宿主机范围创建独立的 network namespace
+> Custom bridge network: creates an independent network namespace scoped to the host
 
 <!-- > {% asset_img k8s-nw4.png %} > {% asset_img k8s-nw5.png %} -->
 
-- host 模式：--net=host
+- host mode: --net=host
 
-共享宿主机网络，容器暴露端口时占用宿主机端口。网络模式简单，性能较好，一般用于单容器服务。
+Shares the host network. When a container exposes a port, it occupies the host port. This network mode is simple with good performance, generally used for single-container services.
 
 <!-- {% asset_img k8s-nw6.png %} -->
 
-- contaniner 模式：--net=container:name or id
+- container mode: --net=container:name or id
 
-指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace) 。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信
+Specifies that the newly created container shares the Network namespace of an existing container (in K8s, a pod is multiple containers sharing a network namespace). Everything except networking, such as filesystem and processes, remains isolated. Processes between containers can communicate via the lo interface
 
 <!-- {% asset_img k8s-nw7.png %} -->
 
-- none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络
+- none mode: The container has an independent Network namespace but no network configuration. Custom network configuration can be applied. Generally used for CPU-intensive tasks where computation results are saved to disk and no external network access is needed
 
-### 2) docker 宿主环境中容器网络
+### 2) Container Networking in the Docker Host Environment
 
-- 每一个container都有一个network namespace，然后拥有container自己的网络设备，路由表，arp表，协议栈，iptable等，各个container的network namespace相互隔离。
-- 在宿主的default netwok nemespace中会有一个linux bridge设备，一般名称为docker0。
-- 每一个container对应一个veth pair设备，这个设备的一端在container的network namespace里，另一端attach到宿主networkwork namespace的docker0 linux bridge上。
-- 这样在宿主环境里，就好像有一个二层交换机(docker0 bridge)，把宿主内的所有container连接起来。所以，在宿主内的container都是可以直接相互访问的，而且是直连的方式
+- Each container has its own network namespace with its own network devices, routing table, ARP table, protocol stack, iptables, etc. The network namespaces of different containers are isolated from each other.
+- In the host's default network namespace, there is a Linux bridge device, typically named docker0.
+- Each container corresponds to a veth pair device, with one end in the container's network namespace and the other end attached to the docker0 Linux bridge in the host's network namespace.
+- In the host environment, this is like having a Layer 2 switch (docker0 bridge) connecting all containers within the host. Therefore, containers within the same host can directly access each other in a direct-connection manner
 
 <!-- {% asset_img k8s-nw8.png %} -->
 
 ```shell
-## 相关命令
-#查看 bridge 网桥信息
-#k8s pod 伴生 infrastructure 容器，与基础容器共用 network namespace 与 veth pair
+## Related commands
+# View bridge information
+# K8s pod companion infrastructure container shares network namespace and veth pair with the base container
 brctl show
 
-#查看 veth pair 设备信息
+# View veth pair device information
 ip addr
 ip -d link show
 
-#查看路由表
+# View routing table
 route -n
 
-#查看 docker 容器信息
+# View Docker container information
 docker ps/inspect/container
 ```
 
-## Service：cluster ip 实现原理
+## Service: ClusterIP Implementation
 
-### 1) cluster ip 如何访问
+### 1) How ClusterIP is Accessed
 
-k8s 集群中服务需要相互访问，一般为之创建相应的 service，集群内部访问时一般使用 cluster ip。一个 cluster ip 后面会关联多个 endpoints（实际的 pod 地址) 。对于 cluster ip 的访问，也就是实现了对 cluster ip 关联的多个 endpoints 负载均衡访问（负载方式为 iptables 或 ipvs）
+Services in a K8s cluster need to access each other. Typically, a corresponding service is created, and ClusterIP is used for internal cluster access. A ClusterIP is associated with multiple endpoints (actual pod addresses). Accessing a ClusterIP achieves load-balanced access to the multiple endpoints associated with it (load balancing via iptables or ipvs)
 
-### 2) iptables 方式
+### 2) iptables Method
 
-- 查看 service 信息：cluster ip 以及关联的 endpoints ip
+- View service information: ClusterIP and associated endpoint IPs
 
 ```shell
 # kubectl describe service nginx-test
@@ -132,7 +132,7 @@ TargetPort:        80/TCP
 Endpoints:         10.42.1.6:80,10.42.2.6:80
 ```
 
-- 查看宿主机 iptables
+- View host iptables
 
 ```shell
 # iptables -nvL -t nat |head
@@ -142,15 +142,15 @@ pkts bytes target     prot opt in     out     source               destination
 202 12456 CNI-HOSTPORT-DNAT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
 ```
 
-对于 PREROUTING chain 中，所有的流量都走到了 KUBE-SERVICES 这个 target 中。请注意 PREROUTING chain 是流量到达之后的第一个入口。如果在 pod 里运行命令 curl http://10.43.6.58，根据容器内部路由表，数据包应该是这样的流动：
+In the PREROUTING chain, all traffic goes to the KUBE-SERVICES target. Note that the PREROUTING chain is the first entry point after traffic arrives. If you run `curl http://10.43.6.58` inside a pod, based on the container's internal routing table, the packet flow would be:
 
-- 在pod中，根据路由表发现cluster ip(**10.43.6.58**)走默认路由，选择了默认网关。
-- 在pod中，默认网关的ip地址就是宿主netwok namespace的 **docker0 或 cni0** 的ip地址，并且默认网关为直连路由。
-- 在pod中，根据路由表，使用eth0 device发送数据，eth0本质是veth pair在pod network namespace的一端，另一端attach在宿主netwok namespace的 **docker0 或 cni0** bridge上。
-- veth pair，数据从pod network namespace的一端发出，进入到了attached到**docker0 或 cni0** bridge上的另一端。
-- **docker0 或 cni0** bridge收到数据之后，自然就来到了host network namesapce 的 PREROUTING chain
+- In the pod, the routing table shows that the cluster IP (**10.43.6.58**) takes the default route, selecting the default gateway.
+- In the pod, the default gateway's IP address is the IP address of **docker0 or cni0** in the host's network namespace, and the default gateway is a directly connected route.
+- In the pod, according to the routing table, data is sent using the eth0 device. eth0 is essentially one end of a veth pair in the pod's network namespace, with the other end attached to the **docker0 or cni0** bridge in the host's network namespace.
+- Via the veth pair, data sent from one end in the pod's network namespace enters the other end attached to the **docker0 or cni0** bridge.
+- After the **docker0 or cni0** bridge receives the data, it naturally enters the PREROUTING chain of the host network namespace
 
-- 查看 KUBE-SERVICES target
+- View KUBE-SERVICES target
 
 ```shell
 # iptables -nvL -t nat | grep 10.43.6.58
@@ -163,14 +163,14 @@ pkts bytes target     prot opt in     out     source               destination
 0     0 KUBE-SEP-GWUIQWA2TNZI4ESX  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -> 10.42.2.6:80 */
 ```
 
-在 KUBE-SERVICES target中我们可以看到目标地址为cluster ip 10.43.6.58 的匹配target 为 KUBE-SVC-7CWUT4JBGBRVUN2L。
-**KUBE-SVC-7CWUT4JBGBRVUN2L 链信息：**
+In the KUBE-SERVICES target, we can see that the matching target for the destination address cluster IP 10.43.6.58 is KUBE-SVC-7CWUT4JBGBRVUN2L.
+**KUBE-SVC-7CWUT4JBGBRVUN2L chain information:**
 
-- 存在两个target （对应两个 Pod ) KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX
-- 在 KUBE-SEP-U2YYZT2C3O6VM4EV 中有statistic mode random probability 0.5。0.5 利用了iptable内核随机模块，随机比率为0.5，也就是50%
-- 由于一半随机比率进入 KUBE-SEP-U2YYZT2C3O6VM4EV target， 因此另一个 target 的随机比率也为50%，实现负载均衡
+- There are two targets (corresponding to two Pods): KUBE-SEP-U2YYZT2C3O6VM4EV and KUBE-SEP-GWUIQWA2TNZI4ESX
+- KUBE-SEP-U2YYZT2C3O6VM4EV has statistic mode random probability 0.5. The 0.5 uses the iptables kernel random module with a random ratio of 0.5, i.e., 50%
+- Since half the traffic randomly enters the KUBE-SEP-U2YYZT2C3O6VM4EV target, the other target also gets 50% of the traffic, achieving load balancing
 
-- 查看 KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX
+- View KUBE-SEP-U2YYZT2C3O6VM4EV and KUBE-SEP-GWUIQWA2TNZI4ESX
 
 ```shell
 # iptables -nvL -t nat | grep KUBE-SEP-U2YYZT2C3O6VM4EV -A 3
@@ -186,15 +186,15 @@ pkts bytes target     prot opt in     out     source               destination
 0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp to:10.42.2.6:80
 ```
 
-在这2个target中我们可以看到：
+In these 2 targets, we can see:
 
-- 分别做了MASQ操作，这个应该是出站engress流量(限定了source ip)，不是我们的入站ingress流量。
-- 做了DNAT操作，把原来的cluster ip给DANT转换成了pod的ip 10.42.1.6和10.42.2.6。把原来的port转换成了80 port
-- 经过这个一系列iptable的target我们的原始请求10.42.1.6:80就变成了10.42.1.6:80或者10.42.2.6:80，而且两者转变的机率各是50%。
-- 根据iptable，经过PREROUTING chain发现DNAT之后的10.42.1.6或者10.42.2.6不是本地的ip(这两个ip是pod的ip，当然不会在host network namespace里)。所以就走到了Forwarding chain中，根据host network namespace的路由表来决定下一跳地址
+- MASQ operations were performed, which are for outbound egress traffic (with source IP restrictions), not our inbound ingress traffic.
+- DNAT operations were performed, converting the original cluster IP to the pod IPs 10.42.1.6 and 10.42.2.6, and converting the original port to port 80.
+- After this series of iptables targets, our original request to 10.43.6.58:80 is transformed to either 10.42.1.6:80 or 10.42.2.6:80, with each having a 50% probability.
+- Based on iptables, after the PREROUTING chain discovers that the DNAT-translated IP 10.42.1.6 or 10.42.2.6 is not a local IP (these are pod IPs and naturally would not be in the host network namespace), the packet goes to the FORWARDING chain, where the next-hop address is determined by the host network namespace's routing table
 
 ```shell
-# 查看路由表信息
+# View routing table information
 # ip route
 default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100
 10.42.0.0/24 dev cni0 proto kernel scope link src 10.42.0.1
@@ -203,32 +203,32 @@ default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100
 192.168.205.0/24 dev enp0s1 proto kernel scope link src 192.168.205.4 metric 100
 192.168.205.1 dev enp0s1 proto dhcp scope link src 192.168.205.4 metric 100
 
-# 根据路由表规则10.42.1.6和10.42.2.6走 flannel.1 vtep 设备跨主机通信 node 节点上的 pod
+# According to routing table rules, 10.42.1.6 and 10.42.2.6 use the flannel.1 vtep device for cross-host communication to pods on node
 ```
 
-- clusterip 类型 service 总结
-  - 流量从pod network namespace中走到host netwok namespace的docker0中。
-  - 在host netwok namespace的**PREROUTING chain**中会经过一系列target。
-  - 在这些target里根据iptable内核随机模块来实现匹配endpoint target，随机比率为均匀分配，实现均匀的负载均衡。内核实现负载均衡，无法自定义负载均衡算法。
-  - 在endpoint target里实现了DNAT，也就是将目标地址cluster ip转化为实际的pod的ip。
-  - cluster ip是虚拟ip，不会和任何device绑定。
-  - 需要host开启路由转发功能(net.ipv4.ip_forward = 1)。
-  - 数据包在host netwok namespace中经过转换以及DNAT之后，由host network namespace的路由表来决定下一跳地址
+- ClusterIP type service summary
+  - Traffic flows from the pod network namespace to docker0 in the host network namespace.
+  - In the host network namespace's **PREROUTING chain**, traffic passes through a series of targets.
+  - In these targets, the iptables kernel random module is used to match endpoint targets with evenly distributed random ratios, achieving uniform load balancing. Load balancing is implemented at the kernel level, so custom load balancing algorithms cannot be used.
+  - DNAT is implemented in the endpoint targets, converting the destination cluster IP to the actual pod IP.
+  - The cluster IP is a virtual IP that is not bound to any device.
+  - The host must have IP forwarding enabled (net.ipv4.ip_forward = 1).
+  - After transformation and DNAT in the host network namespace, the next-hop address is determined by the host network namespace's routing table
 
-### ipvs 方式
+### ipvs Method
 
 - [https://mp.weixin.qq.com/s?\_\_biz=MzI0MDE3MjAzMg==&mid=2648393263&idx=1&sn=d6f27c502a007aa8be7e75b17afac42f&chksm=f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&scene=178&cur_album_id=2123526506718003213#rd](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393263&idx=1&sn=d6f27c502a007aa8be7e75b17afac42f&chksm=f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&scene=178&cur_album_id=2123526506718003213#rd)
 - [https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
 
-## Service：nodeport 实现原理
+## Service: NodePort Implementation
 
-### 1) nodeport ip 如何访问
+### 1) How NodePort is Accessed
 
-通过访问宿主机端口 --> cluster ip 路径（端口范围：30000-32767)
+Access via host port --> cluster IP path (port range: 30000-32767)
 
-### 2) iptables 方式
+### 2) iptables Method
 
-- 查看 service 信息
+- View service information
 
 ```shell
 # kubectl describe service nginx-test
@@ -251,9 +251,9 @@ External Traffic Policy:  Cluster
 Events:                   <none>
 ```
 
-对node port类型的service来说，访问host的port就访问到了这个服务。所以从host网络角度来看，当host收到数据包的时候应该是进入host network namespace的PREROUTING chain中，查看host network namespace的PREROUTING chain。
+For a NodePort type service, accessing the host's port accesses the service. From the host network perspective, when the host receives a packet, it should enter the PREROUTING chain of the host network namespace. Let's examine the host network namespace's PREROUTING chain.
 
-- 查看宿主机 iptables
+- View host iptables
 
 ```shell
 # iptables -nvL -t nat |head
@@ -262,9 +262,9 @@ pkts bytes target     prot opt in     out     source               destination
 323 20898 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */
 ```
 
-根据规则，对于PREROUTING chain中，所有的流量都走到了KUBE-SERVICES这个target中。
+According to the rules, in the PREROUTING chain, all traffic goes to the KUBE-SERVICES target.
 
-- 查看 KUBE-SERVICES target
+- View KUBE-SERVICES target
 
 ```shell
 # iptables -nvL -t nat |grep KUBE-SERVICES -A 10
@@ -273,7 +273,7 @@ pkts bytes target     prot opt in     out     source               destination
 0     0 KUBE-SVC-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80
 ```
 
-在KUBE-SERVICES target中当访问 nginx-test-service 在host上的 32506 时候，根据规则匹配到了 KUBE-NODEPORTS 这个target。
+In the KUBE-SERVICES target, when accessing nginx-test-service on port 32506 on the host, the rules match the KUBE-NODEPORTS target.
 
 ```shell
 # iptables -nvL -t nat |grep KUBE-NODEPORTS -A 3
@@ -282,9 +282,9 @@ pkts bytes target     prot opt in     out     source               destination
 2   124 KUBE-EXT-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp dpt:32506
 ```
 
-在KUBE-NODEPORTS target中可以看到当访问 32506 端口时到 KUBE-EXT-7CWUT4JBGBRVUN2L 这个 target
+In the KUBE-NODEPORTS target, we can see that when accessing port 32506, traffic goes to the KUBE-EXT-7CWUT4JBGBRVUN2L target
 
-- 查看 KUBE-EXT-7CWUT4JBGBRVUN2L target
+- View KUBE-EXT-7CWUT4JBGBRVUN2L target
 
 ```shell
 # iptables -nvL -t nat |grep KUBE-EXT-7CWUT4JBGBRVUN2L -A 5
@@ -306,55 +306,55 @@ Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)
     1    60 KUBE-SEP-GWUIQWA2TNZI4ESX  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -> 10.42.2.6:80 */
 ```
 
-在 KUBE-EXT-7CWUT4JBGBRVUN2L 中可以看到两个 target
+In KUBE-EXT-7CWUT4JBGBRVUN2L, we can see two targets
 
-- KUBE-MARK-MASQ 打标记，无 nat target
-- KUBE-SVC-7CWUT4JBGBRVUN2L target 进入 cluster ip 规则，重复第三部分规则，最终流量进入 Pod
+- KUBE-MARK-MASQ marks packets, no NAT target
+- KUBE-SVC-7CWUT4JBGBRVUN2L target enters the cluster IP rules, repeating the rules from the section above, and traffic ultimately reaches the Pod
 
-- nodeport 类型 service 总结：
-  - 在host netwok namespace的PREROUTING chain中会匹配KUBE-SERVICES target。
-  - 在KUBE-SERVICES target会匹配KUBE-NODEPORTS target
-  - 在KUBE-NODEPORTS target会根据prot来匹配KUBE-SVC-XXX target
-  - KUBE-SVC-XXX target就和第三部分中的cluster-ip类型service一样，最终流量进入到 Pod 中
+- NodePort type service summary:
+  - In the host network namespace's PREROUTING chain, the KUBE-SERVICES target is matched.
+  - In the KUBE-SERVICES target, the KUBE-NODEPORTS target is matched
+  - In the KUBE-NODEPORTS target, the KUBE-SVC-XXX target is matched based on protocol
+  - The KUBE-SVC-XXX target works the same as the ClusterIP type service described above, and traffic ultimately reaches the Pod
 
-### 3) ipvs 方式
+### 3) ipvs Method
 
 - [https://mp.weixin.qq.com/s?\_\_biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd)
 - [https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
 
-## Service：ipvs 与 iptables 对比
+## Service: ipvs vs iptables Comparison
 
-> 基于 ipvs 的 k8s 网络负载要求：
+> Requirements for ipvs-based K8s network load balancing:
 >
-> - linux 内核高于2.4.x
-> - 在 kube-proxy 网络组件中启动参数加入--proxy-mode=ipvs
-> - 安装 ipvsadm 工具（可选) ，用于操作管理 ipvs 规则
+> - Linux kernel version higher than 2.4.x
+> - Add --proxy-mode=ipvs to the kube-proxy startup parameters
+> - Install the ipvsadm tool (optional) for managing ipvs rules
 
-- 两者都是采用linux内核模块完成负载均衡和endpoint的映射，所有操作都在内核空间完成，没有在应用程序的用户空间。
-- iptable方式依赖于linux netfilter/iptable内核模块。
-- ipvs方式依赖linux netfilter/iptable模块，ipset模块，ipvs模块。
-- iptable方式中，host宿主中ipatble的entry数目会随着service和对应endpoints的数目增多而增多。举个例子，比如有10个cluster ip类型的service，每个service有6个endpoints。那么在KUBE-SERVICES target中至少有10个entries(KUBE-SVC-XXX)与10个service对应，每个KUBE-SVC-XXX target中会有6个KUBE-SEP-XXX与6个endpoints来对应，每个KUBE-SEP-XXX会有2个enrties来分别做mark masq和DNAT，这样算起来至少有10*6*2=120个entries在iptable中。试想如果application中service和endpoints数目巨大，iptable entries也是非常庞大的，在一定情况下有可能带来性能上的问题。
-- ipvs方式中host宿主中iptable的entry数目是固定的，因为iptable做匹配的时候会利用ipset(KUBE-CLUSTER-IP或者KUBE-NODE-PORT-TCP)来匹配，service的数目决定了ipset的大小，并不会影响iptable的大小。这样就解决了iptable模式下，entries随着service和endpoints的增多而增多的问题。
-- 对于负载均衡，iptable方式采用random模块来完成负载均衡，ipvs方式支持多种负载均衡，例如round-robin，least connection，source hash等（可参考http://www.linuxvirtualserver.org/) ，并且由kubelet启动参数--ipvs-scheduler控制。
-- 对于目标地址的映射，iptable方式采用linux原生的DNAT，ipvs方式则利用ipvs模块完成。
-- ipvs方式会在host netwok namespace中创建网络设备kube-ipvs0，并且绑定了所有的cluster ip，这样保证了cluster-ip类型的service数据进入INPUT chain，从而让ipvs来完成负载均衡和目标地址的映射。
-- iptable方式不会在host netwok namespace中创建额外的网络设备。
-- iptable方式数据在host network namespace的chain中的路径是：PREROUTING-->FORWARDING-->POSTROUTING 在PREROUTING chain中完成负载均衡，mark masq和目标地址映射。
+- Both use Linux kernel modules to perform load balancing and endpoint mapping. All operations are done in kernel space, not in user space of applications.
+- The iptables method relies on the Linux netfilter/iptables kernel module.
+- The ipvs method relies on the Linux netfilter/iptables module, ipset module, and ipvs module.
+- In the iptables method, the number of iptables entries on the host increases as the number of services and their corresponding endpoints increases. For example, with 10 ClusterIP type services, each having 6 endpoints, there would be at least 10 entries (KUBE-SVC-XXX) in the KUBE-SERVICES target corresponding to the 10 services, each KUBE-SVC-XXX target would have 6 KUBE-SEP-XXX entries for the 6 endpoints, and each KUBE-SEP-XXX would have 2 entries for mark masq and DNAT respectively. This adds up to at least 10*6*2=120 entries in iptables. If the number of services and endpoints in an application is large, the iptables entries become enormous, potentially causing performance issues.
+- In the ipvs method, the number of iptables entries on the host is fixed because iptables matching uses ipset (KUBE-CLUSTER-IP or KUBE-NODE-PORT-TCP). The number of services determines the ipset size but does not affect the iptables size. This solves the problem of entries growing with the number of services and endpoints in the iptables method.
+- For load balancing, the iptables method uses the random module, while the ipvs method supports multiple load balancing algorithms such as round-robin, least connection, source hash, etc. (see http://www.linuxvirtualserver.org/), controlled by the kubelet startup parameter --ipvs-scheduler.
+- For destination address mapping, the iptables method uses Linux native DNAT, while the ipvs method uses the ipvs module.
+- The ipvs method creates a network device kube-ipvs0 in the host network namespace and binds all cluster IPs to it, ensuring that ClusterIP type service data enters the INPUT chain, allowing ipvs to perform load balancing and destination address mapping.
+- The iptables method does not create additional network devices in the host network namespace.
+- In the iptables method, the data path through the chains in the host network namespace is: PREROUTING-->FORWARDING-->POSTROUTING. Load balancing, mark masq, and destination address mapping are completed in the PREROUTING chain.
 
-- ipvs方式数据在host network namespace的chain中的路径是：PREROUTING-->INPUT-->POSTROUTING 在PREROUTING chain中完成mark masq SNAT，在INPUT chain利用ipvs完成负载均衡和目标地址映射。
-- iptable和ipvs方式在完成负载均衡和目标地址映射后都会根据host network namespace的路由表做下一跳路由选择。
+- In the ipvs method, the data path through the chains in the host network namespace is: PREROUTING-->INPUT-->POSTROUTING. Mark masq SNAT is completed in the PREROUTING chain, and ipvs performs load balancing and destination address mapping in the INPUT chain.
+- Both iptables and ipvs methods perform next-hop routing based on the host network namespace's routing table after completing load balancing and destination address mapping.
 
-## 跨主机网络通信：flannel 组件
+## Cross-Host Network Communication: flannel Component
 
-### 1) flannel underlay 网络：host-gw 方式
+### 1) flannel underlay Network: host-gw Method
 
-**underlay 网络概念与配置**
+**Underlay Network Concept and Configuration**
 
-- 概念：underlay 网络在通讯过程没有额外封包，通过将容器的宿主机作为路由实现数据包转包
+- Concept: The underlay network has no additional encapsulation during communication. It achieves packet forwarding by using the container's host as a router
 
-- 配置方式：略
+- Configuration: omitted
 
-**service 与 Pod 对应信息**
+**Service and Pod Information**
 
 ```shell
 # kubectl describe service nginx-test
@@ -380,15 +380,15 @@ nginx-test-7646687cc4-n8s9s   1/1     Running   6 (60m ago)   26d   10.42.0.65  
 nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9    node1    <none>           <none>
 ```
 
-**数据包走向分析，从10.42.0.65请求10.42.1.9**
+**Packet Flow Analysis: from 10.42.0.65 to 10.42.1.9**
 
-- 数据包从源 pod 到宿主机
+- Packet from source pod to host
 
-当在pod **10.42.0.65**里向pod **10.42.1.9**里发送数据包的时候，pod **10.42.0.65**的网卡是veth的一个端点。根据pod network namespace中的路由规则，数据一定是发送到**10.42.0.1**，也就是宿主network namespace的cni0 linux bridge设备。由于pod **10.42.0.65**网卡veth另一个端点attach在cni0 bridge设备上，所以数据被cni0 bride接收，也就是数据从pod的network namesapce流动到了host的network namespace里。
+When sending a packet from pod **10.42.0.65** to pod **10.42.1.9**, pod **10.42.0.65**'s network interface is one end of a veth pair. According to the routing rules in the pod's network namespace, data is sent to **10.42.0.1**, which is the cni0 Linux bridge device in the host's network namespace. Since the other end of pod **10.42.0.65**'s veth is attached to the cni0 bridge device, the data is received by cni0 bridge, meaning the data flows from the pod's network namespace to the host's network namespace.
 
-- 数据包在源 pod 宿主机中的路由
+- Packet routing in the source pod's host
 
-由于数据包的目标ip地址是**10.42.1.9**，而源pod **10.42.0.65**的宿主ip是**192.168.205.4**。宿主机上开启了转发功能(net.ipv4.ip_forward = 1)，所以主机发现目标ip **10.42.1.9**不是自己的ip时候，就对这个数据包做路由转发。查看宿主**192.168.205.4**的路由表
+Since the destination IP address of the packet is **10.42.1.9** and the host IP of source pod **10.42.0.65** is **192.168.205.4**, the host has IP forwarding enabled (net.ipv4.ip_forward = 1). When the host determines that the destination IP **10.42.1.9** is not its own IP, it performs route forwarding on the packet. Let's examine the routing table of host **192.168.205.4**
 
 ```shell
 # ip addr |grep 192.168.205.4
@@ -398,11 +398,11 @@ nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9   
 10.42.1.0/24 via 192.168.205.3 enp0s1 ...
 ```
 
-在路由表里发现**10.42.1.0/24**网段的数据下一跳是**192.168.205.3**，也就是目标pod **10.42.1.9**的宿主机器。所以进行arp目标mac地址封包，将数据发往**192.168.205.3**。注意目标pod的下一跳地址是目标pod所在的host，也就是说数据会从原始pod所在的host通过下一跳发往目标pod所在的host。即是原始pod的host必须和目标pod的host在同一个二层网络里，因为只有这样才可以下一跳路由可达。这个也是flannel的underlay网络host gw方式的限制，既要求所有的k8s worker node节点都在同一个二层网络里(可以认为是在同一个ip子网)。
+The routing table shows that the next hop for the **10.42.1.0/24** subnet is **192.168.205.3**, which is the host machine of the destination pod **10.42.1.9**. Therefore, ARP destination MAC address encapsulation is performed and data is sent to **192.168.205.3**. Note that the next hop for the destination pod is the host where the destination pod resides, meaning data is sent from the source pod's host to the destination pod's host via the next hop. This means the source pod's host and the destination pod's host must be in the same Layer 2 network, because only then is the next-hop route reachable. This is also the limitation of flannel's underlay host-gw method, which requires all K8s worker nodes to be in the same Layer 2 network (essentially in the same IP subnet).
 
-- 数据包在目标 pod 宿主机中的路由
+- Packet routing in the destination pod's host
 
-当数据包路由到目标pod **10.42.1.9**的host **192.168.205.3**的时候(通过二层交换)，目标pod宿主机上开启了转发功能(net.ipv4.ip_forward = 1)，所以主机发现目标ip **10.42.1.9 **不是自己的ip时候，就对这个数据包做路由转发。查看宿主**192.168.205.3**的路由表
+When the packet is routed to host **192.168.205.3** of destination pod **10.42.1.9** (via Layer 2 switching), the destination pod's host has IP forwarding enabled (net.ipv4.ip_forward = 1). When the host determines that destination IP **10.42.1.9** is not its own IP, it performs route forwarding on the packet. Let's examine the routing table of host **192.168.205.3**
 
 ```shell
 # ip addr |grep 192.168.205.3
@@ -412,7 +412,7 @@ nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9   
 10.42.1.0/24 dev cni0 proto kernel scope link src 10.42.1.1
 ```
 
-在路由表里发现**10.42.1.0/24**网段的数据下一跳是直连路由，由设备cni0 网卡转发。cni 网卡 **10.42.1.1** 作为linux bridge，会把数据通过veth pair从host network namespace发送到目标pod的**10.42.1.9**的network namespace里。然后由内核交给应用程序处理，从而完成了pod到pod的通讯。可以使用 kubectl debug 查看路由经过节点
+The routing table shows that the next hop for the **10.42.1.0/24** subnet is a directly connected route, forwarded by the cni0 interface. The cni interface **10.42.1.1**, acting as a Linux bridge, sends data via a veth pair from the host network namespace to the network namespace of destination pod **10.42.1.9**. The kernel then hands it to the application for processing, completing pod-to-pod communication. You can use kubectl debug to view the routing path through nodes
 
 ```shell
 # kubectl debug -it nginx-test-7646687cc4-z8xnq --image=busybox -- /bin/sh
@@ -421,29 +421,29 @@ nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9   
 # traceroute 10.42.1.9
 ```
 
-**flannel underlay（host-gw 方式) 总结**
+**flannel underlay (host-gw method) Summary**
 
-- 从源pod的network namespace到host network namespace的cni0 linux bridge上。
-- 在源pod所在的host里做三层路由选择，下一跳地址为目标pod所在的host。
-- 数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包)
-- 在目标pod所在的host里做三层路由选择，本地直连路由到目标pod里。
-- 要求所有的节点必须开启路由转发功能(net.ipv4.ip_forward = 1)
-- 要求所有的节点都在同一个二层网络里，来完成目标pod所在host的下一跳路由
+- Data flows from the source pod's network namespace to the cni0 Linux bridge in the host network namespace.
+- Layer 3 routing is performed on the source pod's host, with the next-hop address being the host where the destination pod resides.
+- The packet is sent from the source pod's host to the destination pod's host. (Layer 2 MAC encapsulated packet)
+- Layer 3 routing is performed on the destination pod's host, with a locally connected route to the destination pod.
+- All nodes must have IP forwarding enabled (net.ipv4.ip_forward = 1)
+- All nodes must be in the same Layer 2 network to enable next-hop routing to the destination pod's host
 
-### 2) flannel overlay 网络：vxlan 方式
+### 2) flannel overlay Network: vxlan Method
 
-**overlay 网络概念与配置**
+**Overlay Network Concept and Configuration**
 
-- 概念
+- Concept
 
-vxlan 是一种overlay 网络技术，意在利用在三层网络之上构建二层网络。对于二层网络一般采用 vlan 技术来隔离，不过 vlan 在数据包里总共4个字节，有12bit用来标识不同的二层网络，这样总共可以有4000多个 vlan。而 vxlan header有8个字节，有24bit用来标识不同的二层网络，这样总共是1600多万个 vxlan。[vxlan详解](https://tools.ietf.org/html/rfc7348)
+VXLAN is an overlay network technology designed to build Layer 2 networks on top of Layer 3 networks. Layer 2 networks typically use VLAN technology for isolation, but VLAN uses only 4 bytes in the packet with 12 bits to identify different Layer 2 networks, allowing a total of about 4,000 VLANs. VXLAN headers use 8 bytes with 24 bits to identify different Layer 2 networks, allowing a total of over 16 million VXLANs. [VXLAN specification](https://tools.ietf.org/html/rfc7348)
 
-- 配置方式：[参考](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393268&idx=1&sn=ea7df945f11a57619a81df8599bcbe99&chksm=f1310b5bc646824daaf9ac6cb2dec4b8c8f54fdf4753b5379db991c88e4e5951ec928b9da2d9&scene=178&cur_album_id=2123526506718003213#rd)
+- Configuration: [Reference](https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393268&idx=1&sn=ea7df945f11a57619a81df8599bcbe99&chksm=f1310b5bc646824daaf9ac6cb2dec4b8c8f54fdf4753b5379db991c88e4e5951ec928b9da2d9&scene=178&cur_album_id=2123526506718003213#rd)
 
-  1.使用 vxlan 配置集群时，因为 vxlan 利用 udp 包的 payload 封装二层 eth 包，mtu 值从1500变为1450。
-  2.vxlan 利用 udp 封包，etcd 配置 udp 使用8472端口接收数据，需要在所有节点放行8472 udp port 。
+  1. When configuring a cluster with VXLAN, the MTU value changes from 1500 to 1450 because VXLAN encapsulates Layer 2 ethernet frames in UDP packet payloads.
+  2. VXLAN uses UDP encapsulation. etcd is configured to receive data on UDP port 8472, so port 8472 UDP must be allowed on all nodes.
 
-**service 与 Pod 对应信息**
+**Service and Pod Information**
 
 ```shell
 # kubectl describe service nginx-test
@@ -469,7 +469,7 @@ nginx-test-7646687cc4-n8s9s   1/1     Running   6 (60m ago)   26d   10.42.0.65  
 nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9    node1    <none>           <none>
 ```
 
-**kubectl debug 查看路由走向与网络，进入 pod 10.42.0.65**
+**kubectl debug to view routing path and network, entering pod 10.42.0.65**
 
 ```shell
 #kubectl debug -it nginx-test-7646687cc4-n8s9s --image=busybox -- /bin/sh
@@ -485,11 +485,11 @@ traceroute to 10.42.1.9 (10.42.1.9), 30 hops max, 46 byte packets
  3  10.42.1.9  1.453 ms  0.979 ms  0.976 ms
 ```
 
-**数据包走向分析，从10.42.0.65请求10.42.1.9**
+**Packet Flow Analysis: from 10.42.0.65 to 10.42.1.9**
 
-- 数据在 pod namespace network 中路由
+- Data routing in the pod's network namespace
 
-ip为**10.42.0.65**的pod从自己的network namespace访问pod **10.42.1.9**，根据**10.42.0.65** pod network namespace的路由表，数据进入了**10.42.0.65** pod的宿主**192.168.205.4**的network namespace中的linux bridge cni0。查看宿主机路由信息
+Pod with IP **10.42.0.65** accesses pod **10.42.1.9** from its own network namespace. According to the routing table in **10.42.0.65**'s pod network namespace, data enters the Linux bridge cni0 in the network namespace of **10.42.0.65** pod's host **192.168.205.4**. Let's examine the host routing information
 
 ```shell
 # ip addr |grep 192.168.205.4
@@ -499,11 +499,11 @@ ip为**10.42.0.65**的pod从自己的network namespace访问pod **10.42.1.9**，
 10.42.1.0/24 via 10.42.1.0 dev flannel.1 onlink
 ```
 
-**10.42.1.0/24**网段的访问下一跳ip地址是**10.42.1.0**，用flannel.1设备发送。flannel.1设备就是 flannel 启动的时候根据vxlan类型网络在宿主上创建的，它属于vxlan设备，会完成对二层eth以太数据包到udp数据包的封装与拆封。其中的".1"代表vxlan这个二层网络id号为1，也对应了vxlan网络在etcd里的配置。这个时候数据包源ip为**10.42.0.65**，目标ip为**10.42.1.9**，源mac为pod **10.42.0.65** network namespace中veth设备mac，目标mac为下一跳ip **10.42.1.0/32 **的mac。
+The next-hop IP address for the **10.42.1.0/24** subnet is **10.42.1.0**, sent via the flannel.1 device. The flannel.1 device is created on the host when flannel starts based on the VXLAN network type. It is a VXLAN device that handles encapsulation and decapsulation of Layer 2 ethernet frames into UDP packets. The ".1" represents the VXLAN Layer 2 network ID of 1, which corresponds to the VXLAN network configuration in etcd. At this point, the packet's source IP is **10.42.0.65**, destination IP is **10.42.1.9**, source MAC is the veth device MAC in pod **10.42.0.65**'s network namespace, and destination MAC is the MAC of next-hop IP **10.42.1.0/32**.
 
-- 查看 vtep 端点 mac 地址以及转发接口信息
+- View VTEP endpoint MAC addresses and forwarding interface information
 
-查看 mac 地址信息：在pod **10.42.0.65**的宿主**192.168.205.4**上通过arp表查询**10.42.1.0/32**的mac地址为 62:c8:a9:ce:ca:4e
+View MAC address information: On host **192.168.205.4** of pod **10.42.0.65**, query the ARP table for the MAC address of **10.42.1.0/32**, which is 62:c8:a9:ce:ca:4e
 
 ```shell
 # ip addr |grep 192.168.205.4
@@ -517,7 +517,7 @@ ip为**10.42.0.65**的pod从自己的network namespace访问pod **10.42.1.9**，
 10.42.2.0 lladdr ca:cb:1f:99:10:97 PERMANENT
 ```
 
-查看 mac 地址转发信息：由于flannel.1设备是vxlan设备，会有转发接口与它的mac对应，继续在pod **10.42.0.65**的宿主**192.168.205.4**上查询flannel.1设备的mac转发接口。
+View MAC address forwarding information: Since the flannel.1 device is a VXLAN device, there is a forwarding interface corresponding to its MAC. Continue querying the flannel.1 device's MAC forwarding interface on host **192.168.205.4** of pod **10.42.0.65**.
 
 ```shell
 # ip addr |grep 192.168.205.4
@@ -531,7 +531,7 @@ ip为**10.42.0.65**的pod从自己的network namespace访问pod **10.42.1.9**，
 ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent
 ```
 
-可以看到 flannel.1设备mac地址 **62:c8:a9:ce:ca:4e** 对应的转发接口为 **192.168.205.3**，代表flannel.1设备将会把原始二层数据包(源ip为**10.42.0.65**，目标ip为**10.42.1.9**，源mac为 pod **10.42.0.65** network namespace中veth设备mac，目标mac为**10.42.1.0/32** mac)做为 upd 的 payload 发给 **192.168.205.3 **的 **8472 **端口。目标pod **10.42.1.9 **的宿主机确实是 **192.168.205.3**，而且其上的flannel.1设备同样会对8472端口的数据进行upd解包。
+We can see that the forwarding interface for flannel.1 device MAC address **62:c8:a9:ce:ca:4e** is **192.168.205.3**, meaning the flannel.1 device will send the original Layer 2 packet (source IP **10.42.0.65**, destination IP **10.42.1.9**, source MAC is the veth device MAC in pod **10.42.0.65**'s network namespace, destination MAC is **10.42.1.0/32** MAC) as the UDP payload to port **8472** on **192.168.205.3**. The host of destination pod **10.42.1.9** is indeed **192.168.205.3**, and the flannel.1 device on that host will also process UDP decapsulation on port 8472 data.
 
 - flannel.1 设备处理 udp 封包与解包
 
@@ -547,18 +547,18 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 192.168.205.1   0.0.0.0         255.255.255.255 UH    100    0        0 enp0s1
 ```
 
-flannel.1 设备 udp 封包：从pod **10.42.0.65 **的宿主 **192.168.205.4** 的路由表得知发往 **192.168.205.0/24** 网段为直连路由，使用宿主网络设备 enp0s1 发送。所以对于：
+flannel.1 device UDP encapsulation: From the routing table of host **192.168.205.4** of pod **10.42.0.65**, we know that the **192.168.205.0/24** subnet is a directly connected route, sent via the host network device enp0s1. Therefore:
 
-- 外层udp包：源ip为**192.168.205.4**，目标ip为**192.168.205.3**，源mac为**192.168.205.4** mac，目标mac为**192.168.205.3** mac。目标端口为8472，vxlan id为1.
-- 内层二层以太包：源ip为**10.42.0.65**，目标ip为**10.42.1.9**，源mac为pod **10.42.0.65** network namespace中veth设备mac，目标mac为**10.42.1.0/32** mac
-- 完成封包以后根据宿主路由表发向目标节点 **192.168.205.3**
+- Outer UDP packet: source IP is **192.168.205.4**, destination IP is **192.168.205.3**, source MAC is **192.168.205.4** MAC, destination MAC is **192.168.205.3** MAC. Destination port is 8472, VXLAN ID is 1.
+- Inner Layer 2 ethernet frame: source IP is **10.42.0.65**, destination IP is **10.42.1.9**, source MAC is the veth device MAC in pod **10.42.0.65**'s network namespace, destination MAC is **10.42.1.0/32** MAC
+- After encapsulation, the packet is sent to destination node **192.168.205.3** based on the host routing table
 
-flannel.1 设备 udp 解包：宿主机 **192.168.205.3 **接收到数据包后
+flannel.1 device UDP decapsulation: After host **192.168.205.3** receives the packet
 
-- 目标节点**192.168.205.3**的8472端口接收到udp包之后，发现数据包里有vxlan id标识为1。由于linux内核支持vxlan，所以协议栈可以通过vxlan id判断这是一个vxlan数据报文，并且vxlan为1。然后找到宿主机器上vxlan id为1的vxlan设备处理，就是**192.168.205.3**上的flannel.1设备。
-- flannel.1收到数据之后开始对vxlan udp报文拆包，去掉upd报文的ip，port，mac信息后得到内部的payload，发现是一个二层报文。
-- 对于这个二层报文继续拆包，得到里面的源ip是**10.42.0.65**，目标ip是**10.42.1.9**。
-- 根据**192.168.205.3**上路由表，将数据由linux bridge cni0做本地转发，cni0 作为 linux bridge 利用 veth pair 将数据转发到目标 pod **10.42.1.9**
+- After the destination node **192.168.205.3** receives the UDP packet on port 8472, it finds a VXLAN ID of 1 in the packet. Since the Linux kernel supports VXLAN, the protocol stack can determine through the VXLAN ID that this is a VXLAN data packet with VXLAN ID 1. It then finds the VXLAN device with VXLAN ID 1 on the host machine for processing, which is the flannel.1 device on **192.168.205.3**.
+- After flannel.1 receives the data, it begins decapsulating the VXLAN UDP packet, stripping the UDP packet's IP, port, and MAC information to obtain the internal payload, which is found to be a Layer 2 frame.
+- Continuing to decapsulate this Layer 2 frame, the source IP is **10.42.0.65** and the destination IP is **10.42.1.9**.
+- Based on the routing table on **192.168.205.3**, the data is locally forwarded via the Linux bridge cni0. cni0, acting as a Linux bridge, uses a veth pair to forward data to the destination pod **10.42.1.9**
 
 ```shell
 # ip addr |grep 192.168.205.3
@@ -569,9 +569,9 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0
 ```
 
-- 宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发)
+- Writing the host's routing table and flannel.1 device MAC forwarding interface table (FDB forwarding)
 
-因为所有的host都运行flannel服务，而flannel连接etcd存储中心，所以每个host就知道自己的子网地址cidr是什么，也知道在这个cidr中自己的flannel.1设备ip地址和mac地址，同时也知道了其它host的子网cidr以及flannel.1设备ip地址和mac地址。而知道了这些信息，就可以在flannel启动的时候写入到路由表和fdb中了，以 **192.168.205.4 **宿主为例：
+Because all hosts run the flannel service and flannel connects to the etcd storage center, each host knows its own subnet CIDR, its own flannel.1 device IP and MAC address within this CIDR, and also knows the subnet CIDRs and flannel.1 device IP and MAC addresses of other hosts. With this information, entries can be written to the routing table and FDB when flannel starts. Using host **192.168.205.4** as an example:
 
 ```shell
 ~# ip addr |grep 192.168.205.4
@@ -584,35 +584,35 @@ ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent
 # etcdctl ....
 ```
 
-**flannel overlay（vxlan 方式) 总结**
+**flannel overlay (VXLAN method) Summary**
 
-- 每个宿主都有名字为flannel.x的vxlan网络设备来完成对于vxlan数据的udp封包与拆包，upd数据在宿主的8472端口上(端口值可配置)处理。
-- 数据从pod的network namespace进入到host的network namespace中。
-- 根据host network namespace中的路由表，下一跳ip为目标vxlan设备的ip，并且由当前host的flannel.x设备发送。
-- 根据host network namespace中的apr表找到下一跳ip的mac地址。
-- 根据host network namespace中fbd找到下一跳ip的mac地址对应的转发ip。
-- 当前host的flannel.x设备根据下一跳ip的mac地址对应的转发ip和本地路由表进行upd封包，这个时候：
-  - 外层udp包：源ip为当前host ip，目标ip为mac转发表中匹配的ip，源mac为前host ip的mac，目标mac为fdb中匹配ip的mac。目标端口为8472(可配置)，vxlan id为1(可配置).
-  - 内层二层以太帧包：源ip为源pod ip，目标ip为目标pod ip，源mac为源pod mac，目标mac为host network namespace中路由表里下一跳ip的mac(一般为目标pod对应的host中flannel.x设备ip)。
-- 数据包由当前host路由到目标节点host。
-- 目标节点host的8472端口接收到udp包之后，发现数据包里有vxlan id标识.。然后根据linux vxlan协议，在目标宿主机器上找到与数据报文中vxlan id对应的vxlan设备，将数据交由其处理。
-- vxlan设备收到数据之后开始对vxlan udp报文拆包，去掉upd报文的ip，port，mac信息后得到内部的payload，发现是一个二层报文。然后继续对这个二层报文拆包，得到里面的源pod ip和目标pod ip。
-- 根据目标节点host上路由表，将数据由linux bridge cni0做本地转发。
-- 数据由linux bridge cni0利用veth pair转发到目标pod。
-- 每个宿主host的flannel服务启动的时候读取etcd中的vxlan配置信息，在宿主host的路由表和mac转发接口表fdb里写入相应数据。
+- Each host has a VXLAN network device named flannel.x to handle UDP encapsulation and decapsulation of VXLAN data, processed on the host's port 8472 (configurable).
+- Data flows from the pod's network namespace into the host's network namespace.
+- Based on the routing table in the host network namespace, the next-hop IP is the destination VXLAN device's IP, sent by the current host's flannel.x device.
+- The next-hop IP's MAC address is found from the ARP table in the host network namespace.
+- The forwarding IP corresponding to the next-hop IP's MAC address is found from the FDB in the host network namespace.
+- The current host's flannel.x device performs UDP encapsulation based on the forwarding IP corresponding to the next-hop IP's MAC address and the local routing table. At this point:
+  - Outer UDP packet: source IP is the current host IP, destination IP is the matched IP from the MAC forwarding table, source MAC is the current host IP's MAC, destination MAC is the MAC of the matched IP from FDB. Destination port is 8472 (configurable), VXLAN ID is 1 (configurable).
+  - Inner Layer 2 ethernet frame: source IP is the source pod IP, destination IP is the destination pod IP, source MAC is the source pod MAC, destination MAC is the MAC of the next-hop IP from the routing table in the host network namespace (typically the flannel.x device IP on the host of the destination pod).
+- The packet is routed from the current host to the destination node host.
+- After the destination node host receives the UDP packet on port 8472, it finds a VXLAN ID in the packet. Based on the Linux VXLAN protocol, it finds the VXLAN device on the destination host matching the VXLAN ID in the data packet and hands the data to it for processing.
+- The VXLAN device decapsulates the VXLAN UDP packet, stripping the UDP packet's IP, port, and MAC information to obtain the internal payload, which is found to be a Layer 2 frame. It then continues decapsulating this Layer 2 frame to obtain the source pod IP and destination pod IP.
+- Based on the routing table on the destination node host, data is locally forwarded via the Linux bridge cni0.
+- Data is forwarded from the Linux bridge cni0 to the destination pod via a veth pair.
+- When the flannel service starts on each host, it reads the VXLAN configuration from etcd and writes the corresponding data to the host's routing table and MAC forwarding interface table (FDB).
 
-### 3) flannel underlay 与 overlay 网络对比
+### 3) flannel underlay vs overlay Network Comparison
 
-- 都要求host宿主开启网络转发功能(net.ipv4.ip_forward = 1)。
-- flannel underlay网络没有数据包的额外封包与拆包，效率会更高一些。
-- 对于flannel underlay网络要求所有的worker node都在同一个二层网络里，从而完成目标pod的下一跳路由。即underlay网络worker node不能跨子网。
-- flannel vxlan overlay 网络有封包与拆包，并且外层包都是 udp 包。因此 worker node只要三层路由可达就好，支持worker node能跨子网。
-- flannel vxlan overlay网络内层包是二层以太包，基于linux vxlan设备
-- flannel underlay网络和flannel vxlan overlay网络所有数据包都由操作系统内核空间处理，没有用户空间的应用程序参与。
+- Both require the host to have network forwarding enabled (net.ipv4.ip_forward = 1).
+- The flannel underlay network has no additional packet encapsulation/decapsulation, making it more efficient.
+- The flannel underlay network requires all worker nodes to be in the same Layer 2 network to enable next-hop routing to the destination pod. This means underlay network worker nodes cannot span subnets.
+- The flannel VXLAN overlay network has encapsulation/decapsulation, with the outer packets being UDP packets. Therefore, worker nodes only need Layer 3 route reachability, supporting worker nodes across subnets.
+- The flannel VXLAN overlay network's inner packets are Layer 2 ethernet frames, based on Linux VXLAN devices
+- In both flannel underlay and flannel VXLAN overlay networks, all packets are processed in the operating system kernel space without user-space application involvement.
 
 > Reference:
 >
-> 1. [k8s 集群网络](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
-> 2. [iptables 详解](https://www.jianshu.com/p/ee4ee15d3658)
-> 3. [Docker 网络类型](https://developer.aliyun.com/article/974008#slide-4)
-> 4. [ipvs 工作模式原理](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)
+> 1. [K8s Cluster Networking](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
+> 2. [iptables Explained](https://www.jianshu.com/p/ee4ee15d3658)
+> 3. [Docker Network Types](https://developer.aliyun.com/article/974008#slide-4)
+> 4. [ipvs Working Mode Principles](https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/)

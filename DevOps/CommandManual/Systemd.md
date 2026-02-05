@@ -145,4 +145,4 @@ systemctl set-environment VARIABLE=VALUE
 
 > Reference:
 >
-> 1.  [Systemd 入门教程](https://ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html)
+> 1.  [Systemd Beginner's Tutorial](https://ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html)

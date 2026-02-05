@@ -1,16 +1,16 @@
 ## Introduction
 
-kvm：内核模块，负责 CPU 与内存虚拟化，拦截 Guest 客户机的 I/O 交给 QEMU 处理。
-QEMU： 实现 IO 虚拟化与各设备模拟（磁盘、网卡、显卡、声卡等），通过 IOCTL 系统调用与 kvm 内核交互。
-qemu-kvm： 核心虚拟化软件，提供硬件仿真和与 kvm 内核模块的接口。
-libvirt：管理虚拟化平台的服务和守护进程（libvirtd），提供了一个通用的 API 来管理各种虚拟化技术（如 kvm，Xen）。
-virsh：基于 libvirt 的 CLI 命令行工具。
-virt-install：创建 kvm 虚拟机的命令行工具。
-virt-manager：虚拟机 UI 管理工具。
-virt-viewer：连接到虚拟机屏幕工具。
-virt-clone：虚拟机克隆工具。
-virt-top：查看虚拟机负载工具。
-virt-v2v：虚拟机格式迁移工具。
+kvm: Kernel module responsible for CPU and memory virtualization, intercepts guest I/O and passes it to QEMU for processing.
+QEMU: Implements IO virtualization and device emulation (disk, network card, graphics card, sound card, etc.), interacts with the kvm kernel via IOCTL system calls.
+qemu-kvm: Core virtualization software, provides hardware emulation and an interface with the kvm kernel module.
+libvirt: Service and daemon (libvirtd) for managing virtualization platforms, provides a common API for managing various virtualization technologies (such as kvm, Xen).
+virsh: CLI command-line tool based on libvirt.
+virt-install: Command-line tool for creating kvm virtual machines.
+virt-manager: Virtual machine UI management tool.
+virt-viewer: Tool for connecting to virtual machine display.
+virt-clone: Virtual machine cloning tool.
+virt-top: Tool for viewing virtual machine load.
+virt-v2v: Virtual machine format migration tool.
 
 ## How To Use
 

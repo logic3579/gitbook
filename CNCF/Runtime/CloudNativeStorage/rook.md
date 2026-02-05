@@ -18,7 +18,7 @@ description: Rook
 
 ### Run On Kubernetes
 
-[[cc-k8s|deploy by kubernetes manifest]]
+#### Deploy by Kubernetes Manifest
 
 ```bash
 # https://rook.io/docs/rook/v1.11/Getting-Started/quickstart/#tldr
@@ -34,7 +34,7 @@ kubectl create -f cluster-test.yaml
 kubectl -n rook-ceph get pod,crd
 ```
 
-[[cc-helm|deploy by helm]]
+#### Deploy by Helm
 
 ```bash
 # Add and update repo
