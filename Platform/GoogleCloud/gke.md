@@ -52,9 +52,11 @@ GCP settings
 # Create a static internal/external IP address for istio external gateway.
 1. Reserve external IP and named istio-ingress-external.
 2. Modify values-external.yaml loadBalancerIP and deployment.
+
+# Workload Identity enable.
 ```
 
-gke-manager init
+gke-manager instance init
 
 ```bash
 

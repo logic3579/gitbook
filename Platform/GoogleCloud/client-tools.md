@@ -59,6 +59,10 @@ gcloud compute ssh
 gcloud compute disks snapshot
 gcloud compute snapshots describe
 gcloud compute snapshots delete
+gcloud compute disks resize VM_NAME \
+    --size=100 \
+    --zone=asia-southeast1-a \
+    --project=PROJECT_NAME
 
 # IAP
 ## ssh
