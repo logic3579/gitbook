@@ -69,73 +69,96 @@ pip install -r requirements.txt
 
 ### Poetry
 
+A dependency management and packaging tool for Python. It allows declaring project libraries and their constraints via `pyproject.toml` and manages virtual environments automatically.
+
 #### Install
 
 ```bash
-# Option 1(recommend)
+# Standalone installer (recommend)
 curl -sSL https://install.python-poetry.org | python -
 poetry self update
 
-
-# Option 2
-pip3 install pipx
-# Install shared tool poetry to /root/.local/bin/poetry
-/usr/local/bin/pipx install poetry
-export PATH=$PATH:/root/.local/bin
-# Upgrade
+# pipx
+pipx install poetry
 pipx upgrade poetry
 ```
 
-#### How to use
+#### Project Management
 
 ```bash
-# New project
-poetry new poetry-project
+# Create a new project
+poetry new my-project
 
-# Init existed project
+# Initialize an existing project
 cd my-project
 poetry init
-
-
-# Create Virtualenv with system Python
-poetry env use /usr/bin/python3.10
-poetry env info
-poetry env list <--full-path>
-
-# Add and install dependencies
-poetry add <package_name==version>
-# Add requirements.txt depencies
-poetry add $(cat requirements.txt)
-# Add depency for only dev
-poetry add --dev pytest
-
-# Add dependencies by manual
-vim pyproject.toml
-poetry install
-
-# show all depencies
-poetry show
-
-# Update dependencies by manual
-poetry update
-
-# Remove Virtualenv
-poetry env remove <env_name>
-
-# Run On poetry Virtualenv
-poetry run python -V
-poetry run python <your_script.py>
-
-# Active Virtualenv python shell
-poetry shell
 
 # Build and publish to PyPI
 poetry build
 poetry publish
+```
 
-# Config poetry
+#### Dependency Management
+
+```bash
+# Add dependencies
+poetry add flask
+poetry add 'requests>=2.31'
+poetry add --group dev pytest ruff   # dev dependencies
+
+# Add from requirements.txt
+poetry add $(cat requirements.txt)
+
+# Install from pyproject.toml
+poetry install
+
+# Remove a dependency
+poetry remove flask
+
+# Show all dependencies
+poetry show
+poetry show --tree                   # dependency tree
+
+# Update dependencies
+poetry update
+```
+
+#### Virtual Environment
+
+```bash
+# Use a specific Python version
+poetry env use /usr/bin/python3.10
+poetry env use 3.12
+
+# Show environment info
+poetry env info
+poetry env list                      # list all environments
+
+# Remove an environment
+poetry env remove <env_name>
+
+# Activate the environment shell
+poetry shell
+```
+
+#### Running Commands
+
+```bash
+# Run a command inside the virtualenv
+poetry run python -V
+poetry run python app.py
+poetry run pytest
+```
+
+#### Configuration
+
+```bash
+# List all configuration
 poetry config --list
-poetry config virtualenvs.create true <--local>
+
+# Set config (append --local for project-level)
+poetry config virtualenvs.create true
+poetry config virtualenvs.in-project true --local
 ```
 
 ### uv
@@ -225,19 +248,38 @@ uv pip freeze > requirements.txt
 uv pip compile requirements.in -o requirements.txt
 ```
 
-#### Run Single-File Scripts & CLI Tools
+#### Scripts
 
 ```bash
-# Run a script with inline dependencies (PEP 723)
+# Run a script with inline dependencies declared in the script (PEP 723)
 uv run --with requests script.py
+uv run --with flask --with jinja2 app.py
+```
 
-# Run CLI tools without installing (like pipx)
+#### Tools (uvx / uv tool)
+
+`uvx` is an alias for `uv tool run`. It runs a CLI tool in a **temporary isolated environment** — no global install needed. Use `--from` when the package name differs from the command name.
+
+```bash
+# Run a tool directly (fetched on demand, not permanently installed)
 uvx ruff check .
 uvx black .
 
-# Install a global CLI tool
-uv tool install ruff
-uv tool list
+# --from <package>: explicitly specify the package that provides the command
+uvx --from httpie http https://httpbin.org/get
+uvx --from httpie http POST https://httpbin.org/post name=uv
+uvx --from cowsay cowsay -t "Hello uv"
+
+# Pin a specific version
+uvx --from 'ruff==0.4.0' ruff check .
+
+# uv tool: manage persistent global CLI tools (installed to ~/.local/bin)
+uv tool install ruff             # install a tool globally
+uv tool install httpie           # provides the `http` command
+uv tool list                     # list all installed tools
+uv tool uninstall ruff           # uninstall a tool
+uv tool upgrade ruff             # upgrade a specific tool
+uv tool upgrade --all            # upgrade all installed tools
 ```
 
 > Reference:
