@@ -138,10 +138,113 @@ poetry config --list
 poetry config virtualenvs.create true <--local>
 ```
 
+### uv
+
+An extremely fast Python package and project manager, written in Rust. It is a drop-in replacement for pip, pip-tools, pipx, poetry, pyenv, and virtualenv — all in a single tool.
+
+#### Install
+
+```bash
+# Standalone installer (recommend)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# pip
+pip install uv
+
+# Homebrew
+brew install uv
+
+# Upgrade
+uv self update
+```
+
+#### Python Management
+
+```bash
+# Install a specific Python version
+uv python install 3.12
+
+# List available Python versions
+uv python list
+
+# Pin project Python version (writes .python-version)
+uv python pin 3.12
+```
+
+#### Project Management
+
+```bash
+# Create a new project
+uv init my-project
+uv init --lib my-lib       # library project (src layout)
+
+# Add and remove dependencies
+uv add flask
+uv add 'requests>=2.31'
+uv add --dev pytest ruff    # dev dependencies
+uv remove flask
+
+# Sync environment from pyproject.toml / uv.lock
+uv sync
+
+# Run a command in the project environment
+uv run python app.py
+uv run pytest
+
+# Build and publish
+uv build
+uv publish
+```
+
+#### Virtualenv Management
+
+```bash
+# Create a virtualenv (auto-detects Python or specify version)
+uv venv
+uv venv --python 3.12
+uv venv .venv
+
+# Activate
+source .venv/bin/activate
+```
+
+#### pip-Compatible Interface
+
+```bash
+# Install packages (pip-compatible)
+uv pip install flask
+uv pip install -r requirements.txt
+
+# Uninstall
+uv pip uninstall flask
+
+# Freeze current environment
+uv pip freeze > requirements.txt
+
+# Compile a locked requirements file from requirements.in
+uv pip compile requirements.in -o requirements.txt
+```
+
+#### Run Single-File Scripts & CLI Tools
+
+```bash
+# Run a script with inline dependencies (PEP 723)
+uv run --with requests script.py
+
+# Run CLI tools without installing (like pipx)
+uvx ruff check .
+uvx black .
+
+# Install a global CLI tool
+uv tool install ruff
+uv tool list
+```
+
 > Reference:
 >
 > 1. [Official Website](https://www.python.org/)
 > 2. [Repository](https://github.com/python/cpython)
 > 3. [PyPI](https://pypi.org/)
 > 4. [Poetry](https://python-poetry.org/)
-> 5. [toml.io](https://toml.io/cn/)
+> 5. [uv](https://docs.astral.sh/uv/)
+> 6. [toml.io](https://toml.io/cn/)
