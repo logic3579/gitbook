@@ -169,7 +169,7 @@
   - [Minikube](./Platform/DistributionInstaller/minikube.md)
   - [Rancher](./Platform/DistributionInstaller/rancher.md)
 - [Google Cloud](./Platform/GoogleCloud/README.md)
-  - [Client Tools](./Platform/GoogleCloud/client-tools.md)
+  - [gcloud](./Platform/GoogleCloud/gcloud.md)
   - [GCE](./Platform/GoogleCloud/gce.md)
   - [GKE](./Platform/GoogleCloud/gke.md)
 - [PaaS Container Service](./Platform/PaasContainerService/README.md)
