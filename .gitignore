@@ -6,6 +6,7 @@
 .idea/
 .vscode
 .claude/
+!.claude/settings.json
 
 # OSX
 .DS_Store
