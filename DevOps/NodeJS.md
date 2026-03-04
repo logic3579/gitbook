@@ -168,56 +168,60 @@ npm cache clean --force
 npm cache verify
 ```
 
-### yarn
+### Bun
 
-A fast, reliable package manager. Yarn v1 (Classic) uses `yarn.lock`; Yarn Berry (v2+) supports Plug'n'Play.
+An all-in-one JavaScript runtime and toolkit. It includes a bundler, test runner, and npm-compatible package manager — all significantly faster than Node.js equivalents.
 
 #### Install
 
 ```bash
-# Via corepack (recommend, bundled with Node.js >= 16.10)
-corepack enable
-corepack prepare yarn@stable --activate
+# Standalone installer (recommend)
+curl -fsSL https://bun.sh/install | bash
 
-# Via npm
-npm install -g yarn
+# macOS
+brew install oven-sh/bun/bun
 
-# Verify
-yarn -v
+# npm
+npm install -g bun
+
+# Upgrade
+bun upgrade
 ```
 
 #### Project Management
 
 ```bash
 # Initialize a new project
-yarn init
-yarn init -2                         # init with Yarn Berry
+bun init
 
-# Install dependencies
-yarn install
-yarn add express
-yarn add 'axios@^1.7'
-yarn add --dev jest eslint           # dev dependencies
+# Install dependencies (reads package.json, writes bun.lock)
+bun install
+bun add express
+bun add 'axios@^1.7'
+bun add --dev jest eslint            # dev dependencies
 
 # Remove
-yarn remove express
+bun remove express
 
 # Update dependencies
-yarn upgrade
-yarn upgrade-interactive             # interactive upgrade
-yarn outdated
+bun update
+bun outdated
 
-# Run scripts
-yarn build
-yarn dev
-yarn test
+# Run scripts defined in package.json
+bun run build
+bun run dev
+bun test
 
-# Execute a package binary
-yarn dlx create-react-app my-app
+# Run a file directly (uses Bun runtime)
+bun run app.ts                       # TypeScript supported natively
+bun run app.js
 
-# Global install (Classic)
-yarn global add pm2
-yarn global list
+# Execute a package binary (like npx)
+bunx create-next-app my-app
+bunx eslint .
+
+# Build and bundle
+bun build ./src/index.ts --outdir ./dist
 ```
 
 ### pnpm
@@ -280,5 +284,5 @@ pnpm store prune                     # remove unreferenced packages
 > 3. [npm](https://www.npmjs.com/)
 > 4. [nvm](https://github.com/nvm-sh/nvm)
 > 5. [fnm](https://github.com/Schniz/fnm)
-> 6. [Yarn](https://yarnpkg.com/)
+> 6. [Bun](https://bun.sh/)
 > 7. [pnpm](https://pnpm.io/)
