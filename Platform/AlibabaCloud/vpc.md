@@ -41,7 +41,6 @@ CIDR block design specifications:
 - Different accounts (e.g., development, production) can reuse the same CIDR blocks for networking (cross-environment calls generally do not exist).
 
 - Current environment networking information (it is recommended to use the Terway plugin going forward):
-
   - Development environment network architecture
     <!-- {% asset_img vpc2.png %} -->
 
@@ -78,7 +77,6 @@ CIDR block design specifications:
 - [Cloud Enterprise Network (CEN) Working Principles and Operations](https://help.aliyun.com/document_detail/189596.html)
 
 - VPN Gateway Principles and Operations:
-
   - [IPSec VPN Technical Principles](https://cloud.tencent.com/developer/article/1824924)
   - [Alicloud Official Operations Documentation](https://help.aliyun.com/document_detail/65072.html)
 

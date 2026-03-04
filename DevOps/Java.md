@@ -10,43 +10,176 @@ description: Java record
 ### Install
 
 ```bash
-# centos
-
 # ubuntu
-#apt install openjdk-17-jdk
 apt install default-jdk
+apt install openjdk-17-jdk
 
-# build && install
+# macOS
+brew install openjdk@21
 
+# Manual install (Temurin / Adoptium)
+wget https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21/OpenJDK21U-jdk_x64_linux_hotspot.tar.gz
+tar xf OpenJDK21U-jdk_x64_linux_hotspot.tar.gz -C /usr/local/
+export JAVA_HOME=/usr/local/jdk-21
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Verify
+java -version
+javac -version
+```
+
+### SDKMAN
+
+A version manager for JDK and JVM-based tools (Maven, Gradle, etc.).
+
+#### Install
+
+```bash
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk version
+```
+
+#### Usage
+
+```bash
+# List available JDK distributions
+sdk list java
+
+# Install a specific JDK
+sdk install java 21.0.3-tem
+sdk install java 17.0.11-zulu
+
+# Use a JDK version
+sdk use java 21.0.3-tem              # current shell only
+sdk default java 21.0.3-tem          # set as default
+
+# Show current version
+sdk current java
+
+# Install other tools
+sdk install maven
+sdk install gradle
+
+# Upgrade
+sdk upgrade java
 ```
 
 ### IntelliJ IDEA
 
 ```bash
-# active
-cat ideaActive/ja-netfilter-all/ja-netfilter/readme.txt
-
-# settings
-# 1. Python Intergrated Tools -> Docstring format: Google
-
 # Plugins
-gradianto # themes
-rainbow brackets # json
+gradianto          # themes
+rainbow brackets   # bracket colorizer
 ```
 
 ## 2. ProjectManage
 
-### [maven](./CommandManual/BuildTools.md#maven)
+### Maven
 
-### gradle
+Apache Maven is a build automation and dependency management tool for Java. It uses `pom.xml` to declare dependencies, plugins, and build lifecycle.
+
+#### Install
 
 ```bash
+# SDKMAN (recommend)
+sdk install maven
 
+# macOS
+brew install maven
+
+# Manual
+wget https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz
+tar xf apache-maven-3.9.9-bin.tar.gz -C /usr/local/
+export M2_HOME=/usr/local/apache-maven-3.9.9
+export PATH=$M2_HOME/bin:$PATH
+
+# Verify
+mvn -version
+```
+
+#### Project Management
+
+```bash
+# Create a new project from archetype
+mvn archetype:generate \
+    -DgroupId=com.example \
+    -DartifactId=my-app \
+    -DarchetypeArtifactId=maven-archetype-quickstart
+
+# Build lifecycle
+mvn clean                         # clean target/
+mvn compile                       # compile source code
+mvn test                          # run unit tests
+mvn package                       # build JAR/WAR
+mvn install                       # install to local repository
+mvn deploy                        # deploy to remote repository
+
+# Common options
+mvn clean package -DskipTests     # skip tests during build
+mvn clean package -P production   # activate a profile
+mvn dependency:tree               # show dependency tree
+mvn dependency:resolve            # resolve and download dependencies
+mvn versions:display-dependency-updates
+```
+
+#### Configuration
+
+```xml
+<!-- ~/.m2/settings.xml — mirror example -->
+<settings>
+  <mirrors>
+    <mirror>
+      <id>aliyun</id>
+      <mirrorOf>central</mirrorOf>
+      <url>https://maven.aliyun.com/repository/central</url>
+    </mirror>
+  </mirrors>
+</settings>
+```
+
+### Gradle
+
+A build automation tool using Groovy/Kotlin DSL. It uses `build.gradle` (or `build.gradle.kts`) for project configuration.
+
+#### Install
+
+```bash
+# SDKMAN (recommend)
+sdk install gradle
+
+# macOS
+brew install gradle
+
+# Verify
+gradle -version
+```
+
+#### Project Management
+
+```bash
+# Initialize a new project
+gradle init --type java-application
+
+# Build lifecycle
+./gradlew clean                   # clean build/
+./gradlew build                   # compile, test, and package
+./gradlew test                    # run tests
+./gradlew bootRun                 # run Spring Boot application
+./gradlew jar                     # build JAR
+
+# Common options
+./gradlew build -x test           # skip tests
+./gradlew dependencies            # show dependency tree
+./gradlew tasks                   # list available tasks
+
+# Wrapper (generate or update)
+gradle wrapper --gradle-version 8.10
 ```
 
 ## 3. JVM Settings
 
-### common
+### Common
 
 ```bash
 JAVA_OPTS="\
@@ -111,4 +244,7 @@ $JAVA_ARGS
 >
 > 1. [Official Website](https://openjdk.org/projects/jdk/)
 > 2. [Repository](https://github.com/openjdk/jdk)
-> 3. [AliCloud Serverless](https://help.aliyun.com/zh/sae/use-cases/best-practices-for-jvm-heap-size-configuration)
+> 3. [SDKMAN](https://sdkman.io/)
+> 4. [Maven](https://maven.apache.org/)
+> 5. [Gradle](https://gradle.org/)
+> 6. [AliCloud Serverless](https://help.aliyun.com/zh/sae/use-cases/best-practices-for-jvm-heap-size-configuration)

@@ -46,15 +46,15 @@ Alicloud STS (Security Token Service) is a temporary access permission managemen
 
 ## Creating an STS Role and Testing Custom OSS Authorization
 
-1) Test Account Information
-Account: devops_test@xxx.onaliyun.com
-AK: xxxxx
-SK: xxxxx
-ARN: acs:ram::xxxxx:role/xxx-sts
-OSS Bucket Name: oss-test
-OSS Authorized Directory: dir111/dir111_secondline1/
+1. Test Account Information
+   Account: devops_test@xxx.onaliyun.com
+   AK: xxxxx
+   SK: xxxxx
+   ARN: acs:ram::xxxxx:role/xxx-sts
+   OSS Bucket Name: oss-test
+   OSS Authorized Directory: dir111/dir111_secondline1/
 
-2) Granting Authorization
+2. Granting Authorization
 
 - Create a RAM user (sub-account) and generate AK SK (this step is omitted)
 - Add STS permissions to the test account
@@ -71,7 +71,7 @@ OSS Authorized Directory: dir111/dir111_secondline1/
 
 <!-- {% asset_img ram6.png %} -->
 
-3) Testing and Verification (when you cannot log in to the RAM account via the console to verify permissions, you can use ossutil or ossbrowser tools for verification)
+3. Testing and Verification (when you cannot log in to the RAM account via the console to verify permissions, you can use ossutil or ossbrowser tools for verification)
 
 - ossutil Usage: [https://help.aliyun.com/document_detail/50451.html](https://help.aliyun.com/document_detail/50451.html)
 
@@ -79,7 +79,7 @@ OSS Authorized Directory: dir111/dir111_secondline1/
 
 - ossbrowser Usage: [https://help.aliyun.com/document_detail/92268.html](https://help.aliyun.com/document_detail/92268.html)
 
-4) After verifying that listing and other related permissions are correct, provide the ARN information to the development team
+4. After verifying that listing and other related permissions are correct, provide the ARN information to the development team
 
 > Permission Flow:
 >
