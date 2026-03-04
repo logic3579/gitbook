@@ -25,13 +25,13 @@ Automate the upgrade of SQL, configuration, and code using a workflow approach. 
 3. jiracdflow program /cicdflow/jira API upgrade logic
    > New field data is obtained from the JSON data submitted by the release system; old data is retrieved from the database saved during the last upgrade
 
-- When sql_info field data is not empty or differs from the last upgrade, the Jira ticket status enters <Pending SQL Execution>. The sql_info data is submitted to the Archery backend for DBA review and execution (review and execution permissions can be separated; subsequent execution can be delegated to ops or testers). The Jira workflow triggers <Submit SQL> to enter <SQL Executing> status, waiting for SQL execution success to be manually confirmed via <SQL Execution Successful> to proceed to the next step.
+- When sql_info field data is not empty or differs from the last upgrade, the Jira ticket status enters `<Pending SQL Execution>`. The sql_info data is submitted to the Archery backend for DBA review and execution (review and execution permissions can be separated; subsequent execution can be delegated to ops or testers). The Jira workflow triggers `<Submit SQL>` to enter `<SQL Executing>` status, waiting for SQL execution success to be manually confirmed via `<SQL Execution Successful>` to proceed to the next step.
   ![Pasted image 20230316145506](../attachements/Pasted%20image%2020230316145506.png)
 
-- When apollo_info or config_info field data is not empty or differs from the last upgrade, the Jira workflow status enters <CONFIG Executing>, waiting for manual configuration updates and then manually triggering <Config Upgrade Successful> to enter <CODE Executing> status.
+- When apollo_info or config_info field data is not empty or differs from the last upgrade, the Jira workflow status enters `<CONFIG Executing>`, waiting for manual configuration updates and then manually triggering `<Config Upgrade Successful>` to enter `<CODE Executing>` status.
   ![Pasted image 20230317165145](../attachements/Pasted%20image%2020230317165145.png)
 
-- When code_info field data is not empty or differs from the last upgrade, the Jira workflow status enters <CODE Executing>. The program calls cmdb_api to execute the code upgrade operation. Upon successful upgrade, it automatically triggers <Code Upgrade Successful> to enter <UAT Upgrade Complete> status.
+- When code_info field data is not empty or differs from the last upgrade, the Jira workflow status enters `<CODE Executing>`. The program calls cmdb_api to execute the code upgrade operation. Upon successful upgrade, it automatically triggers `<Code Upgrade Successful>` to enter `<UAT Upgrade Complete>` status.
   ![Pasted image 20230317170610](../attachements/Pasted%20image%2020230317170610.png)
 
 ### b) Prerequisites
@@ -119,7 +119,7 @@ tail -f logs/uwsgi.log   # Console output
 /cicdflow/jira/ 接口
 # 源码位置：cicdflow/views.py 下 JiraFlowView 视图函数
 # POST 请求：接收 Jira 的 webhook 请求，根据 webhook 请求类型（新建事件：issue_created & 更新事件：issue_updated）与请求数据中的 status 字段执行不同操作。
-issue_created 事件：Jira 工单首次创建，触发 <SQL待执行>
+issue_created 事件：Jira 工单首次创建，触发 `<SQL待执行>`
 issue_updated 事件：Jira 工单被更新，触发 webhook 流程
 ```
 
@@ -191,10 +191,10 @@ SIGN_UP_ENABLED: OFF   # 关闭注册功能
 > SQL上线 工单目前可以审核执行分离，DBA 审核，其他用户执行
 > DBA 执行工单时，通过唯一工单名称搜索所有待执行工单，按升级序号顺序执行
 
-- <等待审核人审核> 状态：SQL 工单初始化提交，等待 DBA 审核。
-- <审核通过> 状态：DBA 审核通过，等待执行。
-- <执行有异常> 与 <人工终止流程> 状态：SQL 执行异常或人为终止流程，需要重新提交 SQL 工单。（如果同一升级中异常工单后有其他工单，其他工单暂不执行，等待新工单提交后按顺序继续执行）
-- <已正常结束> 状态：SQL 成功人工/自动执行，单个 SQL 正常执行结束。
+- `<等待审核人审核>` 状态：SQL 工单初始化提交，等待 DBA 审核。
+- `<审核通过>` 状态：DBA 审核通过，等待执行。
+- `<执行有异常>` 与 `<人工终止流程>` 状态：SQL 执行异常或人为终止流程，需要重新提交 SQL 工单。（如果同一升级中异常工单后有其他工单，其他工单暂不执行，等待新工单提交后按顺序继续执行）
+- `<已正常结束>` 状态：SQL 成功人工/自动执行，单个 SQL 正常执行结束。
 
 #### 调整源码显示前台数据
 
