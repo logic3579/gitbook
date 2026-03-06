@@ -16,12 +16,12 @@ About knowledge record and Technology stack.
 
 <!-- toc -->
 
-- [APP-META](#)
-- [CNCF](#)
-- [DevOps](#)
-- [Environment](#)
-- [Misc](#)
-- [Platform](#)
+- [APP-META](./APP-META/README.md)
+- [CNCF](./CNCF/README.md)
+- [DevOps](./DevOps/README.md)
+- [Environment](./Environment/README.md)
+- [Misc](./Misc/README.md)
+- [Platform](./Platform/README.md)
 <!-- tocstop -->
 
 ## Using with `gitbook`

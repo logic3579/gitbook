@@ -281,12 +281,12 @@ fmt.Printf("%x \n", i)  // a
 
 ```go
 /*
-    \r	回车符（返回行首）
-    \n	换行符（直接跳到下一行的同列位置）
-    \t	制表符
-    \'	单引号
-    \"	双引号
-    \\	反斜杠
+    \r	carriage return (return to beginning of line)
+    \n	newline (jump to next line at same column)
+    \t	tab
+    \'	single quote
+    \"	double quote
+    \\	backslash
 */
 var s string = "hello world"
 s1 := s[1:3]
@@ -402,9 +402,9 @@ for k,v := range names {
 ```go
 /*
 type Slice struct {
-      Data uintptr   // 指针，指向底层数组中切片指定的开始位置
-      Len int        // 长度，即切片的长度
-      Cap int        // 最大长度（容量），也就是切片开始位置到数组的最后位置的长度
+      Data uintptr   // pointer to the start position of the slice in the underlying array
+      Len int        // length of the slice
+      Cap int        // capacity, distance from slice start to end of underlying array
 }
 */
 // option1: from array
@@ -420,32 +420,32 @@ var sm = make([]string, 3, 5)
 
 // address check
 var arr = [5]int{10, 11, 12, 13, 14}  // int64 = 8Bytes
-s1 := arr[0:3] // 对数组切片
+s1 := arr[0:3] // slice from array
 s2 := arr[2:5]
-s3 := s2[0:2] // 对切片切片
+s3 := s2[0:2] // slice from slice
 
 fmt.Println(s1) // [10, 11, 12]
 fmt.Println(s2) // [12, 13, 14]
 fmt.Println(s3) // [12, 13]
 
-// 地址是连续的
+// addresses are contiguous
 fmt.Printf("%p\n", &arr)
-fmt.Printf("%p\n", &arr[0]) // 相差8个字节
+fmt.Printf("%p\n", &arr[0]) // 8 bytes apart
 fmt.Printf("%p\n", &arr[1])
 fmt.Printf("%p\n", &arr[2])
 fmt.Printf("%p\n", &arr[3])
 fmt.Printf("%p\n", &arr[4])
 
-// 每一个切片都有一块自己的空间地址，分别存储了对于数组的引用地址，长度和容量
-fmt.Printf("%p\n", &s1) // s1自己的地址
+// each slice has its own address space, storing the reference to the array, length and capacity
+fmt.Printf("%p\n", &s1) // address of s1 itself
 fmt.Printf("%p\n", &s1[0])
 fmt.Println(len(s1), cap(s1))
 
-fmt.Printf("%p\n", &s2) // s2自己的地址
+fmt.Printf("%p\n", &s2) // address of s2 itself
 fmt.Printf("%p\n", &s2[0])
 fmt.Println(len(s2), cap(s2))
 
-fmt.Printf("%p\n", &s3) // s3自己的地址
+fmt.Printf("%p\n", &s3) // address of s3 itself
 fmt.Printf("%p\n", &s3[0])
 fmt.Println(len(s3), cap(s3))
 
@@ -460,9 +460,9 @@ emps2 := append(emps, "ddd")
 fmt.Println(emps2)
 emps3 := append(emps2, "eee")
 fmt.Println(emps3)
-// 容量不够时默认发生二倍扩容
+// doubles capacity by default when insufficient
 emps4 := append(emps3, "xxx")
-fmt.Println(emps4, len(emps4), cap(emps4)) // 此时底层数组已经发生变化
+fmt.Println(emps4, len(emps4), cap(emps4)) // underlying array has changed at this point
 
 // append element
 append(emps, "xxx", "yyy")
@@ -496,14 +496,14 @@ fmt.Println(s4)
 ```go
 /*
 type hmap struct {
-    count     int // 当前 map 中元素数量
+    count     int // current number of elements in the map
     flags     uint8
-    B         uint8  // 当前 buckets 数量，2^B 等于 buckets 个数
+    B         uint8  // current number of buckets, 2^B equals bucket count
     noverflow uint16 // approximate number of overflow buckets; see incrnoverflow for details
-    hash0     uint32 // 哈希种子
+    hash0     uint32 // hash seed
 
-    buckets    unsafe.Pointer // buckets 数组指针
-    oldbuckets unsafe.Pointer // 扩容时保存之前 buckets 数据。
+    buckets    unsafe.Pointer // pointer to buckets array
+    oldbuckets unsafe.Pointer // previous buckets data, saved during expansion
     nevacuate  uintptr        // progress counter for evacuation (buckets less than this have been evacuated)
 
     extra *mapextra // optional fields
@@ -752,16 +752,16 @@ func (d Dog) run(){}
 ```go
 /*  alloc heap memory
 type hchan struct {
-    qcount   uint           // total data in the queue 当前队列里还剩余元素个数
-    dataqsiz uint           // size of the circular queue 环形队列长度，即缓冲区的大小，即make(chan T,N) 中的N
-    buf      unsafe.Pointer // points to an array of dataqsiz elements 环形队列指针
-    elemsize uint16 //每个元素的大小
-    closed   uint32 //标识当前通道是否处于关闭状态，创建通道后，该字段设置0，即打开通道；通道调用close将其设置为1，通道关闭
-    elemtype *_type // element type 元素类型，用于数据传递过程中的赋值
-    sendx    uint   // send index 环形缓冲区的状态字段，它只是缓冲区的当前索引-支持数组，它可以从中发送数据
-    recvx    uint   // receive index 环形缓冲区的状态字段，它只是缓冲区当前索引-支持数组，它可以从中接受数据
-    recvq    waitq  // list of recv waiters 等待读消息的goroutine队列
-    sendq    waitq  // list of send waiters 等待写消息的goroutine队列
+    qcount   uint           // total data in the queue, remaining element count
+    dataqsiz uint           // size of the circular queue, i.e. buffer size, the N in make(chan T, N)
+    buf      unsafe.Pointer // points to an array of dataqsiz elements (circular queue pointer)
+    elemsize uint16         // size of each element
+    closed   uint32         // whether the channel is closed; 0 = open, 1 = closed
+    elemtype *_type         // element type, used for assignment during data transfer
+    sendx    uint           // send index in the circular buffer
+    recvx    uint           // receive index in the circular buffer
+    recvq    waitq          // list of recv waiters (goroutine queue waiting to read)
+    sendq    waitq          // list of send waiters (goroutine queue waiting to write)
 
     // lock protects all fields in hchan, as well as several
     // fields in sudogs blocked on this channel.
@@ -769,10 +769,10 @@ type hchan struct {
     // Do not change another G's status while holding this lock
     // (in particular, do not ready a G), as this can deadlock
     // with stack shrinking.
-    lock mutex //互斥锁，为每个读写操作锁定通道，因为发送和接受必须是互斥操作
+    lock mutex // mutex lock, locks the channel for each read/write as send and receive must be mutually exclusive
 }
 
-// sudog 代表goroutine
+// sudog represents a goroutine
 type waitq struct {
     first *sudog
     last  *sudog
@@ -1344,10 +1344,10 @@ func f4() (r int) {
 
 ```go
 /*
-递归特性:
-1. 调用自身函数。
-2. 必须有一个明确的结束条件。
-3. 在计算机中函数调用通过栈（stack）这种数据结构实现的，每当进入一个函数调用，栈就会加一层栈帧，每当函数返回，栈就会减一层栈帧。由于栈的大小不是无限的，递归调用的次数过多，会导致栈溢出。
+Recursion characteristics:
+1. Calls itself.
+2. Must have a clear termination condition.
+3. Function calls are implemented via a stack data structure. Each function call adds a stack frame, and each return removes one. Since the stack size is finite, too many recursive calls will cause a stack overflow.
 */
 
 // example 1
@@ -1443,7 +1443,7 @@ fmt.Println(b3, string(b3))
 
 
 // byte and character
-s := "Hello,世界"
+s := "Hello,World"
 r1 := []byte(s)  // utf8 encode
 r2 := []rune(s)  // Unicode character
 fmt.Println(r1)
@@ -1897,4 +1897,4 @@ SwapXxx()
 >
 > 1. [Official Website](https://go.dev)
 > 2. [Repository](https://github.com/golang/go)
-> 3. [Go语言中文网](https://studygolang.com/dl)
+> 3. [Go Community (CN)](https://studygolang.com/dl)

@@ -4,7 +4,7 @@
 
 # IDE
 .idea/
-.vscode
+.vscode/
 
 # OSX
 .DS_Store
@@ -12,7 +12,16 @@
 .AppleDouble
 .LSOverride
 
-# obsidian
+# Windows
+Thumbs.db
+
+# Node.js
+node_modules/
+
+# GitBook
+_book/
+
+# Obsidian
 .obsidian/workspace.json
 
 # Claude Code

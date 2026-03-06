@@ -20,6 +20,6 @@ content-type: text/css
 
 > Reference:
 >
-> 1. [Official Website](#)
-> 2. [Repository](#)
+> 1. [Cloudflare CDN](https://www.cloudflare.com/application-services/products/cdn/)
+> 2. [AWS CloudFront](https://aws.amazon.com/cloudfront/)
 

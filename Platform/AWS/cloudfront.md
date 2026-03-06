@@ -26,5 +26,5 @@ deploy using helm
 
 > Reference:
 >
-> 1. [Official Website](#)
-> 2. [Repository](#)
+> 1. [Official Website](https://aws.amazon.com/cloudfront/)
+> 2. [Repository](https://github.com/aws/aws-cdk)

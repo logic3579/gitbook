@@ -11,13 +11,13 @@ icon: bullseye-arrow
 
 <!-- toc -->
 
-- [CNAI](#)
-- [AppDefinitionDevelopment](#)
-- [ObservabilityAnalysis](#)
-- [OrchestrationManagement](#)
-- [Provisioning](#)
-- [Runtime](#)
-- [Serverless](#)
+- [CNAI](./CNAI/README.md)
+- [AppDefinition and Development](./AppDefinitionDevelopment/README.md)
+- [Observability and Analysis](./ObservabilityAnalysis/README.md)
+- [Orchestration and Management](./OrchestrationManagement/README.md)
+- [Provisioning](./Provisioning/README.md)
+- [Runtime](./Runtime/README.md)
+- [Serverless](./Serverless/README.md)
 
 <!-- tocstop -->
 

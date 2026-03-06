@@ -91,7 +91,7 @@ indent() {
 # Print the welcome page
 #########################
 print_welcome_page() {
-    local github_url="https://github.com/xxx/xxx"
+    local github_url="https://github.com/logic3579/gitbook"
     log ""
     log "${BOLD}Welcome to the ${MODULE_NAME} container${RESET}"
     log "Subscribe to project updates by watching ${BOLD}${github_url}${RESET}"

@@ -28,8 +28,6 @@
     - [RabbitMQ](./CNCF/AppDefinitionDevelopment/StreamingMessaging/rabbitmq.md)
     - [RocketMQ](./CNCF/AppDefinitionDevelopment/StreamingMessaging/rocketmq.md)
 - [CNAI](./CNCF/CNAI/README.md)
-  - [CICD](./CNCF/CNAI/CICD/README.md)
-    - [MLflow](./CNCF/CNAI/CICD/mlflow.md)
   - [Data Architecture](./CNCF/CNAI/DataArchitecture/README.md)
     - [ClickHouse](./CNCF/CNAI/DataArchitecture/clickhouse.md)
     - [Flink](./CNCF/CNAI/DataArchitecture/flink.md)
@@ -101,6 +99,7 @@
 
 ## DevOps
 
+- [Overview](./DevOps/README.md)
 - [Bash](./DevOps/Bash.md)
 - [Golang](./DevOps/Golang.md)
 - [Java](./DevOps/Java.md)
@@ -128,12 +127,12 @@
   - [CDN](./DevOps/Network/cdn.md)
   - [Computer Network](./DevOps/Network/computer-network.md)
   - [HTTP](./DevOps/Network/http.md)
-  - [Kubernetes Network](./DevOps/Network/k8s-network.md)
   - [NFS](./DevOps/Network/nfs.md)
   - [TCP](./DevOps/Network/tcp.md)
 - [Service Conf](./DevOps/ServiceConf/README.md)
   - [Elasticsearch](./DevOps/ServiceConf/elasticsearch.md)
   - [Grafana](./DevOps/ServiceConf/grafana.md)
+  - [Jenkins](./DevOps/ServiceConf/jenkins.md)
   - [Kafka](./DevOps/ServiceConf/kafka.md)
   - [Mongodb](./DevOps/ServiceConf/mongodb.md)
   - [Mysql](./DevOps/ServiceConf/mysql.md)
@@ -156,6 +155,7 @@
 
 ## Platform
 
+- [Overview](./Platform/README.md)
 - [Alibaba Cloud](./Platform/AlibabaCloud/README.md)
   - [RAM](./Platform/AlibabaCloud/ram.md)
   - [VPC](./Platform/AlibabaCloud/vpc.md)
@@ -173,8 +173,6 @@
   - [gcloud](./Platform/GoogleCloud/gcloud.md)
   - [GCE](./Platform/GoogleCloud/gce.md)
   - [GKE](./Platform/GoogleCloud/gke.md)
-- [PaaS Container Service](./Platform/PaasContainerService/README.md)
-  - [Portainer](./Platform/PaasContainerService/portainer.md)
 
 ## Misc
 

@@ -545,12 +545,12 @@ cat > /etc/nixos/home.nix << "EOF"
   programs.bash = {
     enable = true;
     enableCompletion = true;
-    # TODO add your custom bashrc content here
+    # Add your custom bashrc content here
     bashrcExtra = ''
       export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
     '';
 
-    # TODO set some aliases for convenience, you can add or remove based on your needs
+    # Set aliases for convenience, add or remove based on your needs
     shellAliases = {
       k = "kubectl";
       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";

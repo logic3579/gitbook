@@ -1,9 +1,9 @@
 ---
 description: opentelemetry
-icon: icon
+icon: bullseye-arrow
 ---
 
-# Overview
+# OpenTelemetry
 
 ## Introduction
 
@@ -13,5 +13,5 @@ icon: icon
 
 > Reference:
 >
-> 1. [Official Website](#)
-> 2. [Repository](#)
+> 1. [Official Website](https://opentelemetry.io/)
+> 2. [Repository](https://github.com/open-telemetry/opentelemetry-collector)

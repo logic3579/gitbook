@@ -8,30 +8,30 @@ description: Docker
 
 ### Linux Namespace
 
-#### 简介
+#### Overview
 
-Linux Namespace 是 Linux 提供的一种内核级别环境隔离的方法。Unix 中有一个叫chroot 的系统调用（通过修改根目录把用户 jai l到一个特定目录下），chroot 提供了一种简单的隔离模式：chroot 内部的文件系统无法访问外部的内容。Linux Namespace 在此基础上，提供了对 UTS、IPC、mount、PID、network、User 等的隔离机制。
+Linux Namespace is a kernel-level environment isolation mechanism provided by Linux. Unix has a system call called chroot (which jails users into a specific directory by modifying the root directory). chroot provides a simple isolation model: the filesystem inside chroot cannot access external content. Linux Namespace builds on this concept, providing isolation mechanisms for UTS, IPC, mount, PID, network, and User.
 
-Linux 下的超级父亲进程的 PID 是1，所以，同 chroot 一样，如果我们可以把用户的进程空间 jail 到某个进程分支下，并像 chroot 那样让其下面的进程 看到的那个超级父进程的 PID为1，于是就可以达到资源隔离的效果了（不同的 PID namespace 中的进程无法看到彼此）
+The super parent process PID in Linux is 1. Similar to chroot, if we can jail a user process space into a certain process branch and make the processes underneath see the super parent PID as 1, we achieve resource isolation (processes in different PID namespaces cannot see each other).
 
-主要是三个系统调用
+Three main system calls:
 
-- **`clone`\*\***() – 实现线程的系统调用，用来创建一个新的进程，并可以通过设计上述参数达到隔离。
-- **`unshare`\*\***() – 使某进程脱离某个 namespace
-- **`setns`\*\***() – 把某进程加入到某个 namespace
+- **`clone()`** – Creates a new process with isolation by setting namespace parameters.
+- **`unshare()`** – Detaches a process from a namespace.
+- **`setns()`** – Attaches a process to an existing namespace.
 
-[Linux Namespace 种类](https://lwn.net/Articles/531114/)
+[Linux Namespace Types](https://lwn.net/Articles/531114/)
 
-| 分类                   | 系统调用参数  | 相关内核版本                                                            |
-| ---------------------- | ------------- | ----------------------------------------------------------------------- |
+| Type                   | System Call Flag | Kernel Version                                                            |
+| ---------------------- | ---------------- | --------------------------------------------------------------------------------- |
 | **Mount namespaces**   | CLONE_NEWNS   | [Linux 2.4.19](http://lwn.net/2001/0301/a/namespaces.php3)              |
 | **UTS namespaces**     | CLONE_NEWUTS  | [Linux 2.6.19](http://lwn.net/Articles/179345/)                         |
 | **IPC namespaces**     | CLONE_NEWIPC  | [Linux 2.6.19](http://lwn.net/Articles/187274/)                         |
 | **PID namespaces**     | CLONE_NEWPID  | [Linux 2.6.24](http://lwn.net/Articles/259217/)                         |
-| **Network namespaces** | CLONE_NEWNET  | [始于Linux 2.6.24 完成于 Linux 2.6.29](http://lwn.net/Articles/219794/) |
-| **User namespaces**    | CLONE_NEWUSER | [始于 Linux 2.6.23 完成于 Linux 3.8)](http://lwn.net/Articles/528078/)  |
+| **Network namespaces** | CLONE_NEWNET     | [Started in Linux 2.6.24, completed in Linux 2.6.29](http://lwn.net/Articles/219794/) |
+| **User namespaces**    | CLONE_NEWUSER    | [Started in Linux 2.6.23, completed in Linux 3.8](http://lwn.net/Articles/528078/)  |
 
-#### clone() 系统调用
+#### clone() System Call
 
 ```c
 #define _GNU_SOURCE
@@ -42,7 +42,7 @@ Linux 下的超级父亲进程的 PID 是1，所以，同 chroot 一样，如果
 #include <signal.h>
 #include <unistd.h>
 
-/* 定义一个给 clone 用的栈，栈大小1M */
+/* Define a 1MB stack for clone */
 #define STACK_SIZE (1024 * 1024)
 static char container_stack[STACK_SIZE];
 
@@ -54,7 +54,7 @@ char* const container_args[] = {
 int container_main(void* arg)
 {
     printf("Container - inside the container!\n");
-    /* 直接执行一个shell，以便我们观察这个进程空间里的资源是否被隔离了 */
+    /* Execute a shell to observe whether resources are isolated */
     execv(container_args[0], container_args);
     printf("Something's wrong!\n");
     return 1;
@@ -63,16 +63,16 @@ int container_main(void* arg)
 int main()
 {
     printf("Parent - start a container!\n");
-    /* 调用clone函数，其中传出一个函数，还有一个栈空间的（为什么传尾指针，因为栈是反着的） */
+    /* Call clone with a function and stack space (tail pointer because the stack grows downward) */
     int container_pid = clone(container_main, container_stack+STACK_SIZE, SIGCHLD, NULL);
-    /* 等待子进程结束 */
+    /* Wait for child process to finish */
     waitpid(container_pid, NULL, 0);
     printf("Parent - container stopped!\n");
     return 0;
 }
 ```
 
-编译运行程序验证
+Compile and run to verify
 
 ```bash
 $ gcc -o ns ns.c
@@ -89,7 +89,7 @@ $ ls /tmp
 int container_main(void* arg)
 {
     printf("Container - inside the container!\n");
-    sethostname("container",10); /* 设置hostname */
+    sethostname("container",10); /* set hostname */
     execv(container_args[0], container_args);
     printf("Something's wrong!\n");
     return 1;
@@ -99,14 +99,14 @@ int main()
 {
     printf("Parent - start a container!\n");
     int container_pid = clone(container_main, container_stack+STACK_SIZE,
-            CLONE_NEWUTS | SIGCHLD, NULL); /*启用CLONE_NEWUTS Namespace隔离 */
+            CLONE_NEWUTS | SIGCHLD, NULL); /* Enable CLONE_NEWUTS Namespace isolation */
     waitpid(container_pid, NULL, 0);
     printf("Parent - container stopped!\n");
     return 0;
 }
 ```
 
-运行程序，子进程的 hostname 变成了 container
+After running the program, the child process hostname becomes container
 
 ```bash
 ubuntu@ubuntu:~$ sudo ./uts
@@ -120,16 +120,16 @@ container
 
 #### IPC Namespace
 
-IPC全称 Inter-Process Communication，是 Unix/Linux 下进程间通信的一种方式，IPC 有共享内存、信号量、消息队列等方法。所以为了隔离，需要把 IPC 给隔离开来，这样只有在同一个 Namespace 下的进程才能相互通信。IPC 需要有一个全局的 ID，Namespace 需要对这个 ID 隔离，不能让别的 Namespace 的进程看到。
+IPC (Inter-Process Communication) is a communication method between processes in Unix/Linux, including shared memory, semaphores, and message queues. To achieve isolation, IPC must be isolated so that only processes within the same Namespace can communicate. IPC requires a global ID, and Namespace must isolate this ID from other Namespaces.
 
-启动 IPC 隔离,需要在调用 clone 时加上 CLONE_NEWIPC 参数
+To enable IPC isolation, add the CLONE_NEWIPC flag when calling clone
 
 ```c
 int container_pid = clone(container_main, container_stack+STACK_SIZE,
             CLONE_NEWUTS | CLONE_NEWIPC | SIGCHLD, NULL);
 ```
 
-先创建一个 IPC 的 Queue,全局 Queue ID 是0
+First create an IPC Queue with global Queue ID 0
 
 ```bash
 ubuntu@ubuntu:~$ ipcmk -Q
@@ -141,10 +141,10 @@ key        msqid      owner      perms      used-bytes   messages
 0xd0d56eb2 0          ubuntu      644        0            0
 ```
 
-运行程序验证 IPC Queue 是否隔离
+Run the program to verify IPC Queue isolation
 
 ```bash
-# 如果运行没有 CLONE_NEWIPC 的程序,在子进程中还是能看到这个全启的IPC Queue
+# Without CLONE_NEWIPC, the child process can still see the global IPC Queue
 ubuntu@ubuntu:~$ sudo ./uts
 Parent - start a container!
 Container - inside the container!
@@ -154,7 +154,7 @@ root@container:~# ipcs -q
 key        msqid      owner      perms      used-bytes   messages
 0xd0d56eb2 0          ubuntu      644        0            0
 
-# 如果我们运行加上了 CLONE_NEWIPC 的程序，IPC 已被隔离
+# With CLONE_NEWIPC enabled, IPC is now isolated
 root@ubuntu:~$ ./ipc
 Parent - start a container!
 Container - inside the container!
@@ -170,7 +170,7 @@ key        msqid      owner      perms      used-bytes   messages
 ```c
 int container_main(void* arg)
 {
-    /* 查看子进程的PID，我们可以看到其输出子进程的 pid 为 1 */
+    /* Check the child process PID - it will output pid 1 */
     printf("Container [%5d] - inside the container!\n", getpid());
     sethostname("container",10);
     execv(container_args[0], container_args);
@@ -181,7 +181,7 @@ int container_main(void* arg)
 int main()
 {
     printf("Parent [%5d] - start a container!\n", getpid());
-    /*启用PID namespace - CLONE_NEWPID*/
+    /* Enable PID namespace - CLONE_NEWPID */
     int container_pid = clone(container_main, container_stack+STACK_SIZE,
             CLONE_NEWUTS | CLONE_NEWPID | SIGCHLD, NULL);
     waitpid(container_pid, NULL, 0);
@@ -190,7 +190,7 @@ int main()
 }
 ```
 
-运行程序验证
+Run the program to verify
 
 ```bash
 ubuntu@ubuntu:~$ sudo ./pid
@@ -200,20 +200,20 @@ root@container:~# echo $$
 1
 ```
 
-PID 为1的作用: PID 为1的进程是 init，地位非常特殊。作为所有进程的父进程，有很多特权（比如：屏蔽信号等），还会为检查所有进程的状态.如果某个子进程脱离了父进程（父进程没有wait它），那么 init 就会负责回收资源并结束这个子进程，所以要做到进程空间的隔离，首先要创建出 PID 为1的进程，最好就像 chroot 那样，把子进程的PID在容器内变成1.
+Role of PID 1: The process with PID 1 is init, which has a special role. As the parent of all processes, it has many privileges (e.g., signal masking) and monitors all process states. If a child process is orphaned (parent didn't wait for it), init reclaims resources and terminates it. To achieve process space isolation, we need to create a process with PID 1, ideally making the child process PID appear as 1 inside the container.
 
-但是在子进程的 shell 里输入 ps,top 等命令，上述程序还是可以看得到所有进程。说明并没有完全隔离。这是因为，像 ps, top 这些命令会去读 /proc 文件系统，因为 /proc 文件系统在父进程和子进程都是一样的，所以这些命令显示的东西都是一样的。**因此,还需要对文件系统进行隔离.**
+However, running ps, top, etc. in the child shell still shows all processes, indicating incomplete isolation. This is because commands like ps and top read from the /proc filesystem, which is shared between parent and child processes. **Therefore, filesystem isolation is also needed.**
 
 #### Mount Namespace
 
-启用 mount namespace 并在子进程中重新 mount /proc 文件系统
+Enable mount namespace and remount /proc filesystem in the child process
 
 ```c
 int container_main(void* arg)
 {
     printf("Container [%5d] - inside the container!\n", getpid());
     sethostname("container",10);
-    /* 重新mount proc文件系统到 /proc下 */
+    /* Remount proc filesystem to /proc */
     //option1
     //mount("none", "/tmp", "tmpfs", 0, "");
     //option2
@@ -226,7 +226,7 @@ int container_main(void* arg)
 int main()
 {
     printf("Parent [%5d] - start a container!\n", getpid());
-    /* 启用Mount Namespace - 增加CLONE_NEWNS参数 */
+    /* Enable Mount Namespace - add CLONE_NEWNS flag */
     int container_pid = clone(container_main, container_stack+STACK_SIZE,
             CLONE_NEWUTS | CLONE_NEWPID | CLONE_NEWNS | SIGCHLD, NULL);
     waitpid(container_pid, NULL, 0);
@@ -235,7 +235,7 @@ int main()
 }
 ```
 
-运行程序验证
+Run the program to verify
 
 ```bash
 ubuntu@ubuntu:~$ sudo ./pid.mnt
@@ -255,38 +255,38 @@ root@container:~# top
 
 #### User Namespace
 
-User Namespace 主要是用了 CLONE_NEWUSER 的参数。使用了这个参数后，内部看到的 UID 和 GID 已经与外部不同了，默认显示为65534。那是因为容器找不到其真正的 UID,所以设置上了最大的 UID（其设置定义在 /proc/sys/kernel/overflowuid）。
+User Namespace uses the CLONE_NEWUSER flag. After enabling it, the internal UID and GID differ from external ones, defaulting to 65534 because the container cannot find its real UID and falls back to the maximum UID (defined in /proc/sys/kernel/overflowuid).
 
-要把容器中的 uid 和真实系统的 uid 给映射在一起，需要修改 /proc/pid/uid_map 和 /proc/pid/gid_map 这两个文件。这两个文件的格式为：
+To map container UIDs to real system UIDs, modify /proc/pid/uid_map and /proc/pid/gid_map. The format of these files is:
 
 ```bash
 ID-inside-ns ID-outside-ns length
 ```
 
-其中：
+Where:
 
-- 第一个字段 ID-inside-ns 表示在容器显示的 UID 或 GID，
-- 第二个字段 ID-outside-ns 表示容器外映射的真实的 UID 或 GID。
-- 第三个字段表示映射的范围，一般填1，表示一一对应。
-  比如，把真实的 uid=1000映射成容器内的 uid=0
+- The first field ID-inside-ns represents the UID or GID displayed inside the container,
+- The second field ID-outside-ns represents the real UID or GID mapped outside the container.
+- The third field represents the mapping range, typically 1 for one-to-one mapping.
+  For example, mapping real uid=1000 to container uid=0
 
 ```bash
 $ cat /proc/2465/uid_map
          0       1000          1
 ```
 
-再比如下面的示例：表示把 namespace 内部从0开始的 uid 映射到外部从0开始的 uid，其最大范围是无符号32位整形
+Another example: mapping uid starting from 0 inside the namespace to uid starting from 0 outside, with the maximum range of unsigned 32-bit integer
 
 ```bash
 $ cat /proc/$$/uid_map
          0          0          4294967295
 ```
 
-需要注意的是：
+Notes:
 
-- 写这两个文件的进程需要这个 namespace 中的 CAP_SETUID (CAP_SETGID)权限（可参看[Capabilities](http://man7.org/linux/man-pages/man7/capabilities.7.html)）
-- 写入的进程必须是此 user namespace 的父或子的 user namespace 进程。
-- 另外需要满如下条件之一：1）父进程将 effective uid/gid 映射到子进程的 user namespace 中，2）父进程如果有 CAP_SETUID/CAP_SETGID 权限，那么它将可以映射到父进程中的任一 uid/gid。
+- The process writing these files needs CAP_SETUID (CAP_SETGID) capability in this namespace (see [Capabilities](http://man7.org/linux/man-pages/man7/capabilities.7.html))
+- The writing process must be in a parent or child user namespace of this user namespace.
+- Additionally, one of the following conditions must be met: 1) The parent maps its effective uid/gid to the child user namespace, 2) If the parent has CAP_SETUID/CAP_SETGID, it can map to any uid/gid in the parent process.
 
 ```c
 #define _GNU_SOURCE
@@ -341,7 +341,7 @@ int container_main(void* arg)
     printf("Container: eUID = %ld;  eGID = %ld, UID=%ld, GID=%ld\n",
             (long) geteuid(), (long) getegid(), (long) getuid(), (long) getgid());
 
-    /* 等待父进程通知后再往下执行（进程间的同步） */
+    /* Wait for parent process notification before proceeding (inter-process sync) */
     char ch;
     close(pipefd[1]);
     read(pipefd[0], &ch, 1);
@@ -387,7 +387,7 @@ int main()
 
     printf("Parent [%5d] - user/group mapping done!\n", getpid());
 
-    /* 通知子进程 */
+    /* Notify child process */
     close(pipefd[1]);
 
     waitpid(container_pid, NULL, 0);
@@ -396,37 +396,37 @@ int main()
 }
 ```
 
-上面的程序，用了一个 pipe 来对父子进程进行同步，为什么要这样做？因为子进程中有一个execv 的系统调用，这个系统调用会把当前子进程的进程空间给全部覆盖掉，我们希望在 execv 之前就做好 user namespace 的 uid/gid 的映射，这样，execv 运行的 /bin/bash 就会因为我们设置了 uid 为0的 inside-uid 而变成#号的提示符。
+The program above uses a pipe to synchronize parent and child processes. This is necessary because the child process calls execv, which replaces the entire process space. We need to complete the user namespace uid/gid mapping before execv, so that /bin/bash launched by execv will show the # prompt due to the inside-uid being set to 0.
 
-运行程序
+Run the program
 
 ```bash
 ubuntu@ubuntu:~$ id
 uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu)
 
-ubuntu@ubuntu:~$ ./user #<--以 ubuntu 用户运行
+ubuntu@ubuntu:~$ ./user #<-- run as ubuntu user
 Parent: eUID = 1000;  eGID = 1000, UID=1000, GID=1000
 Parent [ 3262] - start a container!
 Parent [ 3262] - Container [ 3263]!
 Parent [ 3262] - user/group mapping done!
 Container [    1] - inside the container!
-Container: eUID = 0;  eGID = 0, UID=0, GID=0 #<---Container里的UID/GID都为0了
+Container: eUID = 0;  eGID = 0, UID=0, GID=0 #<--- UID/GID inside container are now 0
 Container [    1] - setup hostname!
 
-root@container:~# id #<----我们可以看到容器里的用户和命令行提示符是root用户了
+root@container:~# id #<---- user and prompt inside container are now root
 uid=0(root) gid=0(root) groups=0(root),65534(nogroup)
 ```
 
-虽然容器内是 root 用户,但其实容器的 /bin/bash 进程是以一个普通用户 ubuntu 运行的,容器的安全性得到提高.
-User Namespace 是以普通用户运行，但是别的 Namespace 需要 root 权限，那么，如果我要同时使用多个 Namespace 时，先用一般用户创建 User Namespace，然后把这个一般用户映射成 root，在容器内用 root 来创建其它的 Naemespace。
+Although the container shows root, the /bin/bash process actually runs as a regular ubuntu user, improving container security.
+User Namespace runs as a regular user, but other Namespaces require root privileges. To use multiple Namespaces simultaneously, first create a User Namespace as a regular user, map that user to root, then create other Namespaces as root inside the container.
 
 #### Network Namespace
 
-一般用 ip 命令创建 Network Namespace.
-注意: 宿主机可能是 VM 主机,物理网卡可能是一个可以路由 IP 的虚拟网卡.
+Network Namespaces are typically created using the ip command.
+Note: The host may be a VM, and the physical NIC may be a virtual NIC capable of routing IPs.
 ![[Pasted image 20240213223106.png]]
 
-docker 容器中,使用 ip link show 或 ip addr show 查看当前宿主机的网络情况
+In a Docker container, use ip link show or ip addr show to view the host network
 
 ```bash
 ubuntu@ubuntu:~$ ip link show
@@ -440,55 +440,55 @@ ubuntu@ubuntu:~$ ip link show
     link/ether 8e:30:2a:ac:8c:d1 brd ff:ff:ff:ff:ff:ff
 ```
 
-如何模拟以上情况:
+How to simulate the above scenario:
 
 ```bash
-## 首先，我们先增加一个网桥lxcbr0，模仿docker0
+## First, add a bridge lxcbr0, simulating docker0
 brctl addbr lxcbr0
 brctl stp lxcbr0 off
-ifconfig lxcbr0 192.168.10.1/24 up #为网桥设置IP地址
+ifconfig lxcbr0 192.168.10.1/24 up # assign IP address to bridge
 
-## 接下来，我们要创建一个network namespace - ns1
+## Next, create a network namespace - ns1
 
-# 增加一个namesapce 命令为 ns1 （使用ip netns add命令）
+# Add a namespace named ns1 (using ip netns add)
 ip netns add ns1
 
-# 激活namespace中的loopback，即127.0.0.1（使用ip netns exec ns1来操作ns1中的命令）
+# Activate the loopback (127.0.0.1) in the namespace (using ip netns exec ns1)
 ip netns exec ns1   ip link set dev lo up
 
-## 然后，我们需要增加一对虚拟网卡
+## Then, add a pair of virtual network interfaces
 
-# 增加一个pair虚拟网卡，注意其中的veth类型，其中一个网卡要按进容器中
+# Add a veth pair; one end will be placed inside the container
 ip link add veth-ns1 type veth peer name lxcbr0.1
 
-# 把 veth-ns1 按到namespace ns1中，这样容器中就会有一个新的网卡了
+# Move veth-ns1 into namespace ns1, giving the container a new NIC
 ip link set veth-ns1 netns ns1
 
-# 把容器里的 veth-ns1改名为 eth0 （容器外会冲突，容器内就不会了）
+# Rename veth-ns1 to eth0 inside the container (avoids name conflict)
 ip netns exec ns1  ip link set dev veth-ns1 name eth0
 
-# 为容器中的网卡分配一个IP地址，并激活它
+# Assign an IP address to the container NIC and activate it
 ip netns exec ns1 ifconfig eth0 192.168.10.11/24 up
 
 
-# 上面我们把veth-ns1这个网卡按到了容器中，然后我们要把lxcbr0.1添加上网桥上
+# Add lxcbr0.1 to the bridge
 brctl addif lxcbr0 lxcbr0.1
 
-# 为容器增加一个路由规则，让容器可以访问外面的网络
+# Add a route rule so the container can access external networks
 ip netns exec ns1     ip route add default via 192.168.10.1
 
-# 在/etc/netns下创建network namespce名称为ns1的目录，
-# 然后为这个namespace设置resolv.conf，这样，容器内就可以访问域名了
+# Create a directory for network namespace ns1 under /etc/netns,
+# then set resolv.conf for this namespace, enabling DNS resolution inside the container
 mkdir -p /etc/netns/ns1
 echo "nameserver 8.8.8.8" > /etc/netns/ns1/resolv.conf
 ```
 
-docker 网络原理与以上方式有两点区别:
+Docker networking differs from the above in two ways:
 
-- Docker 的 resolv.conf 没有用这样的方式，而是用了 [[Docker#Mount Namespace|Mount Namespace]]
-- 另外，docker 是用进程的 PID 来做 Network Namespace 的名称的。
+- Docker resolv.conf uses [[Docker#Mount Namespace|Mount Namespace]] instead of the above method
+- Docker uses the process PID as the Network Namespace name.
 
-为运行的 docker 容器新增网卡,比如为正在运行的docker容器，增加一个 eth1的网卡，并给了一个静态的可被外部访问到的 IP 地址。
+Add a new NIC to a running Docker container, e.g., add an eth1 NIC with a static externally-accessible IP address.
 
 ```bash
 ip link add peerA type veth peer name peerB
@@ -500,28 +500,28 @@ ip netns exec ${container-pid} ip link set eth1 up ;
 ip netns exec ${container-pid} ip addr add ${ROUTEABLE_IP} dev eth1 ;
 ```
 
-需要把外部的“物理网卡”配置成混杂模式，这样这个 eth1 网卡就会向外通过 ARP 协议发送自己的 Mac 地址，然后外部的交换机就会把到这个 IP 地址的包转到“物理网卡”上，因为是混杂模式，所以 eth1就能收到相关的数据，一看包是发给自己的那么就收到。这样，Docker容器的网络就和外部通了。
+The external "physical NIC" must be set to promiscuous mode so that eth1 can broadcast its MAC address via ARP. The external switch then forwards packets for this IP to the "physical NIC". In promiscuous mode, eth1 receives the relevant data, enabling Docker container network connectivity with the external network.
 
 ### Linux Cgroup
 
-Linux CGroup 全称 Linux Control Group， 是 Linux 内核的一个功能，用来限制、 控制与分离一个进程组群的资源（如 CPU、内存、磁盘输入输出等）。
+Linux CGroup (Linux Control Group) is a Linux kernel feature for limiting, controlling, and isolating resource usage (CPU, memory, disk I/O, etc.) of process groups.
 
-Linux CGroupCgroup 可​​​让​​​您​​​为​​​系​​​统​​​中​​​所​​​运​​​行​​​任​​​务​​​（进​​​程​​​）的​​​用​​​户​​​定​​​义​​​组​​​群​​​分​​​配​​​资​​​源​​​ — 比​​​如​​​ CPU 时​​​间​​​、​​​系​​​统​​​内​​​存​​​、​​​网​​​络​​​带​​​宽​​​或​​​者​​​这​​​些​​​资​​​源​​​的​​​组​​​合​​​。​​​您​​​可​​​以​​​监​​​控​​​您​​​配​​​置​​​的​​​ cgroup，拒​​​绝​​​ cgroup 访​​​问​​​某​​​些​​​资​​​源​​​，甚​​​至​​​在​​​运​​​行​​​的​​​系​​​统​​​中​​​动​​​态​​​配​​​置​​​您​​​的​​​ cgroup。
-主要提供以下功能:
+Linux CGroup allows you to allocate resources — such as CPU time, system memory, network bandwidth, or combinations thereof — to user-defined groups of tasks (processes). You can monitor configured cgroups, deny cgroups access to certain resources, and dynamically reconfigure cgroups on a running system.
+Main features:
 
-- **Resource limitation**: 限制资源使用，比如内存使用上限以及文件系统的缓存限制。
-- **Prioritization**: 优先级控制，比如：CPU 利用和磁盘 IO 吞吐。
-- **Accounting**: 一些审计或一些统计，主要目的是为了计费。
-- **Control**: 挂起进程，恢复执行进程。
+- **Resource limitation**: Limit resource usage, such as memory caps and filesystem cache limits.
+- **Prioritization**: Priority control for CPU utilization and disk I/O throughput.
+- **Accounting**: Auditing and statistics, primarily for billing purposes.
+- **Control**: Suspend and resume processes.
 
-使​​​用​​​ cgroup，系​​​统​​​管​​​理​​​员​​​可​​​更​​​具​​​体​​​地​​​控​​​制​​​对​​​系​​​统​​​资​​​源​​​的​​​分​​​配​​​、​​​优​​​先​​​顺​​​序​​​、​​​拒​​​绝​​​、​​​管​​​理​​​和​​​监​​​控​​​。​​​可​​​更​​​好​​​地​​​根​​​据​​​任​​​务​​​和​​​用​​​户​​​分​​​配​​​硬​​​件​​​资​​​源​​​，提​​​高​​​总​​​体​​​效​​​率​​​.
+Using cgroups, system administrators can more precisely control the allocation, prioritization, denial, management, and monitoring of system resources, improving overall efficiency by better distributing hardware resources based on tasks and users.
 
-- 隔离一个进程集合（比如：nginx 的所有进程），并限制他们所消费的资源，比如绑定 CPU的核。
-- 为这组进程分配其足够使用的内存
-- 为这组进程分配相应的网络带宽和磁盘存储限制
-- 限制访问某些设备（通过设置设备的白名单）
+- Isolate a set of processes (e.g., all nginx processes) and limit their resource consumption, such as CPU core binding.
+- Allocate sufficient memory for the process group
+- Allocate appropriate network bandwidth and disk storage limits for the process group
+- Restrict access to certain devices (via device whitelisting)
 
-Ubuntu 中查看 cgroup mount
+View cgroup mount in Ubuntu
 
 ```bash
 ubuntu@ubuntu:~$ mount -t cgroup
@@ -538,7 +538,7 @@ cgroup on /sys/fs/cgroup/perf_event type cgroup (rw,relatime,perf_event)
 cgroup on /sys/fs/cgroup/hugetlb type cgroup (rw,relatime,hugetlb)
 ```
 
-或者使用 lssubsys 命令
+Or use the lssubsys command
 
 ```bash
 $ lssubsys  -m
@@ -555,7 +555,7 @@ perf_event /sys/fs/cgroup/perf_event
 hugetlb /sys/fs/cgroup/hugetlb
 ```
 
-如果没有可自己 mount
+If not available, mount manually
 
 ```bash
 mkdir cgroup
@@ -567,7 +567,7 @@ mount -t cgroup -ocpu cpu ./cgroup/cpu/
 mkdir cgroup/memory
 mount -t cgroup -omemory memory ./cgroup/memory/
 
-# mount 成功,可看到 cpu 和 cpuset 的子系统
+# After successful mount, cpu and cpuset subsystems are visible
 ubuntu@ubuntu:~$ ls /sys/fs/cgroup/cpu /sys/fs/cgroup/cpuset/
 /sys/fs/cgroup/cpu:
 cgroup.clone_children  cgroup.sane_behavior  cpu.shares         release_agent
@@ -584,7 +584,7 @@ cpuset.cpus            cpuset.memory_spread_slab       user
 cpuset.mem_exclusive   cpuset.mems
 ```
 
-在 /sys/fs/cgroup 各个子目录 make dir
+Create directories under /sys/fs/cgroup subdirectories
 
 ```bash
 ubuntu@ubuntu:/sys/fs/cgroup/cpu$ sudo mkdir testdir
@@ -596,7 +596,7 @@ cgroup.event_control   cpu.cfs_period_us  cpu.shares        notify_on_release
 
 #### CPU Limit
 
-模拟非常吃 CPU 的程序
+Simulate a CPU-intensive program
 
 ```bash
 tee > deadloop.c << "EOF"
@@ -612,20 +612,20 @@ gcc deadloop.c -o deadlooop
 ./deadloop
 ```
 
-限制自定义 group 的 CPU
+Limit CPU for a custom cgroup
 
 ```bash
 ubuntu@ubuntu:~# cat /sys/fs/cgroup/cpu/testdir/cpu.cfs_quota_us
 -1
-# 20% CPU 使用率
+# 20% CPU usage
 root@ubuntu:~# echo 20000 > /sys/fs/cgroup/cpu/testdir/cpu.cfs_quota_us
 
-# 查看上面程序的 pid,加入这个 cgroup 中
+# Get the pid of the above program and add it to this cgroup
 ps -ef |grep deadloop
 echo [pid] >> /sys/fs/cgroup/cpu/testdir/tasks
 ```
 
-线程代码示例
+Thread code example
 
 ```c
 #define _GNU_SOURCE         /* See feature_test_macros(7) */
@@ -643,7 +643,7 @@ const int NUM_THREADS = 5;
 
 void *thread_main(void *threadid)
 {
-    /* 把自己加入cgroup中（syscall(SYS_gettid)为得到线程的系统tid） */
+    /* Add self to cgroup (syscall(SYS_gettid) gets the thread system tid) */
     char cmd[128];
     sprintf(cmd, "echo %ld >> /sys/fs/cgroup/cpu/haoel/tasks", syscall(SYS_gettid));
     system(cmd);
@@ -670,12 +670,12 @@ int main (int argc, char *argv[])
         num_threads = NUM_THREADS;
     }
 
-    /* 设置CPU利用率为50% */
+    /* Set CPU utilization to 50% */
     mkdir("/sys/fs/cgroup/cpu/haoel", 755);
     system("echo 50000 > /sys/fs/cgroup/cpu/haoel/cpu.cfs_quota_us");
 
     mkdir("/sys/fs/cgroup/cpuset/haoel", 755);
-    /* 限制CPU只能使用#2核和#3核 */
+    /* Limit CPU to cores #2 and #3 only */
     system("echo \"2,3\" > /sys/fs/cgroup/cpuset/haoel/cpuset.cpus");
 
     pthread_t* threads = (pthread_t*) malloc (sizeof(pthread_t)*num_threads);
@@ -698,7 +698,7 @@ int main (int argc, char *argv[])
 
 #### Memory Limit
 
-模拟耗内存程序(不断的分配内存，每次512个字节，每次休息一秒)
+Simulate a memory-intensive program (allocating 512 bytes each time, sleeping 1 second between allocations)
 
 ```c
 #include <stdio.h>
@@ -728,46 +728,46 @@ int main(void)
 }
 ```
 
-限制内存
+Limit memory
 
 ```bash
-# 创建memory cgroup
+# Create a memory cgroup
 $ mkdir /sys/fs/cgroup/memory/testdir
 $ echo 64k > /sys/fs/cgroup/memory/testdir/memory.limit_in_bytes
 
-# 把上面的进程的pid加入这个cgroup
+# Add the pid of the above process to this cgroup
 $ echo [pid] > /sys/fs/cgroup/memory/haoel/tasks
 ```
 
 #### IO Limit
 
-测试模拟 IO 速度
+Test simulated I/O speed
 
 ```bash
-# dd 命令读写 IO
+# dd command for read/write I/O
 dd if=/dev/sda1 of=/dev/null
 
-# 查看 IO 速度
+# Check I/O speed
 iotop
   TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO>    COMMAND
  8128 be/4 root       55.74 M/s    0.00 B/s  0.00 % 85.65 % dd if=/de~=/dev/null...
 ```
 
-创建一个 blkio(块设备IO) 的 cgroup
+Create a blkio (block device I/O) cgroup
 
 ```bash
 mkdir /sys/fs/cgroup/blkio/testdir
 ```
 
-限制进程 IO 速度
+Limit process I/O speed
 
 ```bash
-# 注：8:0 是设备号，通过 ls -l /dev/sda1 获得
+# Note: 8:0 is the device number, obtained via ls -l /dev/sda1
 root@ubuntu:~# echo '8:0 1048576'  > /sys/fs/cgroup/blkio/testdir/blkio.throttle.read_bps_device
-# 将 dd 命令的 pid 放入 cgroup
+# Add the dd command pid to the cgroup
 root@ubuntu:~# echo [pid] > /sys/fs/cgroup/blkio/testdir/tasks
 
-# 查看 IO 速度
+# Check I/O speed
 iotop
   TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO>    COMMAND
  8128 be/4 root      973.20 K/s    0.00 B/s  0.00 % 94.41 % dd if=/de~=/dev/null...
@@ -775,23 +775,23 @@ iotop
 
 #### Cgroup Subsystem
 
-- blkio — 这​​​个​​​子​​​系​​​统​​​为​​​块​​​设​​​备​​​设​​​定​​​输​​​入​​​/输​​​出​​​限​​​制​​​，比​​​如​​​物​​​理​​​设​​​备​​​（磁​​​盘​​​，固​​​态​​​硬​​​盘​​​，USB 等​​​等​​​）。
-- cpu — 这​​​个​​​子​​​系​​​统​​​使​​​用​​​调​​​度​​​程​​​序​​​提​​​供​​​对​​​ CPU 的​​​ cgroup 任​​​务​​​访​​​问​​​。​​​
-- cpuacct — 这​​​个​​​子​​​系​​​统​​​自​​​动​​​生​​​成​​​ cgroup 中​​​任​​​务​​​所​​​使​​​用​​​的​​​ CPU 报​​​告​​​。​​​
-- cpuset — 这​​​个​​​子​​​系​​​统​​​为​​​ cgroup 中​​​的​​​任​​​务​​​分​​​配​​​独​​​立​​​ CPU（在​​​多​​​核​​​系​​​统​​​）和​​​内​​​存​​​节​​​点​​​。​​​
-- devices — 这​​​个​​​子​​​系​​​统​​​可​​​允​​​许​​​或​​​者​​​拒​​​绝​​​ cgroup 中​​​的​​​任​​​务​​​访​​​问​​​设​​​备​​​。​​​
-- freezer — 这​​​个​​​子​​​系​​​统​​​挂​​​起​​​或​​​者​​​恢​​​复​​​ cgroup 中​​​的​​​任​​​务​​​。​​​
-- memory — 这​​​个​​​子​​​系​​​统​​​设​​​定​​​ cgroup 中​​​任​​​务​​​使​​​用​​​的​​​内​​​存​​​限​​​制​​​，并​​​自​​​动​​​生​​​成​​​​​内​​​存​​​资​​​源使用​​​报​​​告​​​。​​​
-- net_cls — 这​​​个​​​子​​​系​​​统​​​使​​​用​​​等​​​级​​​识​​​别​​​符​​​（classid）标​​​记​​​网​​​络​​​数​​​据​​​包​​​，可​​​允​​​许​​​ Linux 流​​​量​​​控​​​制​​​程​​​序​​​（tc）识​​​别​​​从​​​具​​​体​​​ cgroup 中​​​生​​​成​​​的​​​数​​​据​​​包​​​。​​​
-- net_prio — 这个子系统用来设计网络流量的优先级
-- hugetlb — 这个子系统主要针对于HugeTLB系统进行限制，这是一个大页文件系统。
+- blkio — Sets I/O limits for block devices such as physical devices (disk, SSD, USB, etc.).
+- cpu — Uses the scheduler to provide cgroup task access to CPU.
+- cpuacct — Generates automatic reports on CPU usage by tasks in a cgroup.
+- cpuset — Assigns dedicated CPUs (on multi-core systems) and memory nodes to cgroup tasks.
+- devices — Allows or denies access to devices for tasks in a cgroup.
+- freezer — Suspends or resumes tasks in a cgroup.
+- memory — Sets memory limits for tasks in a cgroup and generates memory usage reports.
+- net_cls — Tags network packets with a class identifier (classid), allowing the Linux traffic controller (tc) to identify packets from specific cgroups.
+- net_prio — Sets network traffic priority
+- hugetlb — Limits HugeTLB (huge page filesystem) usage.
 
-#### Cgroup 相关术语
+#### Cgroup Terminology
 
-- **任务（Tasks）**：就是系统的一个进程。
-- **控制组（Control Group）**：一组按照某种标准划分的进程，比如官方文档中的Professor和Student，或是WWW和System之类的，其表示了某进程组。Cgroups中的资源控制都是以控制组为单位实现。一个进程可以加入到某个控制组。而资源的限制是定义在这个组上，就像上面示例中我用的haoel一样。简单点说，cgroup的呈现就是一个目录带一系列的可配置文件。
-- **层级（Hierarchy）**：控制组可以组织成hierarchical的形式，既一颗控制组的树（目录结构）。控制组树上的子节点继承父结点的属性。简单点说，hierarchy就是在一个或多个子系统上的cgroups目录树。
-- **子系统（Subsystem）**：一个子系统就是一个资源控制器，比如CPU子系统就是控制CPU时间分配的一个控制器。子系统必须附加到一个层级上才能起作用，一个子系统附加到某个层级以后，这个层级上的所有控制族群都受到这个子系统的控制。Cgroup的子系统可以有很多，也在不断增加中。
+- **Tasks**: A system process.
+- **Control Group**: A group of processes classified by certain criteria. Resource control in cgroups is implemented per control group. A process can join a control group, and resource limits are defined on the group. Simply put, a cgroup is represented as a directory with a set of configurable files.
+- **Hierarchy**: Control groups can be organized hierarchically as a tree (directory structure). Child nodes inherit attributes from parent nodes. Simply put, a hierarchy is a cgroups directory tree on one or more subsystems.
+- **Subsystem**: A resource controller, e.g., the CPU subsystem controls CPU time allocation. A subsystem must be attached to a hierarchy to take effect. Once attached, all control groups in that hierarchy are governed by the subsystem.
 
 ## Docker Engine
 
@@ -1065,23 +1065,23 @@ f1b2d749ed2c   none      null      local
 
 ```bash
 # bridge
-每个容器拥有独立网络协议栈，为每一个容器分配、设置 IP 等。将容器连接到虚拟网桥（默认为 docker0 网桥）。
+Each container has its own network stack with individual IP assignment. Containers are connected to a virtual bridge (default: docker0).
 
-# 1.在宿主机上创建 container namespace
+# 1. Create a container namespace on the host
 xxx
 
-# 2.daemon 进程利用 veth pair 技术，在宿主机上创建一对对等虚拟网络接口设备。veth pair 特性是一端流量会流向另一端。
-# 一个接口放在宿主机的 docker0 虚拟网桥上并命名为 vethxxx
-# 查看网桥信息
+# 2. The daemon creates a veth pair on the host. Traffic from one end flows to the other.
+# One interface is placed on the docker0 bridge and named vethxxx
+# View bridge info
 brctl show
 bridge name     bridge id               STP enabled     interfaces
 docker0         8000.0242db01d347       no              vethccab668
-# 查看宿主机 vethxxx 接口
+# View host vethxxx interface
 ip addr |grep vethccab668
-# 另外一个接口放进 container 所属的 namespace 下并命名为 eth0 接口
+# The other interface is placed in the container namespace and named eth0
 docker run --rm -dit busybox sh ip addr
 
-# 3.daemon 进程还会从网桥 docker0 的私有地址空间中分配一个 IP 地址和子网给该容器，并设置 docker0 的 IP 地址为容器的默认网关
+# 3. The daemon assigns an IP address and subnet from docker0's private address space and sets docker0 IP as the default gateway
 docker inspect test |grep Gateway
             "Gateway": "172.17.0.1",
 
@@ -1090,14 +1090,14 @@ docker inspect test |grep Gateway
 ##### Overlay
 
 ```bash
-# 多 docker 主机组建网络，配合 docker swarm 使用
+# Multi-host networking, used with docker swarm
 ```
 
 ##### Host
 
 ```bash
 # host
-使用宿主机的 IP 和端口，共享宿主机网络协议栈。
+Uses the host IP and ports, sharing the host network stack.
 
 # test
 docker run --rm -dit --net host busybox ip addr
@@ -1111,7 +1111,7 @@ ipvlan_mode: l2, l3(default), l3s
 ipvlan_flag: bridge(default), private, vepa
 parent: eth0
 
-# l2 mode: 使用宿主机的望断
+# l2 mode: uses host network segment
 docker network create -d ipvlan \
      --subnet=192.168.1.0/24 \
      --gateway=192.168.1.1 \
@@ -1166,7 +1166,7 @@ docker network create -d macvlan \
 
 ```bash
 # none
-每个容器拥有独立网络协议栈，但没有网络设置，如分配 veth pair 和网桥连接等。
+Each container has its own network stack but without network configuration such as veth pair and bridge connections.
 
 # verify
 docker run --rm -dit --net none busybox ip addr
@@ -1176,7 +1176,7 @@ docker run --rm -dit --net none busybox ip addr
 
 ```bash
 # container
-和一个指定已有的容器共享网络协议栈，使用共有的 IP、端口等。
+Shares the network stack with a specified existing container, using the same IP, ports, etc.
 
 # verify
 docker run -dit --name test --rm busybox sh
@@ -1184,15 +1184,15 @@ docker run -it --name c1 --net container:test --rm busybox ip addr
 docker run -it --name c2 --net container:test --rm busybox ip addr
 ```
 
-##### 自定义网络模式
+##### Custom Network Mode
 
 ```bash
 # user-defined
-默认 docker0 网桥无法通过 container name host 通信，自定义网络默认使用 daemon 进程内嵌的 DNS server，可以直接通过 --name 指定的 container name 进行通信
+The default docker0 bridge cannot communicate via container name. Custom networks use the daemon embedded DNS server, allowing direct communication via --name specified container names.
 
-# 创建自定义网络
+# Create a custom network
 docker network create test-network
-# 宿主机查看新增虚拟网卡
+# View new virtual NIC on the host
 ip addr
     inet 172.19.0.1/16 brd 172.19.255.255 scope global br-8cb8260a95cf
 brctl show
@@ -1201,7 +1201,7 @@ br-8cb8260a95cf         8000.024272aa9d38       no              veth556b81b
 docker run -dit --name test1 --net test-network --rm busybox sh
 docker run -it --name test2 --net test-network --rm busybox ping -c 4 test1
 
-# 连接已有的网络
+# Connect to an existing network
 docker run -dit --name test3 --net test-network --rm busybox sh
 docker network connect test-network test3
 docker exec -it test3 ip addr
@@ -1323,25 +1323,25 @@ CMD ["flask", "run", "--host", "0.0.0.0", "--port", "8000"]
 #### others
 
 ```Dockerfile
-""" 编写规范
-1. 使用统一的 base 镜像。
-2. 动静分离（基础稳定内容放在底层）。
-3. 最小原则（镜像只打包必需的东西）。
-4. 一个原则（每个镜像只有一个功能，交互通过网络，模块化管理）。
-5. 使用更少的层，减少每层的内容。
-6. 不要在 Dockerfile 单独修改文件权限（entrypoint / 拷贝+修改权限同时操作）。
-7. 利用 cache 加快构建速度。
-8. 版本控制和自动构建（放入 git 版本控制中，自动构建镜像，构建参数/变量给予文档说明）。
-9. 使用 .dockerignore 文件（排除文件和目录）
+""" Best Practices
+1. Use a unified base image.
+2. Separate static and dynamic layers (stable content at the bottom).
+3. Minimize image size (only include what is necessary).
+4. Single responsibility (one function per image, interact via network, modular management).
+5. Use fewer layers and reduce content per layer.
+6. Do not modify file permissions separately (combine with COPY or in entrypoint).
+7. Leverage build cache to speed up builds.
+8. Use version control and automated builds (store in git, automate image builds, document build args).
+9. Use .dockerignore files (exclude files and directories).
 """
 
-# ENTRYPOINT 指令:
-# exec 形式，直接启动程序进程，pid=1
+# ENTRYPOINT directive:
+# exec form: directly starts the program process, pid=1
 ENTRYPOINT ["node", "app.js"]
-# shell 形式，fork 一个 shell 子进程，shell 子进程启动程序
+# shell form: forks a shell subprocess which then starts the program
 ENTRYPOINT "node" "app.js"
 
-# Pod template 对应 Dockerfile 字段
+# Pod template fields corresponding to Dockerfile
 spec.contianers[n].command = ENTRYPOINT
 spec.contianers[n].args = CMD
 ```
@@ -1355,4 +1355,4 @@ spec.contianers[n].args = CMD
 > 1. [Official Website](https://docs.docker.com/)
 > 2. [Docker network-drivers](https://docs.docker.com/network/drivers/)
 > 3. [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
-> 4. [COOLSHELL-DOCKER基础技术:Linux NAMESPACE](https://coolshell.cn/articles/17010.html)
+> 4. [COOLSHELL-Docker Fundamentals: Linux NAMESPACE](https://coolshell.cn/articles/17010.html)

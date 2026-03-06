@@ -1,19 +1,27 @@
-FROM ubuntu:latest
+FROM ubuntu:24.04
 
 # Switch to root user
 USER root
 
-# Do something as root
-RUN apt-get install -y net-tools \
+# Create non-root user
+RUN groupadd -r app && useradd -r -g app app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    net-tools \
     curl \
-    wget
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Define working directory
+ENV APP=/app
+
+# Create and switch the work directory
+RUN mkdir -p $APP && chown app:app $APP
+WORKDIR $APP
 
 # This directory is created by the build step in CICD workflow
 COPY --chown=app:app . .
-
-# Create and switch the work directory
-RUN mkdir $APP
-WORKDIR $APP
 
 # Switch to non-root user
 USER app
