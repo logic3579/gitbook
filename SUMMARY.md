@@ -179,7 +179,7 @@
   - [Kube Eventer](./Misc/Kubernetes/kube-eventer.md)
   - [Ubutun Deploy Kubernetes With Containerd](./Misc/Kubernetes/ubuntu-containerd-deploy-k8s.md)
 - [Science](./Misc/Science/README.md)
-  - [V2Ray](./Misc/Science/V2Ray/README.md)
+  - [V2Ray](./Misc/Science/v2ray.md)
   - [ipsec](./Misc/Science/ipsec.md)
   - [OpenVPN](./Misc/Science/openvpn.md)
   - [SSHTunnel](./Misc/Science/sshtunnel.md)
