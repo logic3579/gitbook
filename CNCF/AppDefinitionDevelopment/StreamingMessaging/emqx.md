@@ -80,8 +80,9 @@ mqttx pub -t 'hello' -h 'broker.emqx.io' -p 1883 -m 'Hello from MQTTX CLI' -u 'a
 
 
 
->Reference:
->1. [Official Website](https://www.emqx.io/docs/)
->2. [Repository](https://github.com/emqx/emqx)
->3. [Kubernetes Operator](https://docs.emqx.com/zh/emqx-operator/latest/getting-started/getting-started.html)
->4. [MQTTX Client Tools](https://mqttx.app/)
+> Reference:
+>
+> 1. [Official Website](https://www.emqx.io/docs/)
+> 2. [Repository](https://github.com/emqx/emqx)
+> 3. [Kubernetes Operator](https://docs.emqx.com/zh/emqx-operator/latest/getting-started/getting-started.html)
+> 4. [MQTTX Client Tools](https://mqttx.app/)

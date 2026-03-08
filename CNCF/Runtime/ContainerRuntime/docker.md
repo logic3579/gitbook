@@ -424,7 +424,7 @@ User Namespace runs as a regular user, but other Namespaces require root privile
 
 Network Namespaces are typically created using the ip command.
 Note: The host may be a VM, and the physical NIC may be a virtual NIC capable of routing IPs.
-![[Pasted image 20240213223106.png]]
+<!-- Image removed: Pasted image 20240213223106.png (file not found) -->
 
 In a Docker container, use ip link show or ip addr show to view the host network
 
@@ -485,7 +485,7 @@ echo "nameserver 8.8.8.8" > /etc/netns/ns1/resolv.conf
 
 Docker networking differs from the above in two ways:
 
-- Docker resolv.conf uses [[Docker#Mount Namespace|Mount Namespace]] instead of the above method
+- Docker resolv.conf uses [Mount Namespace](#mount-namespace) instead of the above method
 - Docker uses the process PID as the Network Namespace name.
 
 Add a new NIC to a running Docker container, e.g., add an eth1 NIC with a static externally-accessible IP address.
@@ -1348,7 +1348,7 @@ spec.contianers[n].args = CMD
 
 ### Docker Compose
 
-[[docker-compose.yml|Archery Docker Compose]]
+Archery Docker Compose
 
 > Reference:
 >

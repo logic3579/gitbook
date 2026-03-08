@@ -1,9 +1,8 @@
 ---
 description: HAProxy Load Balancer's development branch (mirror of git.haproxy.org)
-icon: icon
 ---
 
-# Overview
+# HAProxy
 
 ## Introduction
 

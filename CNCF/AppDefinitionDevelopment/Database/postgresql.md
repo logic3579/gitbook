@@ -19,7 +19,7 @@ tar xf postgresql-15.1.tar.gz && rm -f postgresql-15.1.tar.gz
 cd postgresql-15.1/
 
 # compile
-mkdri bld && cd bld
+mkdir bld && cd bld
 ../configure --prefix=/opt/pgsql --with-systemd
 make -j `grep processor /proc/cpuinfo | wc -l`
 make install

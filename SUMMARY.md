@@ -2,10 +2,6 @@
 
 - [Introduction](./README.md)
 
-## APP-META
-
-- [Overview](./APP-META/README.md)
-
 ## CNCF
 
 - [Overview](./CNCF/README.md)
@@ -106,7 +102,6 @@
 - [Node.js](./DevOps/NodeJS.md)
 - [Python](./DevOps/Python.md)
 - [Ruby](./DevOps/Ruby.md)
-- [Spec](./DevOps/Spec.md)
 - [Command Manual](./DevOps/CommandManual/README.md)
   - [Automation](./DevOps/CommandManual/Automation.md)
   - [Build Tools](./DevOps/CommandManual/BuildTools.md)
@@ -169,10 +164,19 @@
   - [GCE](./Platform/GoogleCloud/gce.md)
   - [GKE](./Platform/GoogleCloud/gke.md)
 
+## Standards
+
+- [Overview](./Standards/README.md)
+- [Naming Conventions](./Standards/naming-conventions.md)
+- [Git Flow](./Standards/gitflow.md)
+- [JiraCDflow](./Standards/JiraCDflow/README.md)
+- [GitHub Standards](./Standards/github-standards.md)
+- [GitLab Standards](./Standards/gitlab-standards.md)
+- [Docker Standards](./Standards/docker-standards.md)
+
 ## Misc
 
 - [Overview](./Misc/README.md)
-- [JiraCDflow](./Misc/JiraCDflow/README.md)
 - [Kubernetes](./Misc/Kubernetes/README.md)
   - [Kubernetes Network](./Misc/Kubernetes/k8s-network.md)
   - [Kubernetes RBAC](./Misc/Kubernetes/k8s-rbac.md)
@@ -184,6 +188,5 @@
   - [OpenVPN](./Misc/Science/openvpn.md)
   - [SSHTunnel](./Misc/Science/sshtunnel.md)
   - [WireGuard](./Misc/Science/wireguard.md)
-- [Git Flow](./Misc/gitflow.md)
 - [Hosting](./Misc/hosting.md)
 - [Interview](./Misc/interview.md)

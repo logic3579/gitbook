@@ -196,6 +196,7 @@ kubectl -n middleware get service |grep redis
 
 
 > Reference:
+>
 > 1. [Official Website](https://redis.io/docs/getting-started/)
 > 2. [Repository](https://github.com/redis/redis)
 > 3. [Redis Download Releases](https://download.redis.io/releases/)

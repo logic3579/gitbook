@@ -9,5 +9,6 @@ description: gRPC protocol
 
 
 > Reference:
-> 1. [Official Website](https://https://grpc.io/)
+>
+> 1. [Official Website](https://grpc.io/)
 > 2. [Repository](https://github.com/grpc/grpc)

@@ -1,5 +1,5 @@
 ---
-description: 🤖 AI Gateway | AI Native API Gateway
+description: AI Gateway | AI Native API Gateway
 ---
 
 # Higress
@@ -9,5 +9,6 @@ description: 🤖 AI Gateway | AI Native API Gateway
 
 
 > Reference:
+>
 > 1. [Official Website](https://higress.io/)
 > 2. [Repository](https://github.com/alibaba/higress)

@@ -1,8 +1,8 @@
 ---
-description: ElasticSearch
+description: Elasticsearch
 ---
 
-# ElasticSearch
+# Elasticsearch
 
 ## Introduction
 

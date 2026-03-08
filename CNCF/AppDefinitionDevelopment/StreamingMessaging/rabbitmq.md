@@ -127,6 +127,7 @@ helm -n middleware install rabbitmq .
 
 
 > Reference:
+>
 > 1. [Official Website](https://www.rabbitmq.com/documentation.html)
 > 2. [Repository](https://github.com/rabbitmq/rabbitmq-server)
 > 3. [Erlang Download](https://erlang.org/download/otp_versions_tree.html)

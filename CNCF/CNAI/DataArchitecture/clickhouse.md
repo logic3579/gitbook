@@ -2,7 +2,7 @@
 description: ClickHouse
 ---
 
-# Clickhouse
+# ClickHouse
 
 ## Introduction
 

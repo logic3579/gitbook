@@ -6,6 +6,8 @@ description: Istio
 
 ## Introduction
 
+Istio is an open-source service mesh that provides traffic management, security, and observability for microservices. It uses Envoy sidecar proxies to intercept and control network communication between services.
+
 ### Resource
 
 #### ServiceEntry

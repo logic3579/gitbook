@@ -352,8 +352,8 @@ helm install -n middleware kafka . --create-namespace
 
 > Reference:
 >
-> 1.  [Official Website](https://kafka.apache.org/documentation/)
-> 2.  [Repository](https://github.com/apache/kafka)
-> 3.  [StorageClass Official Documentation](https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/)
-> 4.  [Kafka KRaft Protocol](https://www.infoq.cn/article/j1jm5qehr1jiequby0ot)
+> 1. [Official Website](https://kafka.apache.org/documentation/)
+> 2. [Repository](https://github.com/apache/kafka)
+> 3. [StorageClass Official Documentation](https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/)
+> 4. [Kafka KRaft Protocol](https://www.infoq.cn/article/j1jm5qehr1jiequby0ot)
 > 5.  [NFS Server Deployment](/DevOps/Network/nfs.md#csi-driver-nfs)
