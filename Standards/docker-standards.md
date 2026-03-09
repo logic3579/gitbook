@@ -1,4 +1,5 @@
 ---
+icon: docker
 description: Docker image build and release standards
 ---
 

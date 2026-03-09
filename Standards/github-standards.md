@@ -1,4 +1,5 @@
 ---
+icon: github
 description: GitHub project management and release standards
 ---
 

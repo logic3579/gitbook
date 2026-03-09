@@ -1,4 +1,5 @@
 ---
+icon: gitlab
 description: GitLab project management and release standards
 ---
 
