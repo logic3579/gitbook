@@ -1,5 +1,5 @@
 ---
-icon: code
+icon: bullseye-arrow
 description: DevOps
 ---
 

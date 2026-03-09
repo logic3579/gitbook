@@ -1,5 +1,5 @@
 ---
-icon: list-check
+icon: bullseye-arrow
 description: Standards
 ---
 

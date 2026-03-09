@@ -1,5 +1,5 @@
 ---
-icon: cloud
+icon: bullseye-arrow
 description: Platform
 ---
 

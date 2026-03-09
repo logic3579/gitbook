@@ -122,7 +122,6 @@
   - [CDN](./DevOps/Network/cdn.md)
   - [Computer Network](./DevOps/Network/computer-network.md)
   - [HTTP](./DevOps/Network/http.md)
-  - [NFS](./DevOps/Network/nfs.md)
   - [TCP](./DevOps/Network/tcp.md)
 - [Service Conf](./DevOps/ServiceConf/README.md)
   - [Elasticsearch](./DevOps/ServiceConf/elasticsearch.md)
