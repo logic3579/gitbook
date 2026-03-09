@@ -1,16 +1,14 @@
 ## Introduction
 
-kvm: Kernel module responsible for CPU and memory virtualization, intercepts guest I/O and passes it to QEMU for processing.
-QEMU: Implements IO virtualization and device emulation (disk, network card, graphics card, sound card, etc.), interacts with the kvm kernel via IOCTL system calls.
-qemu-kvm: Core virtualization software, provides hardware emulation and an interface with the kvm kernel module.
-libvirt: Service and daemon (libvirtd) for managing virtualization platforms, provides a common API for managing various virtualization technologies (such as kvm, Xen).
-virsh: CLI command-line tool based on libvirt.
-virt-install: Command-line tool for creating kvm virtual machines.
-virt-manager: Virtual machine UI management tool.
-virt-viewer: Tool for connecting to virtual machine display.
-virt-clone: Virtual machine cloning tool.
-virt-top: Tool for viewing virtual machine load.
-virt-v2v: Virtual machine format migration tool.
+| Component | Description |
+|-----------|-------------|
+| kvm | Kernel module for CPU and memory virtualization |
+| QEMU / qemu-kvm | IO virtualization and device emulation, interacts with kvm via IOCTL |
+| libvirt | Daemon and API for managing virtualization platforms (KVM, Xen, etc.) |
+| virsh | CLI tool based on libvirt |
+| virt-install | CLI tool for creating KVM virtual machines |
+| virt-manager | Virtual machine UI management tool |
+| virt-viewer / virt-clone / virt-top / virt-v2v | Display, clone, monitor, and migrate VMs |
 
 ## How To Use
 

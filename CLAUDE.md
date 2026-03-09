@@ -56,7 +56,7 @@ The documentation is organized into six top-level sections:
 
 - Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
 - `CommandManual/` — CLI references: Automation, BuildTools, ContainerRuntime, Database, IOTools, MemoryTools, NetworkTools, OpenSSL, Package, StreamingMessaging, SystemTools, Systemd, TextSwordsman, VersionControl, VideoTools
-- `Network/` — CDN, Computer Network, HTTP, NFS, TCP
+- `Network/` — CDN, Computer Network, HTTP, TCP
 - `ServiceConf/` — Service configuration guides: Elasticsearch, Grafana, Jenkins, Kafka, MongoDB, MySQL, Nginx, Observability, PostgreSQL, Redis, Saltstack
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
 - Kernel — Linux kernel topics
@@ -80,7 +80,7 @@ The documentation is organized into six top-level sections:
 ### Misc Section Structure
 
 - `Kubernetes/` — Kubernetes network, RBAC, deployment guides
-- `Science/` — VPN/tunnel technologies (V2Ray, IPsec, OpenVPN, SSH Tunnel, WireGuard), hosting
+- `Science/` — VPN/tunnel technologies (V2Ray, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
 - `interview.md` — Interview preparation
 
 ### External Repository References
