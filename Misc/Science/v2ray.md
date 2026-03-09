@@ -1,3 +1,7 @@
+---
+description: Multi-protocol proxy tool with flexible routing and traffic obfuscation
+---
+
 # V2Ray
 
 V2Ray is a network proxy tool that supports multiple protocols including VMess, VLESS, Shadowsocks, Trojan, and more. It provides flexible routing rules, traffic obfuscation, and transport layer security for building private network tunnels.

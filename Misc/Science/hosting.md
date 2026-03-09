@@ -1,5 +1,5 @@
 ---
-description: Hosting
+description: VPS hosting and domain name services
 ---
 
 # Hosting

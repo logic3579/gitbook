@@ -1,3 +1,7 @@
+---
+description: Layer 2/3 tunneling over SSH
+---
+
 # SSH Tunnel
 
 ## Layer2
@@ -26,3 +30,8 @@ ssh -o PermitLocalCommand=yes \
  -w 5:5 root@[server_ip] \
  'ip link set tun5 up && ip addr add 10.0.0.1/32 peer 10.0.0.2 dev tun5' (Server-side SSH needs Tunnel and RootLogin enabled)
 ```
+
+> Reference:
+>
+> 1. [SSH Tunneling](https://www.ssh.com/academy/ssh/tunneling)
+> 2. [OpenSSH Manual](https://man.openbsd.org/ssh)

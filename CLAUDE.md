@@ -102,7 +102,7 @@ Some documents point to external repositories instead of containing inline conte
 
 ### Markdown Conventions
 
-- **Frontmatter**: Every document should have `description` field. All documents under first-level and second-level directories should include an `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names), including both `README.md` files and regular content documents. Use brand icons for branded tools (e.g., `docker`, `github`, `gitlab`) and descriptive icons for concepts (e.g., `code-branch` for Git Flow, `tag` for naming conventions).
+- **Frontmatter**: Every document should have `description` field. First-level and second-level directory `README.md` files should include an `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names). Regular content documents (non-README) do not need `icon`.
 - **H1 title**: Must match the official tool/project name (e.g., `# ClickHouse`, `# Elasticsearch`, not `# Overview`)
 - **Reference format**: Use the standardized blockquote format at the end of each document:
   ```markdown

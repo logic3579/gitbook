@@ -5,37 +5,13 @@ description: Science
 
 # Science
 
-## Forward Proxy
+VPN/tunnel technologies, proxy services, and hosting.
 
-### Tinyproxy
-
-```bash
-# config
-vim /etc/tinyproxy/tinyproxy.conf
-...
-Allow 10.0.0.1
-...
-# start server
-systemctl start tinyproy && systemctl enable tinyproxy
-```
-
-## Proxy
-
-### Outline
-
-### SSR
-
-```bash
-wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh
-```
-
-## Hosting
-
+- [V2Ray](v2ray.md) — Multi-protocol proxy tool with flexible routing and traffic obfuscation
+- [IPsec](ipsec.md) — IPsec/L2TP VPN server via Docker
+- [OpenVPN](openvpn.md) — Open-source VPN solution
+- [SSH Tunnel](sshtunnel.md) — Layer 2/3 tunneling over SSH
+- [WireGuard](wireguard.md) — Modern, high-performance VPN tunnel
+- [Outline](outline.md) — Shadowsocks-based VPN by Jigsaw for secure internet access
+- [ShadowsocksR](ssr.md) — ShadowsocksR proxy with obfuscation and protocol plugins
 - [Hosting](hosting.md) — VPS hosting and domain name services
-
-> Reference:
->
-> 1. [ipsec-vpn-server](https://github.com/hwdsl2/docker-ipsec-vpn-server/blob/master/docs/advanced-usage-zh.md)
-> 2. [OpenVPN](https://openvpn.net/)
-> 3. [V2ray](https://www.v2fly.org)
-> 4. [WireGuard](https://www.wireguard.com/)

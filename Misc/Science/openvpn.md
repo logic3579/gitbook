@@ -1,3 +1,7 @@
+---
+description: Open-source VPN solution
+---
+
 # OpenVPN
 
 ```bash
@@ -13,3 +17,8 @@ docker run -d \
  -v $(pwd)/data:/data \
  yyxx/openvpn
 ```
+
+> Reference:
+>
+> 1. [OpenVPN Official Website](https://openvpn.net/)
+> 2. [OpenVPN Community](https://openvpn.net/community/)

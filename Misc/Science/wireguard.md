@@ -1,3 +1,7 @@
+---
+description: Modern, high-performance VPN tunnel
+---
+
 # WireGuard
 
 ## Install and generate keys
@@ -103,3 +107,8 @@ ip link show wg0
 wg show all
 wg show wg0
 ```
+
+> Reference:
+>
+> 1. [WireGuard Official Website](https://www.wireguard.com/)
+> 2. [WireGuard Quick Start](https://www.wireguard.com/quickstart/)
