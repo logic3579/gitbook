@@ -30,7 +30,7 @@ gitbook build    # Static output to _book/
 
 ## Content Architecture
 
-The documentation is organized into seven top-level sections:
+The documentation is organized into six top-level sections:
 
 | Section | Purpose |
 |---------|---------|
@@ -38,7 +38,7 @@ The documentation is organized into seven top-level sections:
 | `DevOps/` | Programming languages, command manuals, network concepts, service configurations, Linux system topics |
 | `Platform/` | Cloud provider guides (AWS, GCP, Alibaba Cloud) and Kubernetes distribution installers |
 | `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
-| `Misc/` | Kubernetes deep-dives, VPN/tunnel technologies (Science), hosting, interviews |
+| `Misc/` | Kubernetes deep-dives, VPN/tunnel technologies and hosting (Science), interviews |
 | `Environment/` | Development environment setup (references external repository [logic3579/environment](https://github.com/logic3579/environment)) |
 
 ### CNCF Section Structure
@@ -61,6 +61,13 @@ The documentation is organized into seven top-level sections:
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
 - Kernel — Linux kernel topics
 
+### Platform Section Structure
+
+- `AlibabaCloud/` — RAM, VPC
+- `AWS/` — CloudFront, EC2, EKS
+- `GoogleCloud/` — gcloud, GCE, GKE
+- `distribution-installer.md` — Kubernetes distribution installation guides
+
 ### Standards Section Structure
 
 - `naming-conventions.md` — Naming standards for projects, cloud resources, Kubernetes, and docs
@@ -69,6 +76,12 @@ The documentation is organized into seven top-level sections:
 - `github-standards.md` — GitHub project management and release standards
 - `gitlab-standards.md` — GitLab project management and release standards
 - `docker-standards.md` — Docker image build and release standards
+
+### Misc Section Structure
+
+- `Kubernetes/` — Kubernetes network, RBAC, deployment guides
+- `Science/` — VPN/tunnel technologies (V2Ray, IPsec, OpenVPN, SSH Tunnel, WireGuard), hosting
+- `interview.md` — Interview preparation
 
 ### External Repository References
 
@@ -82,7 +95,7 @@ Some documents point to external repositories instead of containing inline conte
 
 1. Create the markdown file in the appropriate category directory under `CNCF/`, `DevOps/`, `Platform/`, `Standards/`, or `Misc/`.
 2. Add the entry to `SUMMARY.md` in the correct section with proper indentation to maintain the navigation hierarchy.
-3. Each category directory typically has a `README.md` that serves as the section overview page.
+3. Each category directory has a `README.md` that serves as the section overview page, following this format: frontmatter (`icon` + `description`) → H1 title → one-line description → sub-page list with brief descriptions.
 4. Embedded YAML configurations and code examples are used extensively throughout the docs — maintain that style.
 5. For tools with dedicated external repositories, use the reference format (frontmatter + brief description + repository link + official references) instead of inline content. See `ansible.md` as a template.
 6. Image attachments are stored in `attachements/` subdirectories alongside the referencing documents.
@@ -98,4 +111,5 @@ Some documents point to external repositories instead of containing inline conte
   > 1. [Official Website](https://example.com/)
   > 2. [Repository](https://github.com/org/repo)
   ```
+- **Images**: Use standard Markdown image syntax (`![alt](attachements/image.png)`), not Hexo `asset_img` or other template syntax
 - **Links**: Use standard Markdown links, not Obsidian WikiLink format (`[[...]]`)
