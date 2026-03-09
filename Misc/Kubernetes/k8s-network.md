@@ -15,7 +15,7 @@ Linux Network Namespace
 - Linux protocol stack: encapsulation and parsing of network protocol packets, such as Layer 2 ethernet packets, Layer 3 IP/ICMP packets, Layer 4 TCP/UDP packets, etc.
 - Linux iptables: based on the kernel module netfilter, manages the Linux firewall, e.g., controlling ingress and egress, NAT address translation, port mapping, etc.
 
-<!-- {% asset_img k8s-nw1.png %} -->
+![k8s-nw1](attachements/k8s-nw1.png)
 
 > Linux has more than just network namespaces for network isolation. There are also pid namespaces for process isolation, user namespaces for user isolation, mount namespaces for mount point isolation, ipc namespaces for semaphore and shared memory isolation, and uts namespaces for hostname and domain name isolation.
 > Combined with cgroup control groups that limit CPU, memory, IO, and other resources, these form the underlying implementation of containers
@@ -24,13 +24,13 @@ Linux Network Namespace
 
 A Linux bridge device can attach multiple Linux slave devices. It functions like an internal virtual Layer 2 switch that can broadcast Layer 2 packets. Note that a Linux bridge device can have its own IP address. When multiple Linux network devices are attached to a bridge, their IP addresses become ineffective (only Layer 2 functionality remains). When one device receives a packet, the bridge forwards the packet to all other devices attached to the bridge, achieving a broadcast effect.
 
-<!-- {% asset_img k8s-nw2.png %} -->
+![k8s-nw2](attachements/k8s-nw2.png)
 
 - Linux Veth Device
 
 Always appears in pairs with two endpoints. Packets flow in from one peer and out to the other peer. A veth pair can span across network namespaces.
 
-<!-- {% asset_img k8s-nw3.png %} -->
+![k8s-nw3](attachements/k8s-nw3.png)
 
 ### 2) K8s Cluster Container Network Communication Methods
 
@@ -63,19 +63,20 @@ The host creates a docker0 network interface with an independent IP range, assig
 
 > Custom bridge network: creates an independent network namespace scoped to the host
 
-<!-- > {% asset_img k8s-nw4.png %} > {% asset_img k8s-nw5.png %} -->
+![k8s-nw4](attachements/k8s-nw4.png)
+![k8s-nw5](attachements/k8s-nw5.png)
 
 - host mode: --net=host
 
 Shares the host network. When a container exposes a port, it occupies the host port. This network mode is simple with good performance, generally used for single-container services.
 
-<!-- {% asset_img k8s-nw6.png %} -->
+![k8s-nw6](attachements/k8s-nw6.png)
 
 - container mode: --net=container:name or id
 
 Specifies that the newly created container shares the Network namespace of an existing container (in K8s, a pod is multiple containers sharing a network namespace). Everything except networking, such as filesystem and processes, remains isolated. Processes between containers can communicate via the lo interface
 
-<!-- {% asset_img k8s-nw7.png %} -->
+![k8s-nw7](attachements/k8s-nw7.png)
 
 - none mode: The container has an independent Network namespace but no network configuration. Custom network configuration can be applied. Generally used for CPU-intensive tasks where computation results are saved to disk and no external network access is needed
 
@@ -86,7 +87,7 @@ Specifies that the newly created container shares the Network namespace of an ex
 - Each container corresponds to a veth pair device, with one end in the container's network namespace and the other end attached to the docker0 Linux bridge in the host's network namespace.
 - In the host environment, this is like having a Layer 2 switch (docker0 bridge) connecting all containers within the host. Therefore, containers within the same host can directly access each other in a direct-connection manner
 
-<!-- {% asset_img k8s-nw8.png %} -->
+![k8s-nw8](attachements/k8s-nw8.png)
 
 ```shell
 ## Related commands
