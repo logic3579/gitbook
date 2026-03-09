@@ -1,78 +1,16 @@
 ---
-description: >-
-  Cloud Native Computing Foundation
-  Cloud Native Interactive Landscape
 icon: bullseye-arrow
+description: CNCF
 ---
 
 # CNCF
 
-## Table of contents
+Cloud Native Computing Foundation — cloud-native tools organized by the CNCF landscape taxonomy.
 
-<!-- toc -->
-
-- [CNAI](./CNAI/README.md)
-- [AppDefinition and Development](./AppDefinitionDevelopment/README.md)
-- [Observability and Analysis](./ObservabilityAnalysis/README.md)
-- [Orchestration and Management](./OrchestrationManagement/README.md)
-- [Provisioning](./Provisioning/README.md)
-- [Runtime](./Runtime/README.md)
-- [Serverless](./Serverless/README.md)
-
-<!-- tocstop -->
-
-## Nginx config
-
-```bash
-cat << "EOF" > cncf.conf
-upstream cluster_ingress {
-  server 1.1.1.1;
-  server 2.2.2.2;
-  server 3.3.3.3;
-}
-upstream cluster_ingress_tls {
-  server 1.1.1.1:443;
-  server 2.2.2.2:443;
-  server 3.3.3.3:443;
-}
-server {
-    listen 80;
-    listen 443;
-
-    server_name
-        # AppDefinition and Development
-        argocd.example.com
-        gitlab.example.com
-        jenkins.example.com
-        harbor.example.com
-        rancher.example.com
-        # Observability and Analysis
-        prometheus.example.com
-        grafana.example.com
-        kibana.example.com
-    ;
-
-    access_log /opt/nginx/logs/access.log main;
-    ssl_certificate     "/opt/nginx/keys/example.com.crt";
-    ssl_certificate_key "/opt/nginx/keys/example.com.key";
-
-    allow 127.0.0.1;
-    deny all;
-
-    location / {
-        proxy_pass http://cluster_ingress;
-        proxy_ignore_client_abort on;
-        proxy_redirect   off;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
-        # websocket
-        proxy_http_version 1.1;
-        proxy_set_header Connection $connection_upgrade;
-        proxy_set_header Upgrade $http_upgrade;
-    }
-}
-EOF
-```
+- [AppDefinition and Development](AppDefinitionDevelopment/README.md) — Application build, CI/CD, databases, and messaging
+- [CNAI](CNAI/README.md) — Data architecture and data science
+- [Observability and Analysis](ObservabilityAnalysis/README.md) — Chaos engineering, cost optimization, and observability
+- [Orchestration and Management](OrchestrationManagement/README.md) — API gateway, service discovery, service mesh, and service proxy
+- [Provisioning](Provisioning/README.md) — Automation, container registry, key management, and security
+- [Runtime](Runtime/README.md) — Cloud native network, storage, and container runtime
+- [Serverless](Serverless/README.md) — Serverless computing

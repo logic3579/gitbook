@@ -89,7 +89,7 @@ Some documents point to external repositories instead of containing inline conte
 
 ### Markdown Conventions
 
-- **Frontmatter**: Every document should have `description` field. Do not use `icon` field.
+- **Frontmatter**: Every document should have `description` field. Top-level and second-level directory `README.md` files should include an `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names). Regular content documents (non-README) do not need `icon`.
 - **H1 title**: Must match the official tool/project name (e.g., `# ClickHouse`, `# Elasticsearch`, not `# Overview`)
 - **Reference format**: Use the standardized blockquote format at the end of each document:
   ```markdown

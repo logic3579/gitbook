@@ -1,8 +1,9 @@
 ---
-description: jiracdflow
+icon: diagram-project
+description: JiraCDflow
 ---
 
-# jiracdflow
+# JiraCDflow
 
 ## 1. Overview
 

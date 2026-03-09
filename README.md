@@ -1,27 +1,24 @@
 ---
-icon: hand-wave
 description: >-
-  Knowledge record and Technology stack.
+  A technical knowledge base covering cloud-native technologies, DevOps practices, and platform engineering.
 ---
-
-[![docker-publish](https://github.com/logic3579/gitbook/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/logic3579/gitbook/actions/workflows/docker-publish.yml)
 
 # Introduction
 
 This is a gitbook by [Logic](https://github.com/logic3579/gitbook/).
 
-About knowledge record and Technology stack.
+A technical knowledge base covering cloud-native technologies, DevOps practices, and platform engineering. Documentation is organized following the CNCF landscape taxonomy.
 
 ## Table of contents
 
 <!-- toc -->
 
-- [APP-META](./APP-META/README.md)
 - [CNCF](./CNCF/README.md)
 - [DevOps](./DevOps/README.md)
-- [Environment](./Environment/README.md)
-- [Misc](./Misc/README.md)
 - [Platform](./Platform/README.md)
+- [Standards](./Standards/README.md)
+- [Misc](./Misc/README.md)
+- [Environment](./Environment/README.md)
 <!-- tocstop -->
 
 ## Using with `gitbook`

@@ -1,7 +1,7 @@
 ---
 icon: violin
-description: OrchestrationManagement
+description: Orchestration and Management
 ---
 
-# OrchestrationManagement
+# Orchestration and Management
 

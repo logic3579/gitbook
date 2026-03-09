@@ -1,5 +1,5 @@
 ---
-icon: icon
+icon: dharmachakra
 description: Kubernetes
 ---
 
