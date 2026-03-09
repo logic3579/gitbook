@@ -1,6 +1,6 @@
 ---
-icon: icon
-description: science proxy
+icon: lock
+description: Science
 ---
 
 # Science

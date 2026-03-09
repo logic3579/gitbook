@@ -1,9 +1,11 @@
 ---
-description: Initial environment(application and dotfiles).
-icon: bullseye-arrow
+icon: desktop
+description: Environment
 ---
 
-# Overview
+# Environment
+
+Development environment setup — application and dotfiles configuration.
 
 [![make-test](https://github.com/logic3579/environment/actions/workflows/make-test.yml/badge.svg)](https://github.com/logic3579/environment/actions/workflows/make-test.yml)
 

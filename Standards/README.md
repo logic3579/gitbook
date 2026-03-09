@@ -1,4 +1,5 @@
 ---
+icon: list-check
 description: Standards
 ---
 
