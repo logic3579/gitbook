@@ -1,4 +1,5 @@
 ---
+icon: hand-wave
 description: >-
   A technical knowledge base covering cloud-native technologies, DevOps practices, and platform engineering.
 ---

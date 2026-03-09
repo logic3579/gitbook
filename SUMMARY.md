@@ -188,5 +188,5 @@
   - [OpenVPN](./Misc/Science/openvpn.md)
   - [SSHTunnel](./Misc/Science/sshtunnel.md)
   - [WireGuard](./Misc/Science/wireguard.md)
-- [Hosting](./Misc/hosting.md)
+  - [Hosting](./Misc/Science/hosting.md)
 - [Interview](./Misc/interview.md)

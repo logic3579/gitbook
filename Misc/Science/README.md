@@ -29,6 +29,10 @@ systemctl start tinyproy && systemctl enable tinyproxy
 wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh
 ```
 
+## Hosting
+
+- [Hosting](hosting.md) — VPS hosting and domain name services
+
 > Reference:
 >
 > 1. [ipsec-vpn-server](https://github.com/hwdsl2/docker-ipsec-vpn-server/blob/master/docs/advanced-usage-zh.md)
