@@ -1,3 +1,7 @@
+---
+description: Kafka and RocketMQ CLI references
+---
+
 # Streaming and Messaging
 
 ## Kafka
@@ -90,3 +94,8 @@ second-event
 ./mqadmin getSyncStateSet -a localhost:9878 -b broker-a
 ./mqadmin getBrokerEpoch -n localhost:9876 -b broker-a
 ```
+
+> Reference:
+>
+> 1. [Kafka CLI Documentation](https://kafka.apache.org/documentation/#cli)
+> 2. [RocketMQ CLI Documentation](https://rocketmq.apache.org/docs/deploymentOperations/02admintool/)

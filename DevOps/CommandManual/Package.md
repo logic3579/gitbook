@@ -1,3 +1,7 @@
+---
+description: Package manager CLI references for apt, dnf, rpm, and pacman
+---
+
 # Package
 
 ## Arch
@@ -122,4 +126,10 @@ rpm -qf /bin/ls
 # manually install or remove a .rpm file package
 rpm -ivh xxx.rpm
 ```
+
+> Reference:
+>
+> 1. [apt Documentation](https://manpages.debian.org/bullseye/apt/apt.8.en.html)
+> 2. [dnf Documentation](https://dnf.readthedocs.io/)
+> 3. [pacman Wiki](https://wiki.archlinux.org/title/Pacman)
 

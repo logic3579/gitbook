@@ -1,3 +1,7 @@
+---
+description: Ansible and SaltStack CLI references
+---
+
 # Automation
 
 ## ansible
@@ -499,7 +503,7 @@ apache:
   service.running:
     - name: httpd
     - reload: true
-    - enable: truej
+    - enable: true
     - watch:
       - file: apache
 EOF
@@ -668,3 +672,8 @@ EOF
 
 salt '*' state.sls tmp.init
 ```
+
+> Reference:
+>
+> 1. [Ansible Documentation](https://docs.ansible.com/)
+> 2. [SaltStack Documentation](https://docs.saltproject.io/)

@@ -1,8 +1,8 @@
 ---
-description: Openssl
+description: OpenSSL
 ---
 
-# Openssl
+# OpenSSL
 
 ## Introduction
 

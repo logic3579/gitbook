@@ -1,3 +1,7 @@
+---
+description: Database CLI references for ClickHouse, Elasticsearch, MongoDB, MySQL, PostgreSQL, Redis, and TiDB
+---
+
 # Database
 
 ## ClickHouse
@@ -395,5 +399,30 @@ redis-cli --cluster rebalance 127.0.0.1:7001
 ## TiDB
 
 ```bash
-tiup
+# deploy cluster
+tiup playground
+tiup cluster deploy <cluster-name> <version> topology.yaml
+
+# cluster management
+tiup cluster list
+tiup cluster display <cluster-name>
+tiup cluster start <cluster-name>
+tiup cluster stop <cluster-name>
+tiup cluster restart <cluster-name>
+tiup cluster scale-out <cluster-name> scale-out.yaml
+tiup cluster scale-in <cluster-name> --node <node-id>
+
+# backup and restore
+tiup br backup full --pd <pd-addr> --storage "s3://bucket/backup"
+tiup br restore full --pd <pd-addr> --storage "s3://bucket/backup"
 ```
+
+> Reference:
+>
+> 1. [ClickHouse Documentation](https://clickhouse.com/docs)
+> 2. [Elasticsearch Documentation](https://www.elastic.co/guide/)
+> 3. [MongoDB Documentation](https://www.mongodb.com/docs/manual/)
+> 4. [MySQL Documentation](https://dev.mysql.com/doc/)
+> 5. [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+> 6. [Redis Documentation](https://redis.io/docs/)
+> 7. [TiDB Documentation](https://docs.pingcap.com/)

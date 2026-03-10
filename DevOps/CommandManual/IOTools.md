@@ -1,3 +1,7 @@
+---
+description: Disk I/O benchmarking, monitoring, and partition management tools
+---
+
 # IO Tools
 
 ## dd
@@ -175,3 +179,8 @@ done
 
 # lvm
 ```
+
+> Reference:
+>
+> 1. [fio Documentation](https://fio.readthedocs.io/)
+> 2. [sysstat (iostat/pidstat/sar)](https://github.com/sysstat/sysstat)

@@ -1,3 +1,7 @@
+---
+description: Network diagnostic and testing tools for TCP, UDP, HTTP, and DNS
+---
+
 # Network Tools
 
 ## TCP & UDP
@@ -46,7 +50,7 @@ docker pull ghcr.io/pouriyajamshidi/tcping:latest
 ### iftop
 
 ```bash
-# iptop -h
+# iftop -h
    -n                  dont do hostname lookups
    -N                  dont convert port numbers to services
    -i interface        listen on named interface
@@ -64,7 +68,7 @@ docker pull ghcr.io/pouriyajamshidi/tcping:latest
 # common
 iftop -nN -i ens4 -o 10s
 iftop -nN -s 5 -t
-iptop -nN -L 5 -t
+iftop -nN -L 5 -t
 iftop -F 192.168.1.0/24
 
 # inside keyboard keys
@@ -404,3 +408,9 @@ dig xxx.debug.danuoyi.tbcache.com
 # query dns request with specific EDNS client subnet
 dig www.google.com +subnet=1.1.1.0/24
 ```
+
+> Reference:
+>
+> 1. [curl Manual](https://curl.se/docs/manpage.html)
+> 2. [tcpdump Manual](https://www.tcpdump.org/manpages/tcpdump.1.html)
+> 3. [iproute2](https://wiki.linuxfoundation.org/networking/iproute2)

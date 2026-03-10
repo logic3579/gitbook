@@ -1,3 +1,7 @@
+---
+description: Git and Subversion CLI references
+---
+
 # Version Control
 
 ## Git
@@ -153,3 +157,9 @@ svn update
 
 svn update -r xxx
 ```
+
+> Reference:
+>
+> 1. [Git Documentation](https://git-scm.com/doc)
+> 2. [Pro Git Book](https://git-scm.com/book)
+> 3. [Subversion Documentation](https://subversion.apache.org/docs/)

@@ -1,3 +1,7 @@
+---
+description: Text processing CLI references for awk, grep, and sed
+---
+
 # Text Swordsman
 
 ## awk
@@ -158,13 +162,68 @@ awk 'BEGIN{ORS=""};{print $0}' x.txt
 ### Basic Syntax
 
 ```bash
+grep [OPTIONS] PATTERN [FILE...]
 
+# Options:
+# -i    case insensitive
+# -r    recursive search
+# -n    show line numbers
+# -l    show only filenames
+# -L    show files NOT matching
+# -c    count matching lines
+# -v    invert match (non-matching lines)
+# -w    match whole words only
+# -E    extended regex (egrep)
+# -P    Perl-compatible regex
+# -A N  show N lines after match
+# -B N  show N lines before match
+# -C N  show N lines before and after match
+# -o    show only the matched part
+# --include  filter files by pattern
+# --exclude  exclude files by pattern
 ```
 
 ### Common Usage
 
 ```bash
+# case insensitive search
+grep -i "error" /var/log/syslog
 
+# recursive search in directory
+grep -rn "TODO" ./src/
+grep -rn "func main" --include="*.go" .
+
+# show context lines
+grep -C 3 "Exception" app.log
+grep -B 5 -A 2 "panic" app.log
+
+# invert match (exclude lines)
+grep -v "^#" /etc/nginx/nginx.conf | grep -v "^$"
+
+# count occurrences
+grep -c "error" /var/log/syslog
+
+# match whole word
+grep -w "port" config.yaml
+
+# multiple patterns
+grep -E "error|warn|fatal" app.log
+grep -e "error" -e "warn" app.log
+
+# show only matched part
+grep -oP '\d+\.\d+\.\d+\.\d+' access.log
+
+# find files containing pattern
+grep -rl "password" /etc/
+grep -rL "description" ./docs/
+
+# exclude directories
+grep -rn "TODO" . --exclude-dir={.git,node_modules,vendor}
+
+# pipe usage
+ps aux | grep nginx | grep -v grep
+cat /etc/passwd | grep -c "/bin/bash"
+dmesg | grep -iE "error|fail|warn"
 ```
 
 ## sed
@@ -245,5 +304,8 @@ sed -n '/requests/a\  cpu: 1000m\n  memory: 1Gi' values.yaml
 sed -i '/autoscaling:/{n;s/enabled: true/enabled: false/}' values.yaml
 ```
 
-> 1. [gawk official](https://www.gnu.org/software/gawk/manual/gawk.html)
-> 2. [sed official](https://www.gnu.org/software/sed/manual/sed.html)
+> Reference:
+>
+> 1. [gawk Manual](https://www.gnu.org/software/gawk/manual/gawk.html)
+> 2. [sed Manual](https://www.gnu.org/software/sed/manual/sed.html)
+> 3. [grep Manual](https://www.gnu.org/software/grep/manual/grep.html)
