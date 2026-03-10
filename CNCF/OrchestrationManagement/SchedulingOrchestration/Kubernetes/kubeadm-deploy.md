@@ -1,12 +1,14 @@
 ---
-title: Ubutun Deploy Kubernetes With Containerd
-categories:
-  - Kubernetes
+description: Deploy Kubernetes cluster with kubeadm and containerd on Ubuntu
 ---
+
+# Kubeadm Deploy
+
+Step-by-step guide to deploying a Kubernetes cluster using kubeadm with containerd as the container runtime on Ubuntu.
 
 ## Environment Preparation
 
-### 1. multipass Virtual Machine Creation
+### 1. Multipass Virtual Machine Creation
 
 ```shell
 # Generate key pair
@@ -54,13 +56,6 @@ EOF
 | Kernel Version          | 5.4.0-109-generic  |
 | containerd              | 1.5.10-1           |
 | kubernetes              | v1.23.2            |
-| kubeadm                 | v1.23.2            |
-| kube-apiserver          | v1.23.2            |
-| kube-controller-manager | v1.23.2            |
-| kube-scheduler          | v1.23.2            |
-| kubectl                 | v1.23.2            |
-| kubelet                 | v1.23.2            |
-| kube-proxy              |                    |
 | etcd                    | v3.5.1             |
 | CNI Plugin (calico)     | v3.18              |
 
@@ -217,8 +212,6 @@ sudo systemctl enable containerd
 sudo systemctl restart containerd
 # Verify
 sudo ctr version
-
-
 ```
 
 ## Build Cluster
@@ -255,7 +248,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now kubelet
 # Check kubelet status - it will restart every few seconds, stuck in a loop waiting for kubeadm instructions
 systemctl status kubelet
-
 ```
 
 ### 2. Initialize Master Node
@@ -323,7 +315,6 @@ kubeadm config images pull --config kubeadm.yaml
 
 # Initialize master node
 sudo kubeadm init --config=kubeadm.yaml
-
 ```
 
 - Execute on Node
@@ -348,7 +339,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```shell
 # Download calico plugin deployment manifest from official source
 wget https://docs.projectcalico.org/v3.18/manifests/calico.yaml
-#wget https://docs.projectcalico.org/v3.22/manifests/calico.yaml
 
 # Modify custom configuration
 vim calico.yaml
@@ -357,12 +347,6 @@ vim calico.yaml
 
 # Verify and wait for calico plugin Pods to run successfully
 watch kubectl get pod -n kube-system
-NAME                                       READY   STATUS    RESTARTS     AGE
-calico-kube-controllers-6cfb54c7bb-7xdld   1/1     Running   0            2m51s
-calico-node-sjr6r                          1/1     Running   0            2m52s
-calico-node-vsczr                          1/1     Running   0            2m51s
-
-
 ```
 
 ```shell
@@ -379,16 +363,12 @@ source <(kubectl completion bash)
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 
 # nerdctl tool (docker command replacement)
-# Official page
 # https://github.com/containerd/nerdctl
-# Download and install
 wget https://github.com/containerd/nerdctl/releases/download/v0.20.0/nerdctl-0.20.0-linux-amd64.tar.gz
 tar Cxfz /usr/local/bin/ nerdctl-0.20.0-linux-amd64.tar.gz
 # Usage
 sudo nerdctl -n k8s.io images
 sudo nerdctl -n k8s.io ps
-sudo nerdctl -n k8s.io images     # equivalent to = sudo ctr -n k8s.io images ls
-sudo nerdctl -n k8s.io pull nginx # equivalent to = sudo crictl pull nginx
 ```
 
 ```shell
@@ -414,40 +394,14 @@ curl 192.168.64.5:31052 -I    # Request Node port (nodePort, accessible from out
 curl 172.16.166.132:80 -I     # Request Pod application internal port (targetPort, container's startup port)
 ```
 
-### 5. Kubernetes Components
-
-**Control Plane Components**
-
-- kube-apiserver: Multi-instance scaling, high availability with traffic balancing?
-- etcd: High availability and backup strategies?
-- kube-scheduler scheduling policies: Pod resource requirements, hardware/software/policy constraints, affinity and anti-affinity specifications, data locality, inter-workload interference, and deadlines
-- kube-controller-manager
-
-**Data Plane Components (All Nodes)**
-
-- kubelet
-- kubeproxy
-- Container Runtime (CR): containerd (later Kubernetes versions no longer use docker)
-
-**Addons**
-
-- Network plugins: calico, flannel
-
-**Observability: Logging and Monitoring**
-
-- Logging: fluentd
-- Monitoring: Prometheus
-
 ## Kubernetes Dashboard
 
-### 1. Kubernetes Native Dashboard
+### Kubernetes Native Dashboard
 
 > Official documentation: [https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/](https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/)
 
 ```shell
 # 1. Deploy Dashboard manifest
-#wget https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml
-#kubectl apply -f recommended.yaml
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.0/aio/deploy/recommended.yaml
 
 # 2. Enable Dashboard access
@@ -475,12 +429,11 @@ kubectl describe secret -n kubernetes-dashboard $(kubectl get secret -n kubernet
 # Login using the token obtained above (default token only has kubernetes-dashboard namespace permissions)
 ```
 
-### 2. K9S Cluster Management Tool
+### K9S Cluster Management Tool
 
 Official documentation: [https://k9scli.io/](https://k9scli.io/)
 
 > Reference:
 >
-> 1. [multipass Official Website](https://multipass.run/)
+> 1. [Multipass Official Website](https://multipass.run/)
 > 2. [Kubernetes Official Documentation](https://kubernetes.io/zh/docs/concepts/overview/components/#container-runtime)
-> 3. [Install Kubernetes Cluster Using Binary Method](https://blog.weiyigeek.top/2022/5-7-654.html)

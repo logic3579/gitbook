@@ -57,6 +57,10 @@
     - [gRPC](./CNCF/OrchestrationManagement/RemoteProcedureCall/grpc.md)
   - [Scheduling & Orchestration](./CNCF/OrchestrationManagement/SchedulingOrchestration/README.md)
     - [Kubernetes](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/README.md)
+      - [Kubernetes Network](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-network.md)
+      - [Kubernetes RBAC](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-rbac.md)
+      - [Kubeadm Deploy](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kubeadm-deploy.md)
+      - [Kube Eventer](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kube-eventer.md)
   - [Service Mesh](./CNCF/OrchestrationManagement/ServiceMesh/README.md)
     - [Istio](./CNCF/OrchestrationManagement/ServiceMesh/istio.md)
   - [Service Proxy](./CNCF/OrchestrationManagement/ServiceProxy/README.md)
@@ -176,11 +180,6 @@
 ## Misc
 
 - [Overview](./Misc/README.md)
-- [Kubernetes](./Misc/Kubernetes/README.md)
-  - [Kubernetes Network](./Misc/Kubernetes/k8s-network.md)
-  - [Kubernetes RBAC](./Misc/Kubernetes/k8s-rbac.md)
-  - [Kube Eventer](./Misc/Kubernetes/kube-eventer.md)
-  - [Ubutun Deploy Kubernetes With Containerd](./Misc/Kubernetes/ubuntu-containerd-deploy-k8s.md)
 - [Science](./Misc/Science/README.md)
   - [V2Ray](./Misc/Science/v2ray.md)
   - [IPsec](./Misc/Science/ipsec.md)

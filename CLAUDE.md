@@ -38,7 +38,7 @@ The documentation is organized into six top-level sections:
 | `DevOps/` | Programming languages, command manuals, network concepts, service configurations, Linux system topics |
 | `Platform/` | Cloud provider guides (AWS, GCP, Alibaba Cloud) and Kubernetes distribution installers |
 | `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
-| `Misc/` | Kubernetes deep-dives, VPN/tunnel technologies and hosting (Science), interviews |
+| `Misc/` | VPN/tunnel technologies and hosting (Science), interviews |
 | `Environment/` | Development environment setup (references external repository [logic3579/environment](https://github.com/logic3579/environment)) |
 
 ### CNCF Section Structure
@@ -47,7 +47,7 @@ The documentation is organized into six top-level sections:
 - `AppDefinitionDevelopment/` — Helm, CI/CD (Argo, GitLab, Jenkins), Databases (MySQL, PostgreSQL, MongoDB, Redis, TiKV), Messaging (Kafka, RabbitMQ, RocketMQ, EMQX)
 - `CNAI/` — Data Architecture (ClickHouse, Flink), Data Science (PyTorch, TensorFlow)
 - `ObservabilityAnalysis/` — Chaos Engineering (Chaos Mesh), Continuous Optimization (OpenCost), Observability (Prometheus, Grafana, Elasticsearch, Fluentd, Logstash, Loki, Jaeger, OpenTelemetry)
-- `OrchestrationManagement/` — API Gateway (Higress, Tyk), Coordination & Service Discovery (CoreDNS, Etcd, Nacos, ZooKeeper), RPC (gRPC), Scheduling & Orchestration (Kubernetes), Service Mesh (Istio), Service Proxy (Envoy, HAProxy, Nginx)
+- `OrchestrationManagement/` — API Gateway (Higress, Tyk), Coordination & Service Discovery (CoreDNS, Etcd, Nacos, ZooKeeper), RPC (gRPC), Scheduling & Orchestration (Kubernetes: Network, RBAC, Kubeadm Deploy, Kube Eventer), Service Mesh (Istio), Service Proxy (Envoy, HAProxy, Nginx)
 - `Provisioning/` — Automation & Configuration (Ansible, Apollo, OpenStack, Salt Project, Terraform), Container Registry (Harbor), Key Management (Vault), Security & Compliance (Cert Manager, Keycloak)
 - `Runtime/` — Cloud Native Network (Cilium, CNI), Cloud Native Storage (CSI, MinIO, Rook, Velero), Container Runtime (Docker, Containerd, CRI-O, Lima)
 - `Serverless/` — (Section placeholder)
@@ -79,7 +79,6 @@ The documentation is organized into six top-level sections:
 
 ### Misc Section Structure
 
-- `Kubernetes/` — Kubernetes network, RBAC, deployment guides
 - `Science/` — VPN/tunnel technologies (V2Ray, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
 - `interview.md` — Interview preparation
 

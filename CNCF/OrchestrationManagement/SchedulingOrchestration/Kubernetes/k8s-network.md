@@ -1,8 +1,8 @@
 ---
-title: Kubernetes Network
-categories:
-  - Kubernetes
+description: Kubernetes container networking, Service implementation, and flannel CNI
 ---
+
+# Kubernetes Network
 
 ## Introduction
 

@@ -1,8 +1,8 @@
 ---
-title: Kubernetes RBAC
-categories:
-  - Kubernetes
+description: Kubernetes RBAC authorization with Role, ClusterRole, and ServiceAccount
 ---
+
+# Kubernetes RBAC
 
 ## Introduction
 
