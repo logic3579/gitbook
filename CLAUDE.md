@@ -55,7 +55,7 @@ The documentation is organized into six top-level sections:
 ### DevOps Section Structure
 
 - Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
-- `CommandManual/` — CLI references: Automation, BuildTools, ContainerRuntime, Database, IOTools, MemoryTools, NetworkTools, OpenSSL, Package, StreamingMessaging, SystemTools, Systemd, TextSwordsman, VersionControl, VideoTools
+- `CommandManual/` — CLI references: automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
 - `Network/` — CDN, Computer Network, HTTP, TCP
 - `ServiceConf/` — Service configuration guides: Elasticsearch, Grafana, Jenkins, Kafka, MongoDB, MySQL, Nginx, Observability, PostgreSQL, Redis, Saltstack
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
@@ -90,9 +90,15 @@ Some documents point to external repositories instead of containing inline conte
 - `CNCF/Provisioning/AutomationConfiguration/saltproject.md` → [logic3579/automation](https://github.com/logic3579/automation)
 - `CNCF/Provisioning/AutomationConfiguration/terraform.md` → [logic3579/terraform](https://github.com/logic3579/terraform)
 
+## Naming Conventions
+
+- **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`, `ServiceConf/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
+- **Documents/files**: kebab-case (e.g., `big-data.md`, `container-runtime.md`, `naming-conventions.md`). Single-word names are just lowercase (e.g., `helm.md`, `docker.md`).
+- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md` follow their respective conventions. Non-documentation directories (code, config, assets like `attachements/`, `iplib/`, `archery/`) are excluded from the PascalCase rule.
+
 ## Conventions for Adding Content
 
-1. Create the markdown file in the appropriate category directory under `CNCF/`, `DevOps/`, `Platform/`, `Standards/`, or `Misc/`.
+1. Create the markdown file (kebab-case name) in the appropriate category directory under `CNCF/`, `DevOps/`, `Platform/`, `Standards/`, or `Misc/`.
 2. Add the entry to `SUMMARY.md` in the correct section with proper indentation to maintain the navigation hierarchy.
 3. Each category directory has a `README.md` that serves as the section overview page, following this format: frontmatter (`icon` + `description`) → H1 title → one-line description → sub-page list with brief descriptions.
 4. Embedded YAML configurations and code examples are used extensively throughout the docs — maintain that style.

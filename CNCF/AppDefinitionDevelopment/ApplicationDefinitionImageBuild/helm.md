@@ -6,7 +6,7 @@ description: Helm
 
 ## Introduction
 
-### [How To Use](../../../DevOps/CommandManual/ContainerRuntime.md#helm)
+### [How To Use](../../../DevOps/CommandManual/container-runtime.md#helm)
 
 > Reference:
 >

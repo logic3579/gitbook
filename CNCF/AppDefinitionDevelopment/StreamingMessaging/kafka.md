@@ -294,7 +294,7 @@ systemctl enable kafka.service
 
 ### Verify
 
-[Kafka Command](/DevOps/CommandManual/StreamingMessaging.md#kafka)
+[Kafka Command](/DevOps/CommandManual/streaming-messaging.md#kafka)
 
 ## Deploy By Container
 

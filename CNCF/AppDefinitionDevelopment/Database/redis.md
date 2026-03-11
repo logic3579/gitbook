@@ -116,7 +116,7 @@ systemctl enable redis.service
 ```
 
 ### Verify
-[Redis Command](/DevOps/CommandManual/Database.md#redis)
+[Redis Command](/DevOps/CommandManual/database.md#redis)
 
 ### Troubleshooting
 ```bash
