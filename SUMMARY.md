@@ -35,6 +35,7 @@
     - [Chaos Mesh](./CNCF/ObservabilityAnalysis/ChaosEngineering/chaosmesh.md)
   - [Continuous Optimization](./CNCF/ObservabilityAnalysis/ContinuousOptimization/README.md)
     - [OpenCost](./CNCF/ObservabilityAnalysis/ContinuousOptimization/opencost.md)
+    - [Kubecost](./CNCF/ObservabilityAnalysis/ContinuousOptimization/kubecost.md)
   - [Observability](./CNCF/ObservabilityAnalysis/Observability/README.md)
     - [Elastic](./CNCF/ObservabilityAnalysis/Observability/elastic.md)
     - [Fluentd](./CNCF/ObservabilityAnalysis/Observability/fluentd.md)
