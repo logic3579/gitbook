@@ -1,5 +1,8 @@
 ---
 description: Database CLI references for ClickHouse, Elasticsearch, MongoDB, MySQL, PostgreSQL, Redis, and TiDB
+tags:
+  - devops/command
+  - database
 ---
 
 # Database

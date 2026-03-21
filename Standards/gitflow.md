@@ -1,6 +1,7 @@
 ---
-icon: code-branch
-description: gitflow
+description: Git branching strategy and workflow
+tags:
+  - standards
 ---
 
 # Git Flow

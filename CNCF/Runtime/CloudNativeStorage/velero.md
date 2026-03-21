@@ -1,5 +1,9 @@
 ---
 description: Backup and migrate Kubernetes applications and their persistent volumes
+tags:
+  - cncf/runtime
+  - storage
+  - kubernetes
 ---
 
 # Velero

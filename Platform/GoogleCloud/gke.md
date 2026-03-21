@@ -1,5 +1,8 @@
 ---
 description: Google Kubernetes Engine
+tags:
+  - platform/gcp
+  - kubernetes
 ---
 
 # Google Kubernets Engine

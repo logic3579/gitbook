@@ -1,5 +1,7 @@
 ---
 description: Build tool CLI references for Maven, Gradle, and Make
+tags:
+  - devops/command
 ---
 
 # Build Tools

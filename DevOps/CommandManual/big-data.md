@@ -1,5 +1,8 @@
 ---
 description: HDFS and HBase CLI references for Hadoop ecosystem
+tags:
+  - devops/command
+  - database
 ---
 
 # Big Data

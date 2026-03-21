@@ -1,5 +1,8 @@
 ---
 description: Containerd
+tags:
+  - cncf/runtime
+  - container
 ---
 
 # Containerd

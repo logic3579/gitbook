@@ -1,5 +1,8 @@
 ---
 description: MongoDB
+tags:
+  - cncf/app-definition
+  - database
 ---
 
 # MongoDB

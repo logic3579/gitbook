@@ -1,5 +1,8 @@
 ---
 description: Apache Kafka
+tags:
+  - cncf/app-definition
+  - messaging
 ---
 
 # Kafka

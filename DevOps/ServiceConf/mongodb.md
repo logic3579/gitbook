@@ -1,3 +1,10 @@
+---
+description: MongoDB service configuration
+tags:
+  - devops/service-conf
+  - database
+---
+
 # Mongodb
 
 /etc/my.cnf

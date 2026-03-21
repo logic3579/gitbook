@@ -1,5 +1,8 @@
 ---
 description: Network diagnostic and testing tools for TCP, UDP, HTTP, and DNS
+tags:
+  - devops/command
+  - networking
 ---
 
 # Network Tools

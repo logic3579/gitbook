@@ -1,5 +1,8 @@
 ---
 description: Elasticsearch
+tags:
+  - cncf/observability
+  - logging
 ---
 
 # Elasticsearch

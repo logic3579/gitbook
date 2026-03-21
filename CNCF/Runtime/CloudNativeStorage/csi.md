@@ -1,5 +1,9 @@
 ---
 description: Container Storage Interface (CSI) Specification.
+tags:
+  - cncf/runtime
+  - storage
+  - kubernetes
 ---
 
 # CSI

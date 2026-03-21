@@ -1,5 +1,9 @@
 ---
 description: Nacos
+tags:
+  - cncf/orchestration
+  - service-discovery
+  - configuration
 ---
 
 # Nacos

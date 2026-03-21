@@ -1,3 +1,10 @@
+---
+description: Elasticsearch service configuration
+tags:
+  - devops/service-conf
+  - logging
+---
+
 # Elasticsearch
 
 /opt/elasticsearch/conf/elasticsearch.conf

@@ -1,5 +1,8 @@
 ---
 description: PostgreSQL
+tags:
+  - cncf/app-definition
+  - database
 ---
 
 # PostgreSQL

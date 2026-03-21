@@ -1,0 +1,56 @@
+filters:
+  and:
+    - file.ext == "md"
+    - file.name != "SUMMARY"
+    - file.name != "CLAUDE"
+    - file.name != "AGENTS"
+formulas:
+  content_size: if(file.size > 2000, "✅ Rich", if(file.size > 500, "📝 Basic", "⚠️ Stub"))
+  days_since_update: (now() - file.mtime).days
+  section: file.folder.split("/")[0]
+properties:
+  formula.content_size:
+    displayName: Status
+  formula.days_since_update:
+    displayName: Days Since Update
+  formula.section:
+    displayName: Section
+  description:
+    displayName: Description
+views:
+  - type: table
+    name: All Documents
+    groupBy:
+      property: formula.section
+      direction: ASC
+    order:
+      - file.name
+      - formula.section
+      - description
+      - formula.content_size
+      - formula.days_since_update
+      - file.size
+    summaries:
+      file.size: Average
+  - type: table
+    name: Stub Files (Need Content)
+    filters:
+      and:
+        - file.size < 500
+        - file.name != "README"
+    order:
+      - file.name
+      - file.folder
+      - file.size
+      - formula.days_since_update
+  - type: table
+    name: Recently Updated
+    filters:
+      and:
+        - file.name != "README"
+    order:
+      - file.name
+      - formula.section
+      - file.mtime
+      - formula.content_size
+    limit: 20

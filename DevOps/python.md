@@ -1,6 +1,8 @@
 ---
 icon: code
 description: Python record
+tags:
+  - devops/language
 ---
 
 # Python

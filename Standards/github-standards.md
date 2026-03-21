@@ -1,6 +1,7 @@
 ---
-icon: github
 description: GitHub project management and release standards
+tags:
+  - standards
 ---
 
 # GitHub Standards

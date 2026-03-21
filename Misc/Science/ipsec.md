@@ -1,5 +1,7 @@
 ---
 description: IPsec/L2TP VPN server via Docker
+tags:
+  - misc/vpn
 ---
 
 # IPsec

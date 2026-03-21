@@ -1,5 +1,7 @@
 ---
 description: FFmpeg video and audio processing CLI references
+tags:
+  - devops/command
 ---
 
 # Video Tools

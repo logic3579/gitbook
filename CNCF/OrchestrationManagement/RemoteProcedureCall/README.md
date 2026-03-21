@@ -1,5 +1,9 @@
 ---
-description: RemoteProcedureCall
+description: Remote Procedure Call
 ---
 
-# RemoteProcedureCall
+# Remote Procedure Call
+
+Frameworks for efficient communication between distributed services.
+
+- [gRPC](grpc.md) — High-performance RPC framework using Protocol Buffers and HTTP/2

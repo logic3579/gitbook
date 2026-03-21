@@ -1,5 +1,8 @@
 ---
 description: MySQL
+tags:
+  - cncf/app-definition
+  - database
 ---
 
 # MySQL

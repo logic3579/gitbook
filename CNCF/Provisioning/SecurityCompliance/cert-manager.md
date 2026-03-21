@@ -1,5 +1,9 @@
 ---
 description: Automatically provision and manage TLS certificates in Kubernetes
+tags:
+  - cncf/provisioning
+  - security
+  - kubernetes
 ---
 
 # cert-manager

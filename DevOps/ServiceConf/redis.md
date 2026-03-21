@@ -1,3 +1,10 @@
+---
+description: Redis service configuration
+tags:
+  - devops/service-conf
+  - database
+---
+
 # Redis
 
 **/opt/redis/redis.conf**

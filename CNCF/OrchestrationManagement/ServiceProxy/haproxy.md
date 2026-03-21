@@ -1,5 +1,8 @@
 ---
 description: HAProxy Load Balancer's development branch (mirror of git.haproxy.org)
+tags:
+  - cncf/orchestration
+  - service-proxy
 ---
 
 # HAProxy

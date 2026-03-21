@@ -1,5 +1,7 @@
 ---
 description: VPS hosting and domain name services
+tags:
+  - misc/vpn
 ---
 
 # Hosting

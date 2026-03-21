@@ -1,3 +1,9 @@
+---
+description: Boot process and BIOS/UEFI
+tags:
+  - devops/system
+---
+
 # Boot
 
 ## BIOS vs UEFI

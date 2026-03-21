@@ -1,3 +1,9 @@
+---
+description: Nix package manager
+tags:
+  - devops/system
+---
+
 # Nix
 
 ## Install

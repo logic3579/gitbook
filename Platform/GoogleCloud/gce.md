@@ -1,5 +1,7 @@
 ---
 description: Google Computer Engine
+tags:
+  - platform/gcp
 ---
 
 # Computer Engine

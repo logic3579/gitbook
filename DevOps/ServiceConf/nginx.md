@@ -1,3 +1,10 @@
+---
+description: Nginx service configuration
+tags:
+  - devops/service-conf
+  - service-proxy
+---
+
 # Nginx
 
 ## main config

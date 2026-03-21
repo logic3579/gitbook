@@ -1,6 +1,8 @@
 ---
 description: Salt Project (SaltStack)
-icon: bullseye-arrow
+tags:
+  - cncf/provisioning
+  - configuration
 ---
 
 # Salt Project

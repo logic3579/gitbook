@@ -1,3 +1,11 @@
+---
+description: iptables firewall configuration
+tags:
+  - devops/system
+  - networking
+  - security
+---
+
 # iptables
 
 ## Introduction

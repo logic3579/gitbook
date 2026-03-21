@@ -1,5 +1,9 @@
 ---
 description: OpenCost provides visibility into current and historical Kubernetes spend and resource allocation.
+tags:
+  - cncf/observability
+  - kubernetes
+  - monitoring
 ---
 
 # OpenCost

@@ -1,5 +1,8 @@
 ---
 description: Vault
+tags:
+  - cncf/provisioning
+  - security
 ---
 
 # Vault

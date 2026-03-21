@@ -1,3 +1,10 @@
+---
+description: Grafana service configuration
+tags:
+  - devops/service-conf
+  - monitoring
+---
+
 # Grafana
 
 /etc/grafana/grafana.ini

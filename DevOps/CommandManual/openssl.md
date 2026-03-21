@@ -1,5 +1,8 @@
 ---
 description: OpenSSL
+tags:
+  - devops/command
+  - security
 ---
 
 # OpenSSL

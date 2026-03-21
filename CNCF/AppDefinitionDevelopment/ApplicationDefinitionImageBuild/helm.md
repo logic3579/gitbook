@@ -1,5 +1,9 @@
 ---
 description: Helm
+tags:
+  - cncf/app-definition
+  - helm
+  - kubernetes
 ---
 
 # Helm

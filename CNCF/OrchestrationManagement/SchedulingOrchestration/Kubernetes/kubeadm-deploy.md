@@ -1,5 +1,8 @@
 ---
 description: Deploy Kubernetes cluster with kubeadm and containerd on Ubuntu
+tags:
+  - cncf/orchestration
+  - kubernetes
 ---
 
 # Kubeadm Deploy

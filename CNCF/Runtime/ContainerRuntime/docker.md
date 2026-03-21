@@ -1,5 +1,8 @@
 ---
 description: Docker
+tags:
+  - cncf/runtime
+  - container
 ---
 
 # Docker

@@ -1,5 +1,7 @@
 ---
 description: Layer 2/3 tunneling over SSH
+tags:
+  - misc/vpn
 ---
 
 # SSH Tunnel

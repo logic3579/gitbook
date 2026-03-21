@@ -1,5 +1,8 @@
 ---
 description: Minio
+tags:
+  - cncf/runtime
+  - storage
 ---
 
 # Minio

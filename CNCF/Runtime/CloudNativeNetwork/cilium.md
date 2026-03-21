@@ -1,5 +1,9 @@
 ---
 description: Cilium
+tags:
+  - cncf/runtime
+  - networking
+  - kubernetes
 ---
 
 # Cilium

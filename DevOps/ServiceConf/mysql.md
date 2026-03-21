@@ -1,3 +1,10 @@
+---
+description: MySQL service configuration
+tags:
+  - devops/service-conf
+  - database
+---
+
 # Mysql
 
 /etc/my.cnf

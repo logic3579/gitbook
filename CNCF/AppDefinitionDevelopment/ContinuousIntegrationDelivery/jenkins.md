@@ -1,5 +1,8 @@
 ---
 description: Jenkins
+tags:
+  - cncf/app-definition
+  - ci-cd
 ---
 
 # Jenkins

@@ -1,6 +1,8 @@
 ---
 icon: wrench
 description: Kernel record
+tags:
+  - devops/kernel
 ---
 
 # Kernel

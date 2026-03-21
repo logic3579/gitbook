@@ -1,5 +1,8 @@
 ---
 description: Nginx
+tags:
+  - cncf/orchestration
+  - service-proxy
 ---
 
 # Nginx

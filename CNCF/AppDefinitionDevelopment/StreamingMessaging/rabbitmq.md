@@ -1,5 +1,8 @@
 ---
 description: RabbitMQ
+tags:
+  - cncf/app-definition
+  - messaging
 ---
 
 # RabbitMQ

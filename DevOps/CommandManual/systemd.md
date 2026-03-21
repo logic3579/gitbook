@@ -1,5 +1,7 @@
 ---
 description: Systemd service management and system control CLI references
+tags:
+  - devops/command
 ---
 
 # Systemd

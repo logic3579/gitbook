@@ -1,5 +1,7 @@
 ---
 description: Shadowsocks-based VPN by Jigsaw for secure internet access
+tags:
+  - misc/vpn
 ---
 
 # Outline

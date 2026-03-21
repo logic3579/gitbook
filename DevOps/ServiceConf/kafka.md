@@ -1,3 +1,10 @@
+---
+description: Kafka service configuration
+tags:
+  - devops/service-conf
+  - messaging
+---
+
 # Kafka
 
 /opt/kafka/server.conf

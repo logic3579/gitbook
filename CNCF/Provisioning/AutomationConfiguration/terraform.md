@@ -1,6 +1,8 @@
 ---
 description: Terraform
-icon: bullseye-arrow
+tags:
+  - cncf/provisioning
+  - configuration
 ---
 
 # Terraform

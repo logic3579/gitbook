@@ -1,5 +1,8 @@
 ---
 description: RocketMQ
+tags:
+  - cncf/app-definition
+  - messaging
 ---
 
 # RocketMQ

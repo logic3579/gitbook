@@ -1,5 +1,8 @@
 ---
 description: Memory Database Redis
+tags:
+  - cncf/app-definition
+  - database
 ---
 
 # Redis

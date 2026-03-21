@@ -1,5 +1,7 @@
 ---
 description: System performance analysis and debugging tools
+tags:
+  - devops/command
 ---
 
 # System Tools

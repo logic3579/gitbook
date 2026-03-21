@@ -1,5 +1,8 @@
 ---
 description: Ansible and SaltStack CLI references
+tags:
+  - devops/command
+  - configuration
 ---
 
 # Automation

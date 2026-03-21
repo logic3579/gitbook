@@ -1,6 +1,8 @@
 ---
 icon: code
 description: Java record
+tags:
+  - devops/language
 ---
 
 # Java

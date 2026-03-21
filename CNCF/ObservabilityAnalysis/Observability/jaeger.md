@@ -1,5 +1,8 @@
 ---
 description: Jaeger
+tags:
+  - cncf/observability
+  - tracing
 ---
 
 # Jaeger

@@ -1,5 +1,8 @@
 ---
 description: Fluentd and Fluent Bit
+tags:
+  - cncf/observability
+  - logging
 ---
 
 # Fluentd & Fluent Bit

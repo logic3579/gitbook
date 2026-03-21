@@ -1,5 +1,8 @@
 ---
 description: OpenStack
+tags:
+  - cncf/provisioning
+  - configuration
 ---
 
 # OpenStack

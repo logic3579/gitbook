@@ -1,5 +1,8 @@
 ---
 description: ClickHouse
+tags:
+  - cncf/cnai
+  - database
 ---
 
 # ClickHouse

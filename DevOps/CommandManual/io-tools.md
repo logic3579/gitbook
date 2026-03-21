@@ -1,5 +1,7 @@
 ---
 description: Disk I/O benchmarking, monitoring, and partition management tools
+tags:
+  - devops/command
 ---
 
 # IO Tools

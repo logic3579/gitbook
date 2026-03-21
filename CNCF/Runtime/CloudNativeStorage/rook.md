@@ -1,5 +1,9 @@
 ---
 description: Rook
+tags:
+  - cncf/runtime
+  - storage
+  - kubernetes
 ---
 
 # Rook

@@ -1,6 +1,8 @@
 ---
 icon: instalod
 description: Kubernetes Distribution Installer
+tags:
+  - kubernetes
 ---
 
 # Distribution Installer

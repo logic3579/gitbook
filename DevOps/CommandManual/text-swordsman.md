@@ -1,5 +1,7 @@
 ---
 description: Text processing CLI references for awk, grep, and sed
+tags:
+  - devops/command
 ---
 
 # Text Swordsman

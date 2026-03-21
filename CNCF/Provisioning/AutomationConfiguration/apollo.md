@@ -1,5 +1,8 @@
 ---
 description: Apollo
+tags:
+  - cncf/provisioning
+  - configuration
 ---
 
 # Apollo

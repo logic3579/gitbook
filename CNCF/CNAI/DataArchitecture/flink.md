@@ -1,5 +1,8 @@
 ---
 description: Flink
+tags:
+  - cncf/cnai
+  - messaging
 ---
 
 # Flink

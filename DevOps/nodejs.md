@@ -1,6 +1,8 @@
 ---
 icon: code
 description: Node.js record
+tags:
+  - devops/language
 ---
 
 # Node.js

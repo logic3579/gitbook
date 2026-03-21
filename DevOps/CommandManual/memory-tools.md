@@ -1,5 +1,7 @@
 ---
 description: Memory inspection, monitoring, and cache management tools
+tags:
+  - devops/command
 ---
 
 # Memory Tools

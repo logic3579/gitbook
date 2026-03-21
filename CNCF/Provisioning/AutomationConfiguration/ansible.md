@@ -1,6 +1,8 @@
 ---
 description: Ansible
-icon: bullseye-arrow
+tags:
+  - cncf/provisioning
+  - configuration
 ---
 
 # Ansible

@@ -1,6 +1,7 @@
 ---
-icon: code
 description: Bash record
+tags:
+  - devops/language
 ---
 
 # Bash

@@ -1,5 +1,8 @@
 ---
 description: CDN
+tags:
+  - devops/network
+  - networking
 ---
 
 # CDN

@@ -1,5 +1,8 @@
 ---
 description: TCP protocol
+tags:
+  - devops/network
+  - networking
 ---
 
 # TCP

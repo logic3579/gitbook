@@ -1,5 +1,8 @@
 ---
 description: Elastic Kubernetes Service
+tags:
+  - platform/aws
+  - kubernetes
 ---
 
 # Elastic Kubernetes Service

@@ -1,5 +1,9 @@
 ---
 description: Container Network Interface - networking for Linux containers
+tags:
+  - cncf/runtime
+  - networking
+  - kubernetes
 ---
 
 # CNI

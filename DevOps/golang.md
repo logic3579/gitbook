@@ -1,6 +1,8 @@
 ---
 icon: code
 description: Golang training
+tags:
+  - devops/language
 ---
 
 # Golang

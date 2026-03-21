@@ -1,5 +1,8 @@
 ---
 description: TiKV
+tags:
+  - cncf/app-definition
+  - database
 ---
 
 # TiKV

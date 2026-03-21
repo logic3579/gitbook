@@ -1,5 +1,7 @@
 ---
 description: Linux From Scratch 12.1 for systemd
+tags:
+  - devops/system
 ---
 
 # Linux From Scratch 12.1

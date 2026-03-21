@@ -1,5 +1,8 @@
 ---
 description: Envoy
+tags:
+  - cncf/orchestration
+  - service-proxy
 ---
 
 # Envoy

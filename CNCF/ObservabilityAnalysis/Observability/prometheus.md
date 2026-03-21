@@ -1,5 +1,8 @@
 ---
 description: Prometheus
+tags:
+  - cncf/observability
+  - monitoring
 ---
 
 # Prometheus

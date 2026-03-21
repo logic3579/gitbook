@@ -1,5 +1,8 @@
 ---
 description: Cloudfront
+tags:
+  - platform/aws
+  - networking
 ---
 
 # Cloudfront

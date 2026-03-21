@@ -1,5 +1,8 @@
 ---
 description: Harbor
+tags:
+  - cncf/provisioning
+  - container
 ---
 
 # Harbor

@@ -1,8 +1,11 @@
 ---
-title: VPC Network Planning Guide
-categories:
-  - Alicloud
+description: Alibaba Cloud VPC network planning, CIDR block design, and ACK cluster networking best practices
+tags:
+  - platform/alibaba
+  - networking
 ---
+
+# VPC
 
 ## CIDR Block Planning Overview
 

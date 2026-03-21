@@ -1,5 +1,9 @@
 ---
 description: CoreDNS
+tags:
+  - cncf/orchestration
+  - service-discovery
+  - kubernetes
 ---
 
 # CoreDNS

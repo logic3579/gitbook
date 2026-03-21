@@ -1,5 +1,7 @@
 ---
 description: Package manager CLI references for apt, dnf, rpm, and pacman
+tags:
+  - devops/command
 ---
 
 # Package

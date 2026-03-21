@@ -8,13 +8,16 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 
 - Repository: https://github.com/logic3579/gitbook
 - Format: Markdown documents organized following the CNCF landscape taxonomy
-- Also used as an Obsidian vault (`.obsidian/` config present)
+- Also used as an Obsidian vault (`.obsidian/` config present) with [obsidian-skills](https://github.com/kepano/obsidian-skills) installed in `.claude/skills/`
 
 ## Key Files
 
 - `SUMMARY.md` — Table of contents and navigation structure for GitBook. **Must be updated** when adding or removing pages.
 - `README.md` — Landing page for the GitBook site.
 - `.gitbook.yaml` — GitBook configuration (points to `README.md` and `SUMMARY.md`).
+- `content-tracker.base` — Obsidian Bases dashboard for tracking content completion status and stub files.
+- `doc-audit.base` — Obsidian Bases dashboard for documentation quality audit (freshness, word estimates).
+- `cncf-landscape.canvas` — Obsidian Canvas visualization of the CNCF technology landscape with tool relationships.
 
 ## Local Development
 
@@ -108,6 +111,13 @@ Some documents point to external repositories instead of containing inline conte
 ### Markdown Conventions
 
 - **Frontmatter**: Every document should have `description` field. First-level and second-level directory `README.md` files should include an `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names). Regular content documents (non-README) do not need `icon`.
+- **Tags**: All content files (non-README) should include `tags` in frontmatter for Obsidian navigation. Use hierarchical nested tags with `/` separator:
+  - CNCF section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`
+  - DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/service-conf`, `devops/system`
+  - Platform section: `platform/aws`, `platform/gcp`, `platform/alibaba`
+  - Standards section: `standards`
+  - Misc section: `misc/vpn`, `misc/interview`
+  - Sub-category tags: `database`, `messaging`, `ci-cd`, `monitoring`, `logging`, `tracing`, `kubernetes`, `networking`, `security`, `container`, `storage`, `service-mesh`, `service-proxy`, `api-gateway`, `service-discovery`, `configuration`, `helm`
 - **H1 title**: Must match the official tool/project name (e.g., `# ClickHouse`, `# Elasticsearch`, not `# Overview`)
 - **Reference format**: Use the standardized blockquote format at the end of each document:
   ```markdown
@@ -118,3 +128,12 @@ Some documents point to external repositories instead of containing inline conte
   ```
 - **Images**: Use standard Markdown image syntax (`![alt](attachements/image.png)`), not Hexo `asset_img` or other template syntax
 - **Links**: Use standard Markdown links, not Obsidian WikiLink format (`[[...]]`)
+
+### Obsidian Integration
+
+This vault uses [obsidian-skills](https://github.com/kepano/obsidian-skills) (installed in `.claude/skills/`) providing five skills: `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `obsidian-cli`, and `defuddle`.
+
+- **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Placed at vault root.
+- **Canvas** (`.canvas` files): Used for visual architecture maps (CNCF landscape). Placed at vault root.
+- **Compatibility**: Content files must use standard Markdown links (not wikilinks) for GitBook compatibility. Obsidian-specific features (tags, bases, canvas) are additive and do not affect GitBook rendering.
+- **Defuddle**: Prefer `npx defuddle parse <url> --md` over WebFetch for extracting clean content from web pages when adding new documentation.

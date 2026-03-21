@@ -1,5 +1,9 @@
 ---
 description: Argo Project
+tags:
+  - cncf/app-definition
+  - ci-cd
+  - kubernetes
 ---
 
 # Argo Project

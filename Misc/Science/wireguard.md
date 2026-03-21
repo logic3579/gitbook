@@ -1,5 +1,7 @@
 ---
 description: Modern, high-performance VPN tunnel
+tags:
+  - misc/vpn
 ---
 
 # WireGuard

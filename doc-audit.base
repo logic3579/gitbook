@@ -1,0 +1,56 @@
+filters:
+  and:
+    - file.ext == "md"
+    - file.name != "SUMMARY"
+    - file.name != "CLAUDE"
+    - file.name != "AGENTS"
+formulas:
+  age_days: (now() - file.mtime).days
+  staleness: if((now() - file.mtime).days > 180, "🔴 Stale", if((now() - file.mtime).days > 90, "🟡 Aging", "🟢 Fresh"))
+  word_estimate: (file.size / 5).round(0)
+  is_readme: if(file.name == "README", "📁 Section", "📄 Content")
+properties:
+  formula.staleness:
+    displayName: Freshness
+  formula.word_estimate:
+    displayName: ~Words
+  formula.is_readme:
+    displayName: Type
+  formula.age_days:
+    displayName: Age (days)
+views:
+  - type: table
+    name: Quality Overview
+    groupBy:
+      property: formula.staleness
+      direction: ASC
+    order:
+      - file.name
+      - file.folder
+      - formula.is_readme
+      - formula.staleness
+      - formula.word_estimate
+      - formula.age_days
+    summaries:
+      formula.word_estimate: Average
+      formula.age_days: Average
+  - type: table
+    name: Stale Documents (>180 days)
+    filters:
+      and:
+        - (now() - file.mtime).days > 180
+    order:
+      - file.name
+      - file.folder
+      - formula.age_days
+      - formula.word_estimate
+  - type: cards
+    name: Section Health
+    filters:
+      and:
+        - file.name == "README"
+    order:
+      - file.name
+      - file.folder
+      - formula.staleness
+      - formula.word_estimate

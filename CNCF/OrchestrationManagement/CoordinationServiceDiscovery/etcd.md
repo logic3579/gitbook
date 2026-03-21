@@ -1,5 +1,9 @@
 ---
 description: Etcd
+tags:
+  - cncf/orchestration
+  - service-discovery
+  - kubernetes
 ---
 
 # Etcd

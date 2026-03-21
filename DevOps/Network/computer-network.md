@@ -1,5 +1,8 @@
 ---
 description: Computer Network
+tags:
+  - devops/network
+  - networking
 ---
 
 # Computer Network

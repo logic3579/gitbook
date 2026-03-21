@@ -1,6 +1,7 @@
 ---
-icon: tag
 description: Naming conventions for projects, cloud resources, Kubernetes, and documentation
+tags:
+  - standards
 ---
 
 # Naming Conventions

@@ -1,5 +1,8 @@
 ---
 description: Grafana
+tags:
+  - cncf/observability
+  - monitoring
 ---
 
 # Grafana

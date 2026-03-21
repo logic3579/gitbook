@@ -1,5 +1,7 @@
 ---
 description: Git and Subversion CLI references
+tags:
+  - devops/command
 ---
 
 # Version Control

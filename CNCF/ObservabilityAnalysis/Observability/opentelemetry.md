@@ -1,6 +1,8 @@
 ---
 description: opentelemetry
-icon: bullseye-arrow
+tags:
+  - cncf/observability
+  - tracing
 ---
 
 # OpenTelemetry

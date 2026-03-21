@@ -1,5 +1,9 @@
 ---
 description: Kubernetes RBAC authorization with Role, ClusterRole, and ServiceAccount
+tags:
+  - cncf/orchestration
+  - kubernetes
+  - security
 ---
 
 # Kubernetes RBAC

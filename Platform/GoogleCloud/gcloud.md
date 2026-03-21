@@ -1,5 +1,7 @@
 ---
 description: gcloud
+tags:
+  - platform/gcp
 ---
 
 # gcloud

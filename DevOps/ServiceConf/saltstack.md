@@ -1,3 +1,10 @@
+---
+description: SaltStack service configuration
+tags:
+  - devops/service-conf
+  - configuration
+---
+
 # Saltstack
 
 ## master

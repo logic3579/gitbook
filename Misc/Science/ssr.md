@@ -1,5 +1,7 @@
 ---
 description: ShadowsocksR proxy with obfuscation and protocol plugins
+tags:
+  - misc/vpn
 ---
 
 # ShadowsocksR

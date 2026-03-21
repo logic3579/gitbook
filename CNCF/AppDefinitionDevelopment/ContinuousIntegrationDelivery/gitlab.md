@@ -1,5 +1,8 @@
 ---
 description: GitLab
+tags:
+  - cncf/app-definition
+  - ci-cd
 ---
 
 # GitLab

@@ -1,3 +1,10 @@
+---
+description: PostgreSQL service configuration
+tags:
+  - devops/service-conf
+  - database
+---
+
 # PostgreSQL
 
 /opt/pgsql/data/postgresql.conf

@@ -1,5 +1,7 @@
 ---
 description: interview
+tags:
+  - misc/interview
 ---
 
 # Interview

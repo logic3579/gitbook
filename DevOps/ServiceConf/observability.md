@@ -1,3 +1,10 @@
+---
+description: Observability service configuration
+tags:
+  - devops/service-conf
+  - monitoring
+---
+
 ## Alertmanager
 
 /opt/observability/alertmanager/alertmanager.yml

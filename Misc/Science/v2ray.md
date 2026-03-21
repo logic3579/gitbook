@@ -1,5 +1,7 @@
 ---
 description: Multi-protocol proxy tool with flexible routing and traffic obfuscation
+tags:
+  - misc/vpn
 ---
 
 # V2Ray

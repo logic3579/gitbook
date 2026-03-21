@@ -1,3 +1,10 @@
+---
+description: Jenkins service configuration
+tags:
+  - devops/service-conf
+  - ci-cd
+---
+
 # jenkins
 
 /etc/jenkins/jenkins.conf

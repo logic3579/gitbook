@@ -1,5 +1,8 @@
 ---
 description: EMQ Technologies
+tags:
+  - cncf/app-definition
+  - messaging
 ---
 
 # EMQX

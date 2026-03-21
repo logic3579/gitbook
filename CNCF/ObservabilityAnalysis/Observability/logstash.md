@@ -1,5 +1,8 @@
 ---
 description: Logstash
+tags:
+  - cncf/observability
+  - logging
 ---
 
 # Logstash

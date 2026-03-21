@@ -1,5 +1,8 @@
 ---
 description: Kafka and RocketMQ CLI references
+tags:
+  - devops/command
+  - messaging
 ---
 
 # Streaming and Messaging

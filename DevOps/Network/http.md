@@ -1,5 +1,8 @@
 ---
 description: HTTP protocol
+tags:
+  - devops/network
+  - networking
 ---
 
 # HTTP

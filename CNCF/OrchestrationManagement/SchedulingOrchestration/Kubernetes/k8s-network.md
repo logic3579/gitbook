@@ -1,5 +1,9 @@
 ---
 description: Kubernetes container networking, Service implementation, and flannel CNI
+tags:
+  - cncf/orchestration
+  - kubernetes
+  - networking
 ---
 
 # Kubernetes Network

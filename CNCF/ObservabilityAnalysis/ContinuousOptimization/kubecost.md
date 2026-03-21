@@ -1,5 +1,9 @@
 ---
 description: Kubecost provides real-time cost visibility and insights for Kubernetes clusters.
+tags:
+  - cncf/observability
+  - kubernetes
+  - monitoring
 ---
 
 # Kubecost

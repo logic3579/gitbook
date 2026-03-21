@@ -1,5 +1,8 @@
 ---
 description: Zookeeper
+tags:
+  - cncf/orchestration
+  - service-discovery
 ---
 
 # Zookeeper

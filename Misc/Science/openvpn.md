@@ -1,5 +1,7 @@
 ---
 description: Open-source VPN solution
+tags:
+  - misc/vpn
 ---
 
 # OpenVPN

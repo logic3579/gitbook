@@ -1,5 +1,8 @@
 ---
 description: Grafana Loki
+tags:
+  - cncf/observability
+  - logging
 ---
 
 # Loki

@@ -1,6 +1,8 @@
 ---
 icon: code
 description: Ruby record
+tags:
+  - devops/language
 ---
 
 # Ruby

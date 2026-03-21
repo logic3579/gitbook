@@ -1,5 +1,9 @@
 ---
 description: Docker, Podman, containerd, kubectl, and Helm CLI references
+tags:
+  - devops/command
+  - container
+  - kubernetes
 ---
 
 # Container Runtime

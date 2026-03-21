@@ -1,5 +1,9 @@
 ---
 description: kube-eventer
+tags:
+  - cncf/orchestration
+  - kubernetes
+  - monitoring
 ---
 
 # kube-eventer

@@ -1,5 +1,9 @@
 ---
 description: Istio
+tags:
+  - cncf/orchestration
+  - service-mesh
+  - kubernetes
 ---
 
 # Istio
