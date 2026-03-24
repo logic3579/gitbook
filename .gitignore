@@ -1,6 +1,7 @@
 # Env
 *~
 .env
+.local
 
 # IDE
 .idea/
