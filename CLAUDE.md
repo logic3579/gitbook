@@ -17,7 +17,7 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 - `.gitbook.yaml` — GitBook configuration (points to `README.md` and `SUMMARY.md`).
 - `content-tracker.base` — Obsidian Bases dashboard for tracking content completion status and stub files.
 - `doc-audit.base` — Obsidian Bases dashboard for documentation quality audit (freshness, word estimates).
-- `cncf-landscape.canvas` — Obsidian Canvas visualization of the CNCF technology landscape with tool relationships.
+- `CNCF/cncf-landscape.canvas` — Obsidian Canvas visualization of the CNCF technology landscape with tool relationships.
 
 ## Local Development
 
@@ -134,6 +134,6 @@ Some documents point to external repositories instead of containing inline conte
 This vault uses [obsidian-skills](https://github.com/kepano/obsidian-skills) (installed in `.claude/skills/`) providing five skills: `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `obsidian-cli`, and `defuddle`.
 
 - **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Placed at vault root.
-- **Canvas** (`.canvas` files): Used for visual architecture maps (CNCF landscape). Placed at vault root.
+- **Canvas** (`.canvas` files): Used for visual architecture maps. Placed in the relevant section directory (e.g., `CNCF/cncf-landscape.canvas`).
 - **Compatibility**: Content files must use standard Markdown links (not wikilinks) for GitBook compatibility. Obsidian-specific features (tags, bases, canvas) are additive and do not affect GitBook rendering.
 - **Defuddle**: Prefer `npx defuddle parse <url> --md` over WebFetch for extracting clean content from web pages when adding new documentation.

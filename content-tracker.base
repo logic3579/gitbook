@@ -4,9 +4,10 @@ filters:
     - file.name != "SUMMARY"
     - file.name != "CLAUDE"
     - file.name != "AGENTS"
+    - '!file.inFolder("tmp")'
 formulas:
   content_size: if(file.size > 2000, "✅ Rich", if(file.size > 500, "📝 Basic", "⚠️ Stub"))
-  days_since_update: (now() - file.mtime).days
+  days_since_update: (now() - file.mtime).days.round(0)
   section: file.folder.split("/")[0]
 properties:
   formula.content_size:
@@ -24,14 +25,16 @@ views:
       property: formula.section
       direction: ASC
     order:
-      - file.name
       - formula.section
       - description
       - formula.content_size
       - formula.days_since_update
+      - file.name
       - file.size
     summaries:
       file.size: Average
+    columnSize:
+      file.name: 189
   - type: table
     name: Stub Files (Need Content)
     filters:

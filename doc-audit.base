@@ -4,8 +4,9 @@ filters:
     - file.name != "SUMMARY"
     - file.name != "CLAUDE"
     - file.name != "AGENTS"
+    - '!file.inFolder("tmp")'
 formulas:
-  age_days: (now() - file.mtime).days
+  age_days: (now() - file.mtime).days.round(0)
   staleness: if((now() - file.mtime).days > 180, "🔴 Stale", if((now() - file.mtime).days > 90, "🟡 Aging", "🟢 Fresh"))
   word_estimate: (file.size / 5).round(0)
   is_readme: if(file.name == "README", "📁 Section", "📄 Content")
@@ -34,6 +35,8 @@ views:
     summaries:
       formula.word_estimate: Average
       formula.age_days: Average
+    columnSize:
+      formula.word_estimate: 175
   - type: table
     name: Stale Documents (>180 days)
     filters:
