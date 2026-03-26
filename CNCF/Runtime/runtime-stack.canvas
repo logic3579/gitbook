@@ -1,0 +1,29 @@
+{
+	"nodes":[
+		{"id":"grp_container_rt01","type":"group","x":0,"y":0,"width":1100,"height":400,"color":"4","label":"Container Runtime"},
+		{"id":"grp_cn_storage_003","type":"group","x":620,"y":500,"width":1000,"height":400,"color":"2","label":"Cloud Native Storage"},
+		{"id":"grp_cn_network_002","type":"group","x":0,"y":500,"width":520,"height":400,"color":"5","label":"Cloud Native Network"},
+		{"id":"node_docker_00001","type":"file","file":"CNCF/Runtime/ContainerRuntime/docker.md","x":40,"y":60,"width":220,"height":60,"color":"4"},
+		{"id":"node_containerd_02","type":"file","file":"CNCF/Runtime/ContainerRuntime/containerd.md","x":320,"y":60,"width":220,"height":60,"color":"4"},
+		{"id":"node_crio_0000003","type":"file","file":"CNCF/Runtime/ContainerRuntime/cri-o.md","x":600,"y":60,"width":220,"height":60,"color":"4"},
+		{"id":"node_lima_0000004","type":"file","file":"CNCF/Runtime/ContainerRuntime/lima.md","x":860,"y":60,"width":200,"height":60,"color":"4"},
+		{"id":"txt_runtime_layer0","type":"text","text":"**Runtime Hierarchy**:\n- **Docker** = CLI + Docker Engine → calls **containerd** as high-level runtime\n- **containerd** = industry-standard high-level runtime (CRI compatible)\n- **CRI-O** = lightweight CRI runtime built specifically for Kubernetes\n- **Lima** = Linux VM for macOS, runs containerd natively\n\nK8s uses CRI interface → containerd or CRI-O as the runtime backend","x":40,"y":200,"width":1020,"height":160},
+		{"id":"node_cni_00000005","type":"file","file":"CNCF/Runtime/CloudNativeNetwork/cni.md","x":40,"y":560,"width":220,"height":60,"color":"5"},
+		{"id":"node_cilium_00006","type":"file","file":"CNCF/Runtime/CloudNativeNetwork/cilium.md","x":260,"y":560,"width":220,"height":60,"color":"5"},
+		{"id":"txt_network_note_0","type":"text","text":"**CNI** = Container Network Interface spec\n**Cilium** = eBPF-based CNI plugin\n\nCilium implements CNI for K8s pod networking, load balancing, network policy, and observability","x":40,"y":720,"width":440,"height":140},
+		{"id":"node_csi_00000007","type":"file","file":"CNCF/Runtime/CloudNativeStorage/csi.md","x":660,"y":560,"width":220,"height":60,"color":"2"},
+		{"id":"node_rook_0000009","type":"file","file":"CNCF/Runtime/CloudNativeStorage/rook.md","x":1180,"y":560,"width":220,"height":60,"color":"2"},
+		{"id":"node_velero_00010","type":"file","file":"CNCF/Runtime/CloudNativeStorage/velero.md","x":920,"y":700,"width":220,"height":60,"color":"2"},
+		{"id":"txt_storage_note_0","type":"text","text":"**CSI** = spec | **MinIO** = S3 object storage | **Rook** = Ceph orchestrator | **Velero** = backup & migrate","x":660,"y":800,"width":760,"height":60},
+		{"id":"node_minio_000008","type":"file","file":"CNCF/Runtime/CloudNativeStorage/minio.md","x":920,"y":560,"width":220,"height":60,"color":"2"}
+	],
+	"edges":[
+		{"id":"edge_dkr_cntrd_001","fromNode":"node_docker_00001","fromSide":"right","toNode":"node_containerd_02","toSide":"left","label":"uses containerd"},
+		{"id":"edge_lima_cntrd_02","fromNode":"node_lima_0000004","fromSide":"left","toNode":"node_containerd_02","toSide":"right","label":"runs containerd"},
+		{"id":"edge_cilium_cni_03","fromNode":"node_cilium_00006","fromSide":"left","toNode":"node_cni_00000005","toSide":"right","label":"implements CNI"},
+		{"id":"edge_rook_csi_0004","fromNode":"node_rook_0000009","fromSide":"left","toNode":"node_csi_00000007","toSide":"right","label":"implements CSI"},
+		{"id":"edge_minio_csi_005","fromNode":"node_minio_000008","fromSide":"left","toNode":"node_csi_00000007","toSide":"right","label":"CSI driver"},
+		{"id":"edge_velero_minio6","fromNode":"node_velero_00010","fromSide":"left","toNode":"node_minio_000008","toSide":"bottom","label":"backup target"},
+		{"id":"edge_cntrd_crio_07","fromNode":"node_containerd_02","fromSide":"right","toNode":"node_crio_0000003","toSide":"left","color":"3","label":"both CRI-compatible"}
+	]
+}

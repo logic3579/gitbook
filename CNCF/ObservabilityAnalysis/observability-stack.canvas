@@ -1,0 +1,34 @@
+{
+	"nodes":[
+		{"id":"grp_metrics_0001","type":"group","x":0,"y":0,"width":760,"height":400,"color":"2","label":"Metrics Pipeline"},
+		{"id":"grp_logging_0002","type":"group","x":860,"y":0,"width":1000,"height":400,"color":"5","label":"Logging Pipeline"},
+		{"id":"grp_tracing_0003","type":"group","x":0,"y":500,"width":760,"height":400,"color":"6","label":"Tracing Pipeline"},
+		{"id":"grp_chaos_cost_04","type":"group","x":860,"y":500,"width":1000,"height":400,"color":"3","label":"Chaos Engineering & Cost Optimization"},
+		{"id":"node_prometheus_01","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/prometheus.md","x":40,"y":60,"width":220,"height":60,"color":"2"},
+		{"id":"node_grafana_00002","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/grafana.md","x":500,"y":60,"width":220,"height":60,"color":"2"},
+		{"id":"node_loki_00000003","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/loki.md","x":40,"y":200,"width":220,"height":60,"color":"2"},
+		{"id":"txt_metrics_flow","type":"text","x":40,"y":300,"width":680,"height":60,"text":"**Flow**: Exporters → Prometheus (scrape) → Grafana (visualize)\nLoki provides log correlation alongside metrics dashboards"},
+		{"id":"node_elastic_00004","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/elastic.md","x":900,"y":60,"width":220,"height":60,"color":"5"},
+		{"id":"node_fluentd_00005","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/fluentd.md","x":1340,"y":60,"width":220,"height":60,"color":"5"},
+		{"id":"node_logstash_0006","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/logstash.md","x":1340,"y":200,"width":220,"height":60,"color":"5"},
+		{"id":"txt_logging_flow0","type":"text","x":900,"y":300,"width":920,"height":60,"text":"**EFK Stack**: Fluentd → Elasticsearch → Kibana\n**ELK Stack**: Logstash → Elasticsearch → Kibana"},
+		{"id":"node_jaeger_00007","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/jaeger.md","x":40,"y":560,"width":220,"height":60,"color":"6"},
+		{"id":"node_otel_0000008","type":"file","file":"CNCF/ObservabilityAnalysis/Observability/opentelemetry.md","x":500,"y":560,"width":220,"height":60,"color":"6"},
+		{"id":"txt_tracing_flow0","type":"text","x":40,"y":700,"width":680,"height":60,"text":"**Flow**: App (OTel SDK) → OTel Collector → Jaeger (storage & UI)\nOTel unifies metrics/logs/traces collection"},
+		{"id":"node_chaosmesh_09","type":"file","file":"CNCF/ObservabilityAnalysis/ChaosEngineering/chaosmesh.md","x":900,"y":560,"width":220,"height":60,"color":"3"},
+		{"id":"node_opencost_010","type":"file","file":"CNCF/ObservabilityAnalysis/ContinuousOptimization/opencost.md","x":1340,"y":560,"width":220,"height":60,"color":"3"},
+		{"id":"node_kubecost_011","type":"file","file":"CNCF/ObservabilityAnalysis/ContinuousOptimization/kubecost.md","x":1340,"y":700,"width":220,"height":60,"color":"3"},
+		{"id":"txt_chaos_cost_00","type":"text","x":900,"y":800,"width":920,"height":60,"text":"Chaos Mesh injects failures → Observability stack validates resilience\nOpenCost/Kubecost monitor resource costs via Prometheus metrics"}
+	],
+	"edges":[
+		{"id":"edge_prom_graf_01","fromNode":"node_prometheus_01","fromSide":"right","toNode":"node_grafana_00002","toSide":"left","label":"visualize"},
+		{"id":"edge_loki_graf_02","fromNode":"node_loki_00000003","fromSide":"right","toNode":"node_grafana_00002","toSide":"bottom","label":"log query"},
+		{"id":"edge_fltd_elas_03","fromNode":"node_fluentd_00005","fromSide":"left","toNode":"node_elastic_00004","toSide":"right","label":"EFK"},
+		{"id":"edge_lgst_elas_04","fromNode":"node_logstash_0006","fromSide":"left","toNode":"node_elastic_00004","toSide":"right","label":"ELK"},
+		{"id":"edge_otel_jgr_005","fromNode":"node_otel_0000008","fromSide":"left","toNode":"node_jaeger_00007","toSide":"right","label":"export traces"},
+		{"id":"edge_otel_prom_06","fromNode":"node_otel_0000008","fromSide":"top","toNode":"node_prometheus_01","toSide":"bottom","label":"export metrics"},
+		{"id":"edge_otel_loki_07","fromNode":"node_otel_0000008","fromSide":"top","toNode":"node_loki_00000003","toSide":"bottom","label":"export logs"},
+		{"id":"edge_cost_prom_08","fromNode":"node_opencost_010","fromSide":"left","toNode":"node_prometheus_01","toSide":"right","label":"cost metrics"},
+		{"id":"edge_chaos_obs_09","fromNode":"node_chaosmesh_09","fromSide":"top","toNode":"node_prometheus_01","toSide":"bottom","label":"validate resilience"}
+	]
+}

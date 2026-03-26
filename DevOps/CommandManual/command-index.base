@@ -1,0 +1,55 @@
+filters:
+  and:
+    - file.ext == "md"
+    - file.inFolder("DevOps/CommandManual")
+    - file.name != "README"
+formulas:
+  content_size: if(file.size > 5000, "✅ Rich", if(file.size > 1500, "📝 Moderate", "⚠️ Thin"))
+  word_estimate: (file.size / 5).round(0)
+  days_since_update: (now() - file.mtime).days.round(0)
+  category: 'if(/network|openssl/.matches(file.name), "🌐 Network & Security", if(/database|big-data|streaming/.matches(file.name), "💾 Data & Messaging", if(/container|build|package|version/.matches(file.name), "📦 Build & Package", if(/system|systemd|memory|io/.matches(file.name), "🖥️ System & I/O", if(/text|video/.matches(file.name), "🔧 Text & Media", "⚙️ Automation")))))'
+properties:
+  formula.content_size:
+    displayName: Status
+  formula.word_estimate:
+    displayName: ~Words
+  formula.days_since_update:
+    displayName: Days Since Update
+  formula.category:
+    displayName: Category
+  description:
+    displayName: Description
+views:
+  - type: table
+    name: By Category
+    groupBy:
+      property: formula.category
+      direction: ASC
+    order:
+      - file.name
+      - description
+      - formula.content_size
+      - formula.word_estimate
+      - formula.days_since_update
+    summaries:
+      formula.word_estimate: Sum
+  - type: table
+    name: Content Gap
+    filters:
+      and:
+        - file.size < 1500
+    order:
+      - file.name
+      - formula.category
+      - file.size
+      - formula.word_estimate
+    summaries:
+      formula.word_estimate: Average
+  - type: table
+    name: Recently Updated
+    order:
+      - file.name
+      - formula.category
+      - file.mtime
+      - formula.content_size
+    limit: 10

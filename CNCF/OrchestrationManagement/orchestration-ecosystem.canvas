@@ -1,0 +1,39 @@
+{
+	"nodes":[
+		{"id":"grp_k8s_core_0001","type":"group","x":0,"y":0,"width":1100,"height":520,"color":"1","label":"Scheduling & Orchestration (Kubernetes)"},
+		{"id":"grp_discovery_002","type":"group","x":1200,"y":0,"width":760,"height":520,"color":"5","label":"Coordination & Service Discovery"},
+		{"id":"grp_traffic_00003","type":"group","x":0,"y":620,"width":1100,"height":520,"color":"4","label":"Traffic Management"},
+		{"id":"grp_gateway_rpc_4","type":"group","x":1200,"y":620,"width":760,"height":520,"color":"6","label":"API Gateway & RPC"},
+		{"id":"node_k8s_readme_01","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/README.md","x":40,"y":60,"width":240,"height":60},
+		{"id":"node_k8s_network2","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-network.md","x":320,"y":60,"width":240,"height":60},
+		{"id":"node_k8s_rbac_003","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-rbac.md","x":600,"y":60,"width":240,"height":60},
+		{"id":"node_kubeadm_0004","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kubeadm-deploy.md","x":40,"y":200,"width":240,"height":60},
+		{"id":"node_kube_evntr_5","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kube-eventer.md","x":320,"y":200,"width":240,"height":60},
+		{"id":"txt_k8s_note_0001","type":"text","x":40,"y":380,"width":1020,"height":100,"text":"**Kubernetes** is the central orchestration platform.\nAll surrounding tools integrate with K8s: Service Discovery for internal DNS & config,\nService Mesh/Proxy for traffic routing, API Gateway for external access."},
+		{"id":"node_etcd_0000006","type":"file","file":"CNCF/OrchestrationManagement/CoordinationServiceDiscovery/etcd.md","x":1240,"y":60,"width":220,"height":60},
+		{"id":"node_coredns_0007","type":"file","file":"CNCF/OrchestrationManagement/CoordinationServiceDiscovery/coredns.md","x":1500,"y":60,"width":220,"height":60},
+		{"id":"node_nacos_000008","type":"file","file":"CNCF/OrchestrationManagement/CoordinationServiceDiscovery/nacos.md","x":1240,"y":200,"width":220,"height":60},
+		{"id":"node_zookeeper_09","type":"file","file":"CNCF/OrchestrationManagement/CoordinationServiceDiscovery/zookeeper.md","x":1500,"y":200,"width":220,"height":60},
+		{"id":"txt_discovery_note","type":"text","x":1240,"y":360,"width":680,"height":120,"text":"**K8s built-in**: etcd (state store) + CoreDNS (service DNS)\n**Standalone**: Nacos (config + discovery) / ZooKeeper (coordination)\nNacos & ZK serve non-K8s or hybrid microservice architectures"},
+		{"id":"node_istio_000010","type":"file","file":"CNCF/OrchestrationManagement/ServiceMesh/istio.md","x":40,"y":680,"width":220,"height":60},
+		{"id":"node_envoy_000011","type":"file","file":"CNCF/OrchestrationManagement/ServiceProxy/envoy.md","x":320,"y":680,"width":220,"height":60},
+		{"id":"node_nginx_000012","type":"file","file":"CNCF/OrchestrationManagement/ServiceProxy/nginx.md","x":600,"y":680,"width":220,"height":60},
+		{"id":"node_haproxy_0013","type":"file","file":"CNCF/OrchestrationManagement/ServiceProxy/haproxy.md","x":600,"y":820,"width":220,"height":60},
+		{"id":"txt_traffic_note_0","type":"text","x":40,"y":960,"width":1020,"height":100,"text":"**Service Mesh**: Istio (control plane) → Envoy (data plane sidecar)\n**Ingress/LB**: Nginx & HAProxy serve as K8s Ingress controllers or standalone reverse proxies"},
+		{"id":"node_higress_0014","type":"file","file":"CNCF/OrchestrationManagement/APIGateway/higress.md","x":1240,"y":680,"width":220,"height":60},
+		{"id":"node_tyk_00000015","type":"file","file":"CNCF/OrchestrationManagement/APIGateway/tyk.md","x":1500,"y":680,"width":220,"height":60},
+		{"id":"node_grpc_0000016","type":"file","file":"CNCF/OrchestrationManagement/RemoteProcedureCall/grpc.md","x":1240,"y":820,"width":220,"height":60},
+		{"id":"txt_gateway_note_0","type":"text","x":1240,"y":960,"width":680,"height":100,"text":"**API Gateway**: North-south traffic entry (auth, rate-limit, routing)\nHigress is Envoy-based (K8s native), Tyk is standalone\n**gRPC**: High-perf inter-service RPC, often paired with Service Mesh"}
+	],
+	"edges":[
+		{"id":"edge_k8s_etcd_001","fromNode":"node_k8s_readme_01","fromSide":"right","toNode":"node_etcd_0000006","toSide":"left","label":"state store"},
+		{"id":"edge_k8s_cdns_002","fromNode":"node_k8s_readme_01","fromSide":"right","toNode":"node_coredns_0007","toSide":"left","label":"DNS"},
+		{"id":"edge_istio_envy_03","fromNode":"node_istio_000010","fromSide":"right","toNode":"node_envoy_000011","toSide":"left","label":"data plane"},
+		{"id":"edge_istio_k8s_004","fromNode":"node_istio_000010","fromSide":"top","toNode":"node_k8s_readme_01","toSide":"bottom","label":"service mesh"},
+		{"id":"edge_nginx_k8s_005","fromNode":"node_nginx_000012","fromSide":"top","toNode":"node_k8s_readme_01","toSide":"bottom","label":"ingress"},
+		{"id":"edge_higr_envy_006","fromNode":"node_higress_0014","fromSide":"left","toNode":"node_envoy_000011","toSide":"right","label":"built on Envoy"},
+		{"id":"edge_grpc_istio_07","fromNode":"node_grpc_0000016","fromSide":"left","toNode":"node_istio_000010","toSide":"right","label":"mesh routing"},
+		{"id":"edge_grpc_k8s_008","fromNode":"node_grpc_0000016","fromSide":"top","toNode":"node_k8s_readme_01","toSide":"bottom","label":"inter-service"},
+		{"id":"edge_hprxy_k8s_09","fromNode":"node_haproxy_0013","fromSide":"top","toNode":"node_k8s_readme_01","toSide":"bottom","label":"load balancer"}
+	]
+}
