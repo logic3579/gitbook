@@ -75,7 +75,6 @@ There is no test suite. To verify changes:
 - Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
 - `CommandManual/` — CLI references: automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
 - `Network/` — CDN, Computer Network, HTTP, TCP
-- `ServiceConf/` — Service configuration guides: Elasticsearch, Grafana, Jenkins, Kafka, MongoDB, MySQL, Nginx, Observability, PostgreSQL, Redis, Saltstack
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
 
 ### Platform Section Structure

@@ -17,6 +17,53 @@ Log aggregation system.
 
 Like Prometheus, but for logs.
 
+#### Promtail Config
+
+**/opt/observability/promtail/config.yml**
+
+```yaml
+server:
+  log_level: info
+  log_format: logfmt
+  http_listen_port: 3101
+
+clients:
+  - url: http://loki-gateway.revosurge-uat.com/loki/api/v1/push
+
+positions:
+  filename: /tmp/positions.yaml
+
+scrape_configs:
+- job_name: docker-containers-debug
+  docker_sd_configs:
+    - host: unix:///var/run/docker.sock
+      refresh_interval: 5s
+      port: 80
+
+  # Use the Docker Compose service name as the 'app' label
+  relabel_configs:
+  - source_labels: [__meta_docker_container_label_com_docker_compose_service]
+    target_label: app
+  - source_labels: [__meta_docker_container_name]
+    regex: '/(.+)'
+    target_label: container_name
+    replacement: '$1'
+
+  # Add static labels
+  - target_label: namespace
+    replacement: 'revosurge'
+  - target_label: node_name
+    replacement: '${HOSTNAME:-unknow_node}'
+
+  # Filter out Promtail's own logs to prevent loops
+  - source_labels: [__meta_docker_container_name]
+    regex: '.*promtail.*'
+    action: drop
+
+  pipeline_stages:
+  - docker: {}
+```
+
 ## Deploy By Binary
 
 ### Quick Start

@@ -38,7 +38,7 @@ The documentation is organized into six top-level sections:
 | Section | Purpose |
 |---------|---------|
 | `CNCF/` | Cloud-native tools organized by CNCF landscape categories |
-| `DevOps/` | Programming languages, command manuals, network concepts, service configurations, Linux system topics |
+| `DevOps/` | Programming languages, command manuals, network concepts, Linux system topics |
 | `Platform/` | Cloud provider guides (AWS, GCP, Alibaba Cloud) and Kubernetes distribution installers |
 | `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
 | `Misc/` | VPN/tunnel technologies and hosting (Science), interviews |
@@ -60,7 +60,6 @@ The documentation is organized into six top-level sections:
 - Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
 - `CommandManual/` — CLI references: automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
 - `Network/` — CDN, Computer Network, HTTP, TCP
-- `ServiceConf/` — Service configuration guides: Elasticsearch, Grafana, Jenkins, Kafka, MongoDB, MySQL, Nginx, Observability, PostgreSQL, Redis, Saltstack
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
 - Kernel — Linux kernel topics
 
@@ -95,7 +94,7 @@ Some documents point to external repositories instead of containing inline conte
 
 ## Naming Conventions
 
-- **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`, `ServiceConf/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
+- **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
 - **Documents/files**: kebab-case (e.g., `big-data.md`, `container-runtime.md`, `naming-conventions.md`). Single-word names are just lowercase (e.g., `helm.md`, `docker.md`).
 - **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md` follow their respective conventions. Non-documentation directories (code, config, assets like `attachements/`, `iplib/`, `archery/`) are excluded from the PascalCase rule.
 
@@ -113,7 +112,7 @@ Some documents point to external repositories instead of containing inline conte
 - **Frontmatter**: Every document should have `description` field. First-level and second-level directory `README.md` files should include an `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names). Regular content documents (non-README) do not need `icon`.
 - **Tags**: All content files (non-README) should include `tags` in frontmatter for Obsidian navigation. Use hierarchical nested tags with `/` separator:
   - CNCF section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`
-  - DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/service-conf`, `devops/system`
+  - DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/system`
   - Platform section: `platform/aws`, `platform/gcp`, `platform/alibaba`
   - Standards section: `standards`
   - Misc section: `misc/vpn`, `misc/interview`

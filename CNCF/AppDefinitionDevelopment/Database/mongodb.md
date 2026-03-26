@@ -39,10 +39,42 @@ mkdir /opt/mongodb/data /opt/mongodb/logs
 ```
 
 ### Config and Boot
-[MongoDB Config](/DevOps/ServiceConf/mongodb.md)
+#### Config
+
+**/etc/mongod.conf**
+
+```yaml
+# mongod.conf
+storage:
+  dbPath: /opt/mongodb/data
+  journal:
+    enabled: true
+
+systemLog:
+  destination: file
+  logAppend: true
+  path: /opt/mongodb/logs/mongod.log
+
+net:
+  port: 27017
+  bindIp: 127.0.0.1
+
+processManagement:
+  timeZoneInfo: /usr/share/zoneinfo
+  fork: true
+  pidFilePath: /opt/mongodb/logs/mongod.pid
+
+# security:
+#   authorization: enabled
+
+# replication:
+#   replSetName: rs0
+```
+
+#### Boot(systemd)
 
 ```bash
-# boot 
+# boot
 cat > /etc/systemd/system/mongod.service << "EOF"
 [Unit]
 Description=MongoDB Database Server

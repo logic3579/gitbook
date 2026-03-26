@@ -65,6 +65,37 @@ helm -n cicd install jenkins . --create-namespace
 kubectl -n cicd get secrets jenkins -ojsonpath='{.data.jenkins-admin-password}' |base64 -d
 ```
 
+## Pipeline Example
+
+Jenkinsfile with Kubernetes agent:
+
+```Jenkinsfile
+pipeline {
+    agent {
+        kubernetes {
+            defaultContainer 'jnlp'
+        }
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                container('maven') {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                container('kubectl') {
+                    sh 'kubectl apply -f deployment.yaml'
+                }
+            }
+        }
+    }
+}
+```
+
 > Reference:
 >
 > 1. [Official Website](https://www.jenkins.io/doc/book/installing/)
