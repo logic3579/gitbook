@@ -18,6 +18,10 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 - `content-tracker.base` — Obsidian Bases dashboard for tracking content completion status and stub files.
 - `doc-audit.base` — Obsidian Bases dashboard for documentation quality audit (freshness, word estimates).
 - `CNCF/cncf-landscape.canvas` — Obsidian Canvas visualization of the CNCF technology landscape with tool relationships.
+- `CNCF/ObservabilityAnalysis/observability-stack.canvas` — Canvas showing metrics/logs/traces pipelines and their relationships.
+- `CNCF/OrchestrationManagement/orchestration-ecosystem.canvas` — Canvas showing K8s-centric ecosystem (service discovery, mesh, gateway, RPC).
+- `CNCF/Runtime/runtime-stack.canvas` — Canvas showing container runtime, network, and storage layers.
+- `DevOps/CommandManual/command-index.base` — Obsidian Bases dashboard for categorized CLI command reference with content gap tracking.
 
 ## Local Development
 
@@ -132,7 +136,11 @@ Some documents point to external repositories instead of containing inline conte
 
 This vault uses [obsidian-skills](https://github.com/kepano/obsidian-skills) (installed in `.claude/skills/`) providing five skills: `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `obsidian-cli`, and `defuddle`.
 
-- **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Placed at vault root.
-- **Canvas** (`.canvas` files): Used for visual architecture maps. Placed in the relevant section directory (e.g., `CNCF/cncf-landscape.canvas`).
+- **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Root-level bases track the whole vault; section-level bases (e.g., `DevOps/CommandManual/command-index.base`) focus on specific directories.
+- **Canvas** (`.canvas` files): Used for visual architecture maps. Top-level canvas (e.g., `CNCF/cncf-landscape.canvas`) shows the full landscape; second-level canvas files (e.g., `CNCF/ObservabilityAnalysis/observability-stack.canvas`) zoom into specific domains with detailed data flows and dependencies.
 - **Compatibility**: Content files must use standard Markdown links (not wikilinks) for GitBook compatibility. Obsidian-specific features (tags, bases, canvas) are additive and do not affect GitBook rendering.
 - **Defuddle**: Prefer `npx defuddle parse <url> --md` over WebFetch for extracting clean content from web pages when adding new documentation.
+
+## Pre-commit Checklist
+
+Before every git commit and push, **always update `CLAUDE.md`** to reflect any structural changes made in the session (new files, moved directories, updated conventions, etc.). This ensures the project documentation stays in sync with the actual codebase.
