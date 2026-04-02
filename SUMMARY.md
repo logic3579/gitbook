@@ -108,6 +108,7 @@
 - [Python](./DevOps/python.md)
 - [Ruby](./DevOps/ruby.md)
 - [Command Manual](./DevOps/CommandManual/README.md)
+  - [AI Coding](./DevOps/CommandManual/ai-coding.md)
   - [Automation](./DevOps/CommandManual/automation.md)
   - [Big Data](./DevOps/CommandManual/big-data.md)
   - [Build Tools](./DevOps/CommandManual/build-tools.md)

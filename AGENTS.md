@@ -6,7 +6,7 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 
 - **Repository**: https://github.com/logic3579/gitbook/
 - **Format**: Markdown documents following CNCF landscape taxonomy
-- **Also used as**: Obsidian vault (`.obsidian/` config present)
+- **Also used as**: Obsidian vault (`.obsidian/` config present) with [obsidian-skills](https://github.com/kepano/obsidian-skills) installed in `.claude/skills/`
 - **Local Dev**: GitBook CLI
 
 ---
@@ -17,6 +17,13 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 - `README.md` — Landing page for the GitBook site.
 - `.gitbook.yaml` — GitBook configuration (points to `README.md` and `SUMMARY.md`).
 - `CLAUDE.md` — Guidance for Claude Code AI assistant.
+- `content-tracker.base` — Obsidian Bases dashboard for tracking content completion status and stub files.
+- `doc-audit.base` — Obsidian Bases dashboard for documentation quality audit (freshness, word estimates).
+- `CNCF/cncf-landscape.canvas` — Obsidian Canvas visualization of the CNCF technology landscape with tool relationships.
+- `CNCF/ObservabilityAnalysis/observability-stack.canvas` — Canvas showing metrics/logs/traces pipelines and their relationships.
+- `CNCF/OrchestrationManagement/orchestration-ecosystem.canvas` — Canvas showing K8s-centric ecosystem (service discovery, mesh, gateway, RPC).
+- `CNCF/Runtime/runtime-stack.canvas` — Canvas showing container runtime, network, and storage layers.
+- `DevOps/CommandManual/command-index.base` — Obsidian Bases dashboard for categorized CLI command reference with content gap tracking.
 
 ---
 
@@ -25,17 +32,13 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 ### GitBook Commands
 
 ```bash
-# Install GitBook CLI (requires Node.js)
+# Install GitBook CLI
 npm install gitbook-cli -g
 
-# Initialize (run once after clone)
+# Initialize and serve locally
 gitbook init
-
-# Serve locally (live preview at http://localhost:4000)
-gitbook serve
-
-# Build static output to _book/
-gitbook build
+gitbook serve    # Live preview at http://localhost:4000
+gitbook build    # Static output to _book/
 ```
 
 ### Preview
@@ -46,18 +49,18 @@ There is no test suite. To verify changes:
 
 ---
 
-## Content Organization
+## Content Architecture
 
-### Main Sections
+The documentation is organized into six top-level sections:
 
 | Section | Purpose |
 |---------|---------|
 | `CNCF/` | Cloud-native tools organized by CNCF landscape categories |
-| `DevOps/` | Programming languages, command manuals, network concepts, service configurations, Linux system topics |
+| `DevOps/` | Programming languages, command manuals, network concepts, Linux system topics |
 | `Platform/` | Cloud provider guides (AWS, GCP, Alibaba Cloud) and Kubernetes distribution installers |
 | `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
 | `Misc/` | VPN/tunnel technologies and hosting (Science), interviews |
-| `Environment/` | Development environment setup (references external repository) |
+| `Environment/` | Development environment setup (references external repository [logic3579/environment](https://github.com/logic3579/environment)) |
 
 ### CNCF Section Structure
 
@@ -73,9 +76,10 @@ There is no test suite. To verify changes:
 ### DevOps Section Structure
 
 - Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
-- `CommandManual/` — CLI references: automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
+- `CommandManual/` — CLI references: ai-coding, automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
 - `Network/` — CDN, Computer Network, HTTP, TCP
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
+- Kernel — Linux kernel topics
 
 ### Platform Section Structure
 
@@ -100,7 +104,7 @@ There is no test suite. To verify changes:
 
 ### External Repository References
 
-For tools with dedicated external repositories, use reference format instead of inline content:
+Some documents point to external repositories instead of containing inline content:
 - `Environment/README.md` → [logic3579/environment](https://github.com/logic3579/environment)
 - `CNCF/Provisioning/AutomationConfiguration/ansible.md` → [logic3579/automation](https://github.com/logic3579/automation)
 - `CNCF/Provisioning/AutomationConfiguration/saltproject.md` → [logic3579/automation](https://github.com/logic3579/automation)
@@ -110,15 +114,20 @@ For tools with dedicated external repositories, use reference format instead of 
 
 ## Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Directories | PascalCase | `CNCF/`, `DevOps/`, `CommandManual/` |
-| Acronyms | Uppercase | `CNCF/`, `CNAI/`, `AWS/` |
-| Documents | kebab-case | `docker.md`, `kubernetes-network.md`, `big-data.md` |
-| Single-word docs | lowercase | `helm.md`, `docker.md` |
-| Exceptions | Fixed names | `README.md`, `SUMMARY.md`, `CLAUDE.md`, `AGENTS.md` |
+- **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
+- **Documents/files**: kebab-case (e.g., `big-data.md`, `container-runtime.md`, `naming-conventions.md`). Single-word names are just lowercase (e.g., `helm.md`, `docker.md`).
+- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md`, `AGENTS.md` follow their respective conventions. Non-documentation directories (code, config, assets like `attachements/`, `iplib/`, `archery/`) are excluded from the PascalCase rule.
 
-**Note**: Non-documentation directories (code, config, assets like `attachements/`, `iplib/`, `archery/`) are excluded from the PascalCase rule.
+---
+
+## Conventions for Adding Content
+
+1. Create the markdown file (kebab-case name) in the appropriate category directory under `CNCF/`, `DevOps/`, `Platform/`, `Standards/`, or `Misc/`.
+2. Add the entry to `SUMMARY.md` in the correct section with proper indentation to maintain the navigation hierarchy.
+3. Each category directory has a `README.md` that serves as the section overview page, following this format: frontmatter (`icon` + `description`) → H1 title → one-line description → sub-page list with brief descriptions.
+4. Embedded YAML configurations and code examples are used extensively throughout the docs — maintain that style.
+5. For tools with dedicated external repositories, use the reference format (frontmatter + brief description + repository link + official references) instead of inline content. See `ansible.md` as a template.
+6. Image attachments are stored in `attachements/` subdirectories alongside the referencing documents.
 
 ---
 
@@ -130,6 +139,9 @@ For tools with dedicated external repositories, use reference format instead of 
 ```yaml
 ---
 description: <brief description>
+tags:
+  - <hierarchical-tag>
+  - <sub-category-tag>
 ---
 ```
 
@@ -142,6 +154,16 @@ description: <section description>
 ```
 
 **Icon Examples**: `bullseye-arrow`, `robot`, `circle-dot`, `hand-wave`, `magnifying-glass-chart`
+
+### Tags
+
+All content files (non-README) should include `tags` in frontmatter for Obsidian navigation. Use hierarchical nested tags with `/` separator:
+- CNCF section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`
+- DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/system`
+- Platform section: `platform/aws`, `platform/gcp`, `platform/alibaba`
+- Standards section: `standards`
+- Misc section: `misc/vpn`, `misc/interview`
+- Sub-category tags: `database`, `messaging`, `ci-cd`, `monitoring`, `logging`, `tracing`, `kubernetes`, `networking`, `security`, `container`, `storage`, `service-mesh`, `service-proxy`, `api-gateway`, `service-discovery`, `configuration`, `helm`
 
 ### H1 Title
 
@@ -211,6 +233,17 @@ The `SUMMARY.md` file controls the GitBook navigation sidebar:
 
 ---
 
+## Obsidian Integration
+
+This vault uses [obsidian-skills](https://github.com/kepano/obsidian-skills) (installed in `.claude/skills/`) providing five skills: `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `obsidian-cli`, and `defuddle`.
+
+- **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Root-level bases track the whole vault; section-level bases (e.g., `DevOps/CommandManual/command-index.base`) focus on specific directories.
+- **Canvas** (`.canvas` files): Used for visual architecture maps. Top-level canvas (e.g., `CNCF/cncf-landscape.canvas`) shows the full landscape; second-level canvas files (e.g., `CNCF/ObservabilityAnalysis/observability-stack.canvas`) zoom into specific domains with detailed data flows and dependencies.
+- **Compatibility**: Content files must use standard Markdown links (not wikilinks) for GitBook compatibility. Obsidian-specific features (tags, bases, canvas) are additive and do not affect GitBook rendering.
+- **Defuddle**: Prefer `npx defuddle parse <url> --md` over WebFetch for extracting clean content from web pages when adding new documentation.
+
+---
+
 ## What NOT To Do
 
 - Do NOT use Obsidian WikiLinks (`[[...]]`)
@@ -261,3 +294,9 @@ No specific linter or formatter configured. Recommended:
 - This is a documentation-only repository (no code, no tests)
 - Content is in English with some Chinese technical terms
 - Images stored in `attachements/` subdirectories alongside referencing docs
+
+---
+
+## Pre-commit Checklist
+
+Before every git commit and push, **always update `AGENTS.md`** to reflect any structural changes made in the session (new files, moved directories, updated conventions, etc.). This ensures the project documentation stays in sync with the actual codebase.

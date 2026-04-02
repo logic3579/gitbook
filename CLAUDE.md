@@ -62,7 +62,7 @@ The documentation is organized into six top-level sections:
 ### DevOps Section Structure
 
 - Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
-- `CommandManual/` — CLI references: automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
+- `CommandManual/` — CLI references: ai-coding, automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, system-tools, systemd, text-swordsman, version-control, video-tools
 - `Network/` — CDN, Computer Network, HTTP, TCP
 - `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
 - Kernel — Linux kernel topics

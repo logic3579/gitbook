@@ -7,6 +7,7 @@ description: Common Command Manual snippets
 
 CLI references and command snippets for common DevOps tools.
 
+- [AI Coding](ai-coding.md) — Claude Code, Gemini CLI, and Codex CLI
 - [Automation](automation.md) — Ansible and SaltStack CLI references
 - [Big Data](big-data.md) — HDFS and HBase
 - [Build Tools](build-tools.md) — Maven, Gradle, and Make
@@ -21,5 +22,5 @@ CLI references and command snippets for common DevOps tools.
 - [Systemd](systemd.md) — Systemd service management and system control
 - [System Tools](system-tools.md) — System performance analysis and debugging
 - [Text Swordsman](text-swordsman.md) — Text processing with awk, grep, and sed
-- [Version Control](version-control.md) — Git and Subversion
+- [Version Control](version-control.md) — Git, GitHub CLI, and Subversion
 - [Video Tools](video-tools.md) — FFmpeg video and audio processing
