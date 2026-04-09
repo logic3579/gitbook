@@ -82,6 +82,8 @@ The documentation is organized into six top-level sections:
 - `github-standards.md` — GitHub project management and release standards
 - `gitlab-standards.md` — GitLab project management and release standards
 - `docker-standards.md` — Docker image build and release standards
+- `github-actions-cicd-monorepo.md` — GitHub Actions CI/CD workflow standard for monorepo architecture
+- `github-actions-cicd-multirepo.md` — GitHub Actions CI/CD workflow standard for multirepo architecture
 
 ### Misc Section Structure
 
