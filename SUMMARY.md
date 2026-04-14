@@ -167,8 +167,10 @@
 - [GitHub Standards](./Standards/github-standards.md)
 - [GitLab Standards](./Standards/gitlab-standards.md)
 - [Docker Standards](./Standards/docker-standards.md)
+- [GitHub Actions CD](./Standards/github-actions-cd.md)
 - [GitHub Actions CI/CD - Monorepo](./Standards/github-actions-cicd-monorepo.md)
 - [GitHub Actions CI/CD - Multirepo](./Standards/github-actions-cicd-multirepo.md)
+- [GitLab CI/CD - Multirepo](./Standards/gitlab-cicd-multirepo.md)
 
 ## Misc
 

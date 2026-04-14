@@ -1,5 +1,5 @@
 ---
-description: GitHub Actions CI/CD workflow standard for monorepo architecture with path-based triggering, Docker build, GHCR publish, and cross-repo CD trigger
+description: GitHub Actions CI/CD workflow standard for monorepo architecture with path-based triggering, Docker build, GHCR publish, and ArgoCD GitOps deployment
 tags:
   - standards
   - ci-cd
@@ -9,7 +9,7 @@ tags:
 
 GitHub Actions CI/CD workflow standard for monorepo architecture. Uses `paths` filtering for per-module triggering, suitable for projects managed by Turborepo / Nx.
 
-Pipeline: path change trigger → application build → Docker image push to GHCR → cross-repo CD trigger.
+Pipeline: path change trigger → application build → Docker image push to GHCR → update GitOps manifest → ArgoCD auto-sync.
 
 ## Workflow Example
 
@@ -123,8 +123,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ============================================
-  # CD: Trigger Deployment in DevOps Repo
+  # CD: Trigger ArgoCD GitOps Deployment
   # ============================================
+  # Uses repository-dispatch to notify the DevOps repo, which updates
+  # Kubernetes manifests in the GitOps repo. ArgoCD watches the GitOps
+  # repo and auto-syncs changes to the target cluster (pull-based CD).
   trigger-cd:
     needs: build-and-publish
     runs-on: ubuntu-latest
@@ -223,4 +226,5 @@ Monorepo workflows typically install dependencies and build artifacts in CI (e.g
 > 1. [GitHub Actions Documentation](https://docs.github.com/en/actions)
 > 2. [docker/build-push-action](https://github.com/docker/build-push-action)
 > 3. [peter-evans/repository-dispatch](https://github.com/peter-evans/repository-dispatch)
-> 4. [Turborepo - CI/CD](https://turbo.build/repo/docs/guides/ci)
+> 4. [Argo CD - Getting Started](https://argo-cd.readthedocs.io/en/stable/getting_started/)
+> 5. [Turborepo - CI/CD](https://turbo.build/repo/docs/guides/ci)

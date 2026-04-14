@@ -1,5 +1,5 @@
 ---
-description: GitHub Actions CI/CD workflow standard for multirepo architecture with multi-platform Docker build, GHCR publish, and cross-repo CD trigger
+description: GitHub Actions CI/CD workflow standard for multirepo architecture with multi-platform Docker build, GHCR publish, and ArgoCD GitOps deployment
 tags:
   - standards
   - ci-cd
@@ -9,7 +9,7 @@ tags:
 
 GitHub Actions CI/CD workflow standard for multirepo (single-repo-per-service) architecture. Each repository corresponds to an independent service, producing multi-platform Docker images.
 
-Pipeline: code push trigger → multi-platform Docker build → image push to GHCR → cross-repo CD trigger.
+Pipeline: code push trigger → multi-platform Docker build → image push to GHCR → update GitOps manifest → ArgoCD auto-sync.
 
 ## Workflow Example
 
@@ -110,8 +110,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ============================================
-  # CD: Trigger Deployment in DevOps Repo
+  # CD: Trigger ArgoCD GitOps Deployment
   # ============================================
+  # Uses repository-dispatch to notify the DevOps repo, which updates
+  # Kubernetes manifests in the GitOps repo. ArgoCD watches the GitOps
+  # repo and auto-syncs changes to the target cluster (pull-based CD).
   trigger-cd:
     needs: build-and-publish
     runs-on: ubuntu-latest
@@ -147,8 +150,7 @@ jobs:
               "environment": "${{ steps.env.outputs.environment }}",
               "triggered_by": "${{ github.actor }}",
               "commit_message": ${{ toJSON(github.event.head_commit.message) }},
-              "source_repo": "${{ github.repository }}",
-              "deploy_method": "ansible"
+              "source_repo": "${{ github.repository }}"
             }
 
       - name: CD Trigger Summary
@@ -161,7 +163,6 @@ jobs:
           echo "| Application | \`${{ env.IMAGE_NAME }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Image Tag | \`${{ needs.build-and-publish.outputs.image_tag }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Environment | ${{ steps.env.outputs.environment }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Deploy Method | ansible |" >> $GITHUB_STEP_SUMMARY
           echo "| Target Repo | my-org/devops-tools |" >> $GITHUB_STEP_SUMMARY
 ```
 
@@ -173,7 +174,7 @@ In a multirepo setup, the entire repository represents a single service. Instead
 
 ```yaml
 paths-ignore:
-  - ".github/**"    # Workflow file changes do not trigger builds
+  - ".github/**" # Workflow file changes do not trigger builds
 ```
 
 ### Root-Level Build Context
@@ -199,28 +200,15 @@ Multirepo services typically require multi-platform deployment (e.g., amd64 + ar
     platforms: linux/amd64,linux/arm64
 ```
 
-### Deploy Method Declaration
-
-The CD payload can include a `deploy_method` field, allowing the DevOps repository to select different deployment strategies per service:
-
-```json
-{
-  "deploy_method": "ansible"
-}
-```
-
-Common deploy methods: `helm` (Kubernetes), `ansible` (VM/bare-metal), `ecs` (AWS ECS), etc.
-
 ## Monorepo vs Multirepo Comparison
 
-| Dimension | Monorepo | Multirepo |
-|-----------|----------|-----------|
-| Trigger | `paths` matching sub-app paths | `paths-ignore` excluding non-build files |
-| Build context | `apps/my-app/` (subdirectory) | `.` (root directory) |
-| Language env | CI setup + build, artifacts COPY into image | Entire build inside Dockerfile |
-| Multi-arch | Typically single-arch (frontend static assets) | Multi-arch (QEMU + Buildx) |
-| Concurrency | `ci-${{ github.ref }}-${{ github.workflow }}` | `ci-${{ github.ref }}` |
-| Deploy method | Usually fixed (e.g., Kubernetes) | Per-service configurable (helm / ansible) |
+| Dimension     | Monorepo                                       | Multirepo                                |
+| ------------- | ---------------------------------------------- | ---------------------------------------- |
+| Trigger       | `paths` matching sub-app paths                 | `paths-ignore` excluding non-build files |
+| Build context | `apps/my-app/` (subdirectory)                  | `.` (root directory)                     |
+| Language env  | CI setup + build, artifacts COPY into image    | Entire build inside Dockerfile           |
+| Multi-arch    | Typically single-arch (frontend static assets) | Multi-arch (QEMU + Buildx)               |
+| Concurrency   | `ci-${{ github.ref }}-${{ github.workflow }}`  | `ci-${{ github.ref }}`                   |
 
 ## Shared Design
 
@@ -228,28 +216,28 @@ The following patterns are consistent across both architectures:
 
 ### Image Tag Strategy
 
-| Scenario | Tag Format | Example |
-|----------|------------|---------|
-| Push to dev | `{branch}-{short_sha}` | `dev-a1b2c3d` |
-| Push to main | `{branch}-{short_sha}` + `latest` | `main-a1b2c3d`, `latest` |
+| Scenario      | Tag Format                                       | Example                              |
+| ------------- | ------------------------------------------------ | ------------------------------------ |
+| Push to dev   | `{branch}-{short_sha}`                           | `dev-a1b2c3d`                        |
+| Push to main  | `{branch}-{short_sha}` + `latest`                | `main-a1b2c3d`, `latest`             |
 | Release event | `{version}` + `{version}-{short_sha}` + `latest` | `v1.2.0`, `v1.2.0-a1b2c3d`, `latest` |
 
 ### Environment Mapping
 
-| Branch | Deploy Environment |
-|--------|--------------------|
-| `dev` | test |
-| `main` / release | prod |
+| Branch           | Deploy Environment |
+| ---------------- | ------------------ |
+| `dev`            | test               |
+| `main` / release | prod               |
 
 ### Cross-Repo CD Trigger
 
-Uses `peter-evans/repository-dispatch` to send a `deploy-app` event to a dedicated DevOps repository, decoupling CI from CD.
+Uses `peter-evans/repository-dispatch` to send a `deploy-app` event to a dedicated DevOps repository. The DevOps repo receives the event, updates Kubernetes manifests in the GitOps repo, and ArgoCD auto-syncs the changes to the cluster (pull-based CD).
 
 ### Required Secrets
 
-| Secret | Purpose |
-|--------|---------|
-| `GITHUB_TOKEN` | Automatically provided, used for GHCR login and image push |
+| Secret            | Purpose                                                                     |
+| ----------------- | --------------------------------------------------------------------------- |
+| `GITHUB_TOKEN`    | Automatically provided, used for GHCR login and image push                  |
 | `DEVOPS_REPO_PAT` | Manually configured, used for cross-repo CD trigger (requires `repo` scope) |
 
 > Reference:
@@ -258,4 +246,5 @@ Uses `peter-evans/repository-dispatch` to send a `deploy-app` event to a dedicat
 > 2. [docker/build-push-action](https://github.com/docker/build-push-action)
 > 3. [docker/setup-qemu-action](https://github.com/docker/setup-qemu-action)
 > 4. [peter-evans/repository-dispatch](https://github.com/peter-evans/repository-dispatch)
-> 5. [GitHub Packages - GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
+> 5. [Argo CD - Getting Started](https://argo-cd.readthedocs.io/en/stable/getting_started/)
+> 6. [GitHub Packages - GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
