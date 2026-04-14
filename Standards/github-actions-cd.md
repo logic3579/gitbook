@@ -111,7 +111,7 @@ jobs:
           echo "Updating $VALUES_FILE with tag: $IMAGE_TAG"
 
           # Get current tag for comparison
-          CURRENT_TAG=$(yq '.global.image.tag' "$VALUES_FILE")
+          CURRENT_TAG=$(yq '.image.tag' "$VALUES_FILE")
           echo "Current tag: $CURRENT_TAG"
 
           if [[ "$CURRENT_TAG" == "$IMAGE_TAG" ]]; then
@@ -121,7 +121,7 @@ jobs:
           fi
 
           # Update the image tag
-          yq -i '.global.image.tag = strenv(IMAGE_TAG)' "$VALUES_FILE"
+          yq -i '.image.tag = strenv(IMAGE_TAG)' "$VALUES_FILE"
 
           echo "changed=true" >> $GITHUB_OUTPUT
           echo "Updated tag to: $IMAGE_TAG"
@@ -192,7 +192,7 @@ jobs:
           echo "Updating $VALUES_FILE with tag: $IMAGE_TAG"
 
           # Get current tag for comparison
-          CURRENT_TAG=$(yq '.global.image.tag' "$VALUES_FILE")
+          CURRENT_TAG=$(yq '.image.tag' "$VALUES_FILE")
           echo "Current tag: $CURRENT_TAG"
 
           if [[ "$CURRENT_TAG" == "$IMAGE_TAG" ]]; then
@@ -202,7 +202,7 @@ jobs:
           fi
 
           # Update the image tag
-          yq -i '.global.image.tag = strenv(IMAGE_TAG)' "$VALUES_FILE"
+          yq -i '.image.tag = strenv(IMAGE_TAG)' "$VALUES_FILE"
 
           echo "changed=true" >> $GITHUB_OUTPUT
           echo "Updated tag to: $IMAGE_TAG"
@@ -352,13 +352,12 @@ helm-charts/
             └── service.yaml
 ```
 
-The CD workflow updates `.global.image.tag` in the environment-specific values file using `yq`:
+The CD workflow updates `.image.tag` in the environment-specific values file using `yq`:
 
 ```yaml
 # values-test.yml
-global:
-  image:
-    tag: "dev-a1b2c3d"    # ← Updated by CD workflow
+image:
+  tag: "dev-a1b2c3d"    # ← Updated by CD workflow
 ```
 
 ### ArgoCD Sync Strategy
