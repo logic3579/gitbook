@@ -300,3 +300,4 @@ No specific linter or formatter configured. Recommended:
 ## Pre-commit Checklist
 
 Before every git commit and push, **always update `AGENTS.md`** to reflect any structural changes made in the session (new files, moved directories, updated conventions, etc.). This ensures the project documentation stays in sync with the actual codebase.
+- Added DevOps/rust.md for Rust language documentation, following DevOps/nodejs.md format.

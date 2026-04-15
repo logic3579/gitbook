@@ -36,20 +36,6 @@ apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev l
 make && make install
 ```
 
-### Pycharm
-
-```bash
-# active
-cat ./ideaActive/ja-netfilter-all/ja-netfilter/readme.txt
-
-# settings
-# 1. Python Intergrated Tools -> Docstring format: Google
-
-# Plugins
-gradianto # themes
-rainbow brackets # json
-```
-
 ## 2. ProjectManage
 
 ### pip

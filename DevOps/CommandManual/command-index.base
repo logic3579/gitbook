@@ -7,7 +7,7 @@ formulas:
   content_size: if(file.size > 5000, "✅ Rich", if(file.size > 1500, "📝 Moderate", "⚠️ Thin"))
   word_estimate: (file.size / 5).round(0)
   days_since_update: (now() - file.mtime).days.round(0)
-  category: 'if(/network|openssl/.matches(file.name), "🌐 Network & Security", if(/database|big-data|streaming/.matches(file.name), "💾 Data & Messaging", if(/container|build|package|version/.matches(file.name), "📦 Build & Package", if(/system|systemd|memory|io/.matches(file.name), "🖥️ System & I/O", if(/text|video/.matches(file.name), "🔧 Text & Media", "⚙️ Automation")))))'
+  category: if(/network|openssl/.matches(file.name), "🌐 Network & Security", if(/database|big-data|streaming/.matches(file.name), "💾 Data & Messaging", if(/container|build|package|version/.matches(file.name), "📦 Build & Package", if(/system|systemd|memory|io/.matches(file.name), "🖥️ System & I/O", if(/text|video/.matches(file.name), "🔧 Text & Media", "⚙️ Automation")))))
 properties:
   formula.content_size:
     displayName: Status
