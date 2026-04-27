@@ -61,7 +61,6 @@
     - [Kubernetes](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/README.md)
       - [Kubernetes Network](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-network.md)
       - [Kubernetes RBAC](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-rbac.md)
-      - [Kubeadm Deploy](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kubeadm-deploy.md)
       - [Kube Eventer](./CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kube-eventer.md)
   - [Service Mesh](./CNCF/OrchestrationManagement/ServiceMesh/README.md)
     - [Istio](./CNCF/OrchestrationManagement/ServiceMesh/istio.md)

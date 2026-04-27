@@ -7,7 +7,7 @@
 		{"id":"node_k8s_readme_01","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/README.md","x":40,"y":60,"width":240,"height":60},
 		{"id":"node_k8s_network2","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-network.md","x":320,"y":60,"width":240,"height":60},
 		{"id":"node_k8s_rbac_003","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/k8s-rbac.md","x":600,"y":60,"width":240,"height":60},
-		{"id":"node_kubeadm_0004","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kubeadm-deploy.md","x":40,"y":200,"width":240,"height":60},
+		{"id":"node_kubeadm_0004","type":"file","file":"Platform/distribution-installer.md","x":40,"y":200,"width":240,"height":60},
 		{"id":"node_kube_evntr_5","type":"file","file":"CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/kube-eventer.md","x":320,"y":200,"width":240,"height":60},
 		{"id":"txt_k8s_note_0001","type":"text","x":40,"y":380,"width":1020,"height":100,"text":"**Kubernetes** is the central orchestration platform.\nAll surrounding tools integrate with K8s: Service Discovery for internal DNS & config,\nService Mesh/Proxy for traffic routing, API Gateway for external access."},
 		{"id":"node_etcd_0000006","type":"file","file":"CNCF/OrchestrationManagement/CoordinationServiceDiscovery/etcd.md","x":1240,"y":60,"width":220,"height":60},

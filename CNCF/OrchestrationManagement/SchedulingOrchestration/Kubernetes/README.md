@@ -169,8 +169,9 @@ kubectl config set-context --current --namespace=<ns>
 
 - [Kubernetes Network](k8s-network.md) — Container networking, Service implementation (iptables/IPVS), and flannel CNI
 - [Kubernetes RBAC](k8s-rbac.md) — RBAC authorization with Role, ClusterRole, and ServiceAccount
-- [Kubeadm Deploy](kubeadm-deploy.md) — Deploy Kubernetes cluster with kubeadm and containerd on Ubuntu
 - [Kube Eventer](kube-eventer.md) — Collect cluster events with kube-eventer and send to Kafka/Telegram
+
+> For deploying clusters with kubeadm (full step-by-step on Ubuntu/containerd, including MacOS via Multipass), see [Distribution Installer › Kubeadm](../../../../Platform/distribution-installer.md#kubeadm).
 
 > Reference:
 >
