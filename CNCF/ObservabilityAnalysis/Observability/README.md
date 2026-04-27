@@ -14,6 +14,7 @@ Monitoring, logging, tracing, and visualization tools for cloud-native systems.
 - [Loki](loki.md) — Horizontally scalable log aggregation system inspired by Prometheus
 - [OpenTelemetry](opentelemetry.md) — Vendor-neutral framework for collecting telemetry data (traces, metrics, logs)
 - [Prometheus](prometheus.md) — Monitoring system and time-series database with powerful query language
+- [VictoriaMetrics](victoriametrics.md) — Fast, cost-effective time-series database; drop-in Prometheus replacement and long-term store
 
 > Reference:
 >

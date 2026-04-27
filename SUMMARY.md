@@ -45,6 +45,7 @@
     - [Loki](./CNCF/ObservabilityAnalysis/Observability/loki.md)
     - [OpenTelemetry](./CNCF/ObservabilityAnalysis/Observability/opentelemetry.md)
     - [Prometheus](./CNCF/ObservabilityAnalysis/Observability/prometheus.md)
+    - [VictoriaMetrics](./CNCF/ObservabilityAnalysis/Observability/victoriametrics.md)
 - [Orchestration and Management](./CNCF/OrchestrationManagement/README.md)
   - [API Gateway](./CNCF/OrchestrationManagement/APIGateway/README.md)
     - [Higress](./CNCF/OrchestrationManagement/APIGateway/higress.md)
