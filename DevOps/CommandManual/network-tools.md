@@ -19,7 +19,7 @@ apt install arping
 # select arp table
 arp -ne
 -e                       display (all) hosts in default (Linux) style
--n, --numeric            don\'t resolve names
+-n, --numeric            don't resolve names
 
 # arping
 arping 192.168.1.100
@@ -242,7 +242,7 @@ apt install dsniff
 
 tcpkill -i <interface> host <destination_ip> and port <destination_port>
 # example
-tcpkill -i lo host 127.0.0.1 and port
+tcpkill -i lo host 127.0.0.1 and port 8080
 ```
 
 ### wscat

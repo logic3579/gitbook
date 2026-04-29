@@ -24,7 +24,7 @@ POSIX options:          GNU long options: (standard)
 
 # example
 awk -F':' '{print $1}' /etc/passwd
-awk 'BEGIN { print "Don\47t Panic!" }'
+awk 'BEGIN { print "Don'\''t Panic!" }'
 
 
 # run awk program, print the first column of each input line

@@ -12,7 +12,7 @@ tags:
 ### inventory
 
 ```bash
-# initial: for initalize the system
+# initial: for initialize the system
 inventories/initial.host
 
 # test hosts
@@ -28,7 +28,7 @@ inventories/prod.host
 # command usage
 # optional arguments
 --vault-password-file VAULT_PASSWORD_FILES
--B --backgroud SECONDS
+-B --background SECONDS
 -C --check
 -D --diff
 -P --poll POLL_INTERVAL
@@ -62,7 +62,7 @@ ansible 'db*' -m ping
 ansible 'web:&db' -m ping
 ansible 'web:db' -m ping
 ansible 'web:!db' -m ping
-ansible "~(web|db).*\.example\.com" –m ping
+ansible "~(web|db).*\.example\.com" -m ping
 
 
 # Common modules
@@ -371,23 +371,23 @@ ansible-vault decrypt playbooks/example.yml
 
 # option1: --ask-vault-pass or --vault-id
 # --ask-vault-pass
-ansible-vault encrypt_string pwd123 --name root_password
+ansible-vault encrypt_string <secret> --name root_password
 ansible-playbook playbooks/example.yml --start-at-task "Vault task" --ask-vault-pass
 # --vault-id (recommend)
-ansible-vault encrypt_string pwd123 --name root_password --vault-id prompt
-#ansible-vault encrypt_string pwd123 --name root_password --vault-id example@prompt
+ansible-vault encrypt_string <secret> --name root_password --vault-id prompt
+#ansible-vault encrypt_string <secret> --name root_password --vault-id example@prompt
 ansible-playbook playbooks/example.yml --vault-id prompt
 
 
 # option2: --vault-password-file or --vault-id
 # --vault-password-file
 ansible-vault encrypt playbooks/example.yml
-echo "your_vault_pwd" > pwd.vault
+echo "<vault_password>" > pwd.vault
 ansible-playbook playbooks/example.yml --vault-password-file pwd.vault
 # --vault-id (recommend)
 ansible-vault encrypt playbooks/example.yml --vault-id pwd.vault
 #ansible-vault encrypt playbooks/example.yml --vault-id example@pwd.vault
-echo "your_vault_pwd" > pwd.vault
+echo "<vault_password>" > pwd.vault
 ansible-playbook playbooks/example.yml --vault-id pwd.vault
 ```
 

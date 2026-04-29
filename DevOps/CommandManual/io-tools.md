@@ -12,7 +12,7 @@ tags:
 # out of CPU
 dd if=/dev/zero of=/dev/null
 
-#
+# benchmark sequential write throughput (direct I/O, bypass page cache)
 time dd if=/dev/zero of=test.file bs=1G count=2 oflag=direct
 ```
 
@@ -186,3 +186,6 @@ done
 >
 > 1. [fio Documentation](https://fio.readthedocs.io/)
 > 2. [sysstat (iostat/pidstat/sar)](https://github.com/sysstat/sysstat)
+> 3. [iotop](https://repo.or.cz/iotop.git)
+> 4. [util-linux (lsblk/blkid/fdisk)](https://github.com/util-linux/util-linux)
+> 5. [GNU parted](https://www.gnu.org/software/parted/)

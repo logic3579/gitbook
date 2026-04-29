@@ -20,7 +20,7 @@ tags:
 openssl genrsa -out a.com.key 2048
 
 # generate CSR file
-openssl genrsa -out a.com.key 2048 openssl req -new -sha256 -key a.com.key -out a.com.csr
+openssl req -new -sha256 -key a.com.key -out a.com.csr
 # view CSR information
 openssl req -noout -text -in a.com.csr
 
@@ -104,13 +104,16 @@ openssl smime -decrypt -in Encrypted.zip -binary -inform DEM -inkey logic.key -o
 ```bash
 # DER/CER/CRT to PEM
 # view certificate info first, then convert format
-openssl x509 -in cert.der -inform der -text -noout openssl x509 -in cert.der -inform der -outform pem -out cert.pem
+openssl x509 -in cert.der -inform der -text -noout
+openssl x509 -in cert.der -inform der -outform pem -out cert.pem
 
 # PEM to DER/CER/CRT
-openssl x509 -in cert.pem -text -noout openssl x509 -in cert.pem -outform der -out cert.der
+openssl x509 -in cert.pem -text -noout
+openssl x509 -in cert.pem -outform der -out cert.der
 
 # PFX to PEM
-openssl pkcs12 -info -nodes -in site.pfx openssl pkcs12 -in site.pfx -out site.pem -nodes
+openssl pkcs12 -info -nodes -in site.pfx
+openssl pkcs12 -in site.pfx -out site.pem -nodes
 
 # JKS to PEM
 # requires keytool from JDK, first convert to PKCS12 format:

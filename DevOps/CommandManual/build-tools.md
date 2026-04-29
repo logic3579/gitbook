@@ -12,7 +12,7 @@ tags:
 # determine file location
 mvn -X clean | grep "settings"
 
-# determini effective settings
+# determine effective settings
 mvn help:effective-settings
 
 # override the default location

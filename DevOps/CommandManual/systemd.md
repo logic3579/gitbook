@@ -78,10 +78,10 @@ localectl set-locale LANG=en_US.UTF-8
 
 ```bash
 loginctl list-sessions
-session-status
+loginctl session-status <session-id>
 
 loginctl list-users
-loginctl user-status
+loginctl user-status <username>
 loginctl show-user root
 ```
 

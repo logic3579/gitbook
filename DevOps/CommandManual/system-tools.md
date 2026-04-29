@@ -60,14 +60,14 @@ strace -c ls
 apt install systemtap
 
 # example
-tee helloword.stp << "EOF"
+tee helloworld.stp << "EOF"
 probe begin
 {
   print ("hello world\n")
   exit ()
 }
 EOF
-stap hellword.stp
+stap helloworld.stp
 
 # network monitor
 tee tcp.stp << "EOF"
