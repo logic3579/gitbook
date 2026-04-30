@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+Logstash is an open-source server-side data processing pipeline from Elastic that ingests, transforms, and ships data to a destination of choice (commonly Elasticsearch). Its plugin-based architecture provides 200+ inputs, filters (grok, mutate, date, geoip, etc.), and outputs, making it the **L** in the ELK / Elastic Stack for log normalization and enrichment.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # 1.download and decompression
@@ -27,9 +29,9 @@ vim config/logstash.conf
 bin/logstash -f logstash.conf
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **/opt/logstash/logstash.conf**
 
@@ -119,7 +121,7 @@ output {
 }
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # boot
@@ -154,9 +156,7 @@ systemctl start .service
 systemctl enable .service
 ```
 
-## Deploy By Container
-
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

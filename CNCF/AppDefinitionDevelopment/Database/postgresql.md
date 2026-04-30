@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+PostgreSQL is a powerful, open-source object-relational database with over 35 years of active development. It is fully ACID compliant and supports advanced features such as MVCC, partial and expression indexes, full-text search, JSONB storage, geospatial types (via PostGIS), logical replication, and extensible procedural languages. PostgreSQL is frequently chosen for workloads demanding strict data integrity, complex queries, and rich extension support.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source
@@ -39,9 +41,9 @@ chown postgres:postgres /opt/pgsql -R
 
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **/opt/pgsql/data/postgresql.conf**
 
@@ -82,7 +84,7 @@ hba_file = '/opt/pgsql/data/pg_hba.conf'
 ident_file = '/opt/pgsql/data/pg_ident.conf'
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # boot
@@ -109,7 +111,7 @@ systemctl start postgresql.service
 systemctl enable postgresql.service
 ```
 
-### Verify
+#### Verify
 
 ```bash
 # syntax check
@@ -117,7 +119,7 @@ systemctl enable postgresql.service
 postgres (PostgreSQL) 15.1
 ```
 
-### Troubleshooting
+#### Troubleshooting
 
 ```bash
 # problem 1
@@ -131,9 +133,7 @@ apt install libsystemd-dev
 
 ```
 
-## Deploy By Container
-
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

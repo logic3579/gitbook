@@ -9,13 +9,15 @@ tags:
 
 ## Introduction
 
-...
+Apache Kafka is a distributed event streaming platform capable of handling trillions of events per day. Originally developed at LinkedIn and now an Apache Software Foundation project, it provides a publish-subscribe log abstraction with horizontal scalability, durable storage, and exactly-once semantics, making it the de facto backbone for real-time data pipelines, event-driven microservices, and stream processing (via Kafka Streams and ksqlDB).
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
 
-#### ZooKeeper Mode
+#### Quick Start
+
+##### ZooKeeper Mode
 
 ```bash
 # source download
@@ -37,7 +39,7 @@ export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 ./bin/kafka-server-start.sh config/server.properties
 ```
 
-#### KRaft Mode
+##### KRaft Mode
 
 ```bash
 # source download
@@ -60,9 +62,9 @@ export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 ./bin/kafka-server-start.sh config/kraft/server.properties
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **ZooKeeper Mode**
 
@@ -200,7 +202,7 @@ log.retention.check.interval.ms=300000
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 **ZooKeeper Mode**
 
@@ -295,13 +297,11 @@ systemctl start kafka.service
 systemctl enable kafka.service
 ```
 
-### Verify
+#### Verify
 
 [Kafka Command](/DevOps/CommandManual/streaming-messaging.md#kafka)
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 docker pull apache/kafka:3.7.1
@@ -311,7 +311,7 @@ docker run -p 9092:9092 apache/kafka:3.7.1
 # https://hub.docker.com/r/bitnami/kafka
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Install by Helm
 

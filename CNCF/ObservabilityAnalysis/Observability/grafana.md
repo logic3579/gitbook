@@ -13,9 +13,11 @@ Grafana Open Source Software (OSS) enables you to query, visualize, alert on, an
 
 Grafana Enterprise is a commercial edition of Grafana that includes exclusive data source plugins and additional features not found in the open source version. You also get 24x7x365 support and training from the core Grafana team. To learn more about these features, refer to Enterprise features.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # option.1: Debian / Ubuntu repo
@@ -33,9 +35,9 @@ cd grafana-10.0.3
 
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 Main configuration file: `/etc/grafana/grafana.ini`
 
@@ -137,7 +139,7 @@ providers:
       foldersFromFilesStructure: true
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # boot
@@ -146,9 +148,7 @@ systemctl start grafana-server.service
 systemctl enable grafana-server.service
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 pull images
 
@@ -195,7 +195,7 @@ docker run -d -p 3000:3000 --name=grafana grafana-custom
 
 > docker-compose = https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/#docker-compose-example
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 **deploy on resource manifest**
 

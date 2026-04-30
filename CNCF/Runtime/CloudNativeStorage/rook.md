@@ -10,17 +10,17 @@ tags:
 
 ## Introduction
 
-...
+Rook is an open-source, cloud-native storage orchestrator for Kubernetes that turns storage software into self-managing, self-scaling, and self-healing services. It currently focuses on Ceph, packaging it as a Kubernetes Operator that automates deployment, configuration, upgrades, and recovery for block, file, and object storage. Rook is a CNCF graduated project.
 
-## Deploy By Container
+## How to Install
 
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # https://hub.docker.com/r/rook/ceph/tags
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Deploy by Kubernetes Manifest
 

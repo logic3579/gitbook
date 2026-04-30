@@ -40,9 +40,9 @@ Apollo is an open-source distributed configuration management center developed b
 - **Portal** — Web UI for managing configurations.
 - **Client SDK** — Embedded in applications to fetch and listen for config changes.
 
-## Deploy By Container
+## How to Install
 
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # Start Apollo with docker-compose (quick start)
@@ -52,7 +52,7 @@ docker-compose up -d
 # Portal available at http://localhost:8070 (apollo/admin)
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # Add Helm repository

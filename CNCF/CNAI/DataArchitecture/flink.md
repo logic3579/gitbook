@@ -36,9 +36,11 @@ Apache Flink is an open-source, unified stream and batch processing framework. I
 - **JobManager** — Coordinates distributed execution: scheduling tasks, triggering checkpoints, and handling failover.
 - **TaskManager** — Worker processes that execute tasks and manage local state.
 
-## Deploy By Binary
+## How to Install
 
-### Run On Systemd
+### Starting via Binary
+
+#### Run On Systemd
 
 ```bash
 # Download and extract
@@ -88,9 +90,7 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-## Deploy By Container
-
-### Run On Kubernetes
+### Starting via Kubernetes
 
 Deploy using the Flink Kubernetes Operator:
 

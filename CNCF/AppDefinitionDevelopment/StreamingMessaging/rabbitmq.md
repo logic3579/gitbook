@@ -8,11 +8,13 @@ tags:
 # RabbitMQ
 
 ## Introduction
-...
 
+RabbitMQ is a mature, open-source message broker implementing AMQP 0-9-1, with support for MQTT, STOMP, and AMQP 1.0 via plugins. It offers flexible routing through exchanges (direct, topic, fanout, headers), reliable delivery with acknowledgments and persistence, and high availability through quorum queues and clustering — well suited for decoupling services and asynchronous task queues.
 
-## Deploy By Binary
-### Quick Start
+## How to Install
+
+### Starting via Binary
+#### Quick Start
 ```bash
 # dependencies: install erlang
 wget https://github.com/erlang/otp/releases/download/OTP-25.3.2.4/otp_src_25.3.2.4.tar.gz
@@ -61,14 +63,14 @@ rabbitmqctl -n rabbitmq1 cluster_status
 # rabbitmqctl -n rabbitmq1 set_policy ha-all "^" '{"ha-mode":"all"}'
 ```
 
-### Config and Boot
-#### Config
+#### Config and Boot
+##### Config
 ```bash
 # $RABBITMQ_HOME/etc/rabbitmq/rabbitmq.conf
 # $RABBITMQ_HOME/etc/rabbitmq/advanced.config
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 ```bash
 cat > /etc/systemd/system/rabbitmq.service << "EOF"
 ...
@@ -79,7 +81,7 @@ systemctl start rabbitmq.service
 systemctl enable rabbitmq.service
 ```
 
-### Verify
+#### Verify
 ```bash
 # syntax check
 /usr/local/erlang/bin/erl -version
@@ -88,15 +90,14 @@ Erlang (SMP,ASYNC_THREADS) (BEAM) emulator version 13.2.2.2
 /opt/rabbitmq/sbin/rabbitmqctl status
 ```
 
-### Troubleshooting
+#### Troubleshooting
 ```bash
 # problem 1
 # 
 ```
 
 
-## Deploy By Container
-### Run On Docker
+### Starting via Docker
 ```bash
 # pull image
 docker pull rabbitmq:3
@@ -111,7 +112,7 @@ docker exec -it rabbitmq sh
 
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami

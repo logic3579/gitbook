@@ -10,11 +10,13 @@ tags:
 
 ## Introduction
 
-...
+etcd is a strongly consistent, distributed key-value store designed to reliably hold data that needs to be accessed by a distributed system. It uses the Raft consensus algorithm to replicate data across nodes and is the canonical control-plane datastore for Kubernetes, storing all cluster state, secrets, and configuration. etcd is a CNCF graduated project.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # built from source
@@ -38,9 +40,9 @@ mkdir -p /opt/etcd/data
 mkdir -p /opt/etcd/config
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 ```bash
 cat > /opt/etcd/config/etcd.conf << "EOF"
@@ -56,7 +58,7 @@ ETCD_INITIAL_CLUSTER_STATE="new"
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 cat > /etc/systemd/system/etcd.service << "EOF"
@@ -84,7 +86,7 @@ systemctl start etcd.service
 systemctl enable etcd.service
 ```
 
-### cli command
+#### cli command
 
 ```bash
 export ETCDCTL_API=3
@@ -99,9 +101,7 @@ etcdctl  --endpoints http://x.x.x.x:2379 --user=root --password=9A4mEZmkjU put m
 etcdctl get my-key
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 rm -rf /tmp/etcd-data.tmp && mkdir -p /tmp/etcd-data.tmp && \
@@ -134,7 +134,7 @@ docker exec etcd-gcr-v3.4.26 /usr/local/bin/etcdctl put foo bar
 docker exec etcd-gcr-v3.4.26 /usr/local/bin/etcdctl get foo
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Deploy by Kubernetes Manifest
 

@@ -200,7 +200,7 @@ spec:
         version: v3
 ```
 
-## Deploy By Container
+## How to Install
 
 ### Sidecar Mode
 

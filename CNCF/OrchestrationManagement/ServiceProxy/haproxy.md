@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+HAProxy is a widely deployed, open-source TCP/HTTP load balancer and reverse proxy known for its reliability, performance, and rich feature set. It supports L4/L7 load balancing, SSL/TLS termination, health checks, sticky sessions, ACL-based routing, HTTP/2, and runtime API control, making it a staple for high-traffic web applications and edge load balancing.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 apt install haproxy
@@ -22,9 +24,9 @@ apt install haproxy
 systemctl start haproxy.service
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 ```bash
 # options: install and config keepalived
@@ -129,7 +131,7 @@ listen stats
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # log
@@ -147,16 +149,14 @@ systemctl start haproxy.service
 systemctl enable haproxy.service
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 docker run -d --name my-running-haproxy --sysctl net.ipv4.ip_unprivileged_port_start=0 my-haproxy
 # -v ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

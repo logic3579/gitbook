@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+HashiCorp Vault is a secrets management and data protection platform that provides centralized storage, dynamic secrets, encryption-as-a-service, and identity-based access. It supports a wide range of authentication methods (Kubernetes, AWS IAM, OIDC, AppRole) and secret engines (KV, database, PKI, transit), and is widely used to manage credentials, certificates, and encryption keys in cloud-native environments.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download and decompress
@@ -27,9 +29,9 @@ export PATH=$PATH:/opt/vault/bin
 #echo "export PATH=$PATH:/opt/vault/bin" >> ~/.bashrc
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 ```bash
 # start server
@@ -71,7 +73,7 @@ export VAULT_TOKEN="xxx.xxx"
 vault status
 ```
 
-### How To Use
+#### How To Use
 
 ```bash
 # kv secret
@@ -128,9 +130,7 @@ vault kv put -mount=secret creds password="my-long-password"
 
 ```
 
-## Deploy By Container
-
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

@@ -9,15 +9,15 @@ tags:
 
 ## Introduction
 
-...
+ClickHouse is an open-source, column-oriented OLAP database designed for real-time analytics on terabyte-to-petabyte datasets. It uses vectorized query execution, data skipping indexes, and aggressive compression to deliver sub-second query response times over massive tables, and is widely used for log analytics, observability, time-series, and user-behavior analytics workloads.
 
-## Deploy By Binary
+## How to Install
 
-### Run On Systemd
+### Starting via Binary
 
-## Deploy By Container
+#### Run On Systemd
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # Add and update repo

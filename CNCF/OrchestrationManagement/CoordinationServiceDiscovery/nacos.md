@@ -10,11 +10,13 @@ tags:
 
 ## Introduction
 
-...
+Nacos is an open-source platform from Alibaba for dynamic service discovery, configuration management, and service governance. It supports both DNS-based and RPC-based service discovery, hot-reloadable configuration with audit history, and integrates natively with Spring Cloud, Dubbo, gRPC, and Kubernetes — frequently used as an alternative to Eureka, Consul, or ZooKeeper in microservice deployments.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source
@@ -37,15 +39,13 @@ sh startup.sh -m standalone
 sh startup.sh
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # https://hub.docker.com/r/nacos/nacos-server
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Deploy by Kubernetes Manifest
 

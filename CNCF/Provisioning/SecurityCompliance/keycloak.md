@@ -31,9 +31,9 @@ Keycloak is an open-source Identity and Access Management (IAM) solution develop
 | Group    | A collection of users to which roles can be assigned                 |
 | Identity Provider | External authentication source (social login, SAML IdP, etc.) |
 
-## Deploy By Container
+## How to Install
 
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # Development mode (in-memory storage, no TLS)
@@ -56,7 +56,7 @@ docker run -d --name keycloak \
   quay.io/keycloak/keycloak:26.1 start
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # Install Keycloak Operator

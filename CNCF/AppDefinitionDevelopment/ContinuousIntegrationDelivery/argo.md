@@ -12,11 +12,11 @@ tags:
 
 ### Introduction
 
-...
+Argo Workflows is an open-source, container-native workflow engine for orchestrating parallel jobs on Kubernetes. Workflows are defined as Kubernetes CRDs, with each step running in its own container, enabling complex DAG and step-based pipelines for data processing, machine learning, and CI/CD use cases.
 
-### Deploy By Container
+### How to Install
 
-#### Run On Kubernetes
+#### Starting via Kubernetes
 
 ```bash
 # add and update repo
@@ -75,11 +75,11 @@ argo -n argo get @latest
 
 ### Introduction
 
-...
+Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes. It continuously monitors Git repositories and reconciles the live cluster state to match the desired state defined in manifests (plain YAML, Helm, Kustomize, or Jsonnet), and provides a web UI, CLI, and rich RBAC for managing multi-cluster, multi-tenant deployments.
 
-### Deploy By Container
+### How to Install
 
-#### Run On Kubernetes
+#### Starting via Kubernetes
 
 ```bash
 # add and update repo

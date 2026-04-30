@@ -119,9 +119,11 @@ Both can be used together. Auto-instrumentation provides framework spans; manual
 | Gateway             | Cluster of standalone Collectors that receive from agents and export to backends. Centralizes config, sampling, and tenancy. |
 | Agent + Gateway     | Recommended for production: agent batches/enriches locally, gateway aggregates. |
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # Download the contrib distribution (includes most receivers/exporters)
@@ -137,9 +139,9 @@ cd /opt/otelcol
 ./otelcol-contrib --config=/opt/otelcol/config.yaml
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **/opt/otelcol/config.yaml**
 
@@ -244,7 +246,7 @@ service:
       level: info
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 cat > /etc/systemd/system/otelcol.service << "EOF"
@@ -270,9 +272,7 @@ systemctl daemon-reload
 systemctl enable --now otelcol.service
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 docker run -d --name otel-collector \
@@ -285,7 +285,7 @@ docker run -d --name otel-collector \
   otel/opentelemetry-collector-contrib:0.115.0
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Install the OpenTelemetry Operator
 

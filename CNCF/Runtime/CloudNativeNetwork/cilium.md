@@ -42,9 +42,9 @@ Cilium is an open-source project that provides eBPF-powered networking, security
 └─────────────────────────────────────────┘
 ```
 
-## Deploy By Container
+## How to Install
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 Install via Helm:
 

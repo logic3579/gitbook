@@ -8,11 +8,13 @@ tags:
 # RocketMQ
 
 ## Introduction
-...
 
+Apache RocketMQ is a distributed messaging and streaming platform originally developed at Alibaba and donated to the Apache Software Foundation. It provides low-latency publish-subscribe messaging, ordered delivery, transactional messages, scheduled and delayed messages, and supports both push and pull consumption models. RocketMQ is battle-tested in large-scale e-commerce and financial trading scenarios.
 
-## Deploy By Binary
-### Quick Start
+## How to Install
+
+### Starting via Binary
+#### Quick Start
 ```bash
 # option1: compile source install
 cd /usr/local/src/
@@ -69,8 +71,8 @@ export PATH=$PATH:/opt/rocketmq/bin
 ./bin/mqshutdown namesrv
 ```
 
-### Config and Boot
-#### Config
+#### Config and Boot
+##### Config
 **Local Mode**
 ```bash
 # namesrv config
@@ -203,7 +205,7 @@ listenPort = 30901
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 **Local Mode**
 ```bash
 # namesrv
@@ -375,7 +377,7 @@ systemctl enable rocketmq-master.service
 systemctl enable rocketmq-broker.service
 ```
 
-### Verify
+#### Verify
 ```bash
 # set nameserver address
 export NAMESRV_ADDR=localhost:9876
@@ -386,15 +388,14 @@ export NAMESRV_ADDR=localhost:9876
 ./tools.sh org.apache.rocketmq.example.quickstart.Consumer
 ```
 
-### Troubleshooting
+#### Troubleshooting
 ```bash
 # problem 1
 # 
 ```
 
 
-## Deploy By Container
-### Run On Docker
+### Starting via Docker
 ```bash
 # pull image
 docker pull apache/rocketmq:5.3.0
@@ -406,7 +407,7 @@ docker run -it --net=host apache/rocketmq ./mqnamesrv
 docker run -it --net=host --mount source=/tmp/store,target=/home/rocketmq/store apache/rocketmq ./mqbroker -n localhost:9876
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 ```bash
 # rocketmq operator
 # https://artifacthub.io/packages/olm/community-operators/rocketmq-operator

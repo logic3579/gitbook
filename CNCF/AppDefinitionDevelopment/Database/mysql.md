@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+MySQL is the most widely used open-source relational database, originally developed by MySQL AB and now maintained by Oracle. It implements the SQL standard with the InnoDB storage engine providing ACID transactions, row-level locking, and crash recovery, and supports asynchronous, semi-synchronous, and group replication for high availability. MySQL powers countless web applications, from the classic LAMP stack to large-scale OLTP workloads.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source with boost lib
@@ -46,9 +48,9 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '123qwe';
 
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **/opt/mysql/sysconfig/my.cnf**
 
@@ -145,7 +147,7 @@ log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # boot
@@ -156,7 +158,7 @@ systemctl start mysql.service
 systemctl enable mysql.service
 ```
 
-### Verify
+#### Verify
 
 ```bash
 # syntax check
@@ -164,7 +166,7 @@ systemctl enable mysql.service
 Ver 8.0.34 for Linux on x86_64 (Source distribution)
 ```
 
-### Troubleshooting
+#### Troubleshooting
 
 ```bash
 # every remake need to execute
@@ -182,9 +184,7 @@ apt install pkg-config
 
 ```
 
-## Deploy By Container
-
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

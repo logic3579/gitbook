@@ -9,11 +9,11 @@ tags:
 
 ## Introduction
 
-...
+Harbor is an open-source, cloud-native container registry that stores, signs, and scans container content. Originally developed at VMware and now a CNCF graduated project, Harbor extends the Docker Distribution registry with role-based access control, image vulnerability scanning (Trivy), image signing (Cosign / Notation), cross-registry replication, and OIDC integration.
 
-## Deploy By Container
+## How to Install
 
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # download offline or online installer and verify
@@ -24,7 +24,7 @@ https://goharbor.io/docs/2.8.0/install-config/download-installer/
 
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

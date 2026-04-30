@@ -11,9 +11,11 @@ tags:
 
 Elasticsearch is an open source, distributed search and analytics engine built for speed, scale, and AI applications. As a retrieval platform, it stores structured, unstructured, and vector data in real time — delivering fast hybrid and vector search, powering observability and security analytics, and enabling AI-driven applications with high performance, accuracy, and relevance.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download and decompression
@@ -40,9 +42,9 @@ curl 127.0.0.1:9200 -u 'elastic:elastic_password'
 ./bin/elasticsearch -d # daemon
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **/opt/elasticsearch/conf/elasticsearch.yml**
 
@@ -94,7 +96,7 @@ cluster.initial_master_nodes: ["node-1", "node-2", "node-3"]
 # node.data: true
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 cat > /etc/systemd/system/elasticsearch.service << "EOF"
@@ -153,9 +155,7 @@ systemctl start elasticsearch.service
 systemctl enable elasticsearch.service
 ```
 
-## Deploy By Container
-
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

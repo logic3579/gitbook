@@ -9,11 +9,13 @@ tags:
 # CoreDNS
 
 ## Introduction
-...
 
+CoreDNS is a flexible, plugin-based DNS server written in Go and the default Kubernetes cluster DNS since version 1.13. It chains plugins (cache, forward, kubernetes, prometheus, etc.) into a request-handling pipeline, allowing operators to compose exactly the DNS behavior they need for service discovery, split-horizon DNS, and authoritative zone serving. CoreDNS is a CNCF graduated project.
 
-## Deploy By Binary
-### Quick Start
+## How to Install
+
+### Starting via Binary
+#### Quick Start
 ```bash
 # get and run from source
 wget https://github.com/coredns/coredns/releases/download/v1.10.1/coredns_1.10.1_linux_amd64.tgz
@@ -27,8 +29,8 @@ install -m 0755 coredns /usr/local/bin
 coredns -conf /opt/coredns/coredns.conf -dns.port=1053
 ```
 
-### Config and Boot
-#### Config
+#### Config and Boot
+##### Config
 ```bash
 # create config
 cat > /opt/coredns/coredns.conf << "EOF"
@@ -50,7 +52,7 @@ example.org:1053 {
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 ```bash
 cat > /etc/systemd/system/coredns.service << "EOF"
 ...
@@ -61,14 +63,13 @@ systemctl start coredns.service
 systemctl enable coredns.service
 ```
 
-## Deploy By Container
-### Run On Docker
+### Starting via Docker
 #### Run on Docker
 ```bash
 # https://hub.docker.com/r/coredns/coredns/tags
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 #### Deploy by Kubernetes Manifest
 ```bash
 #

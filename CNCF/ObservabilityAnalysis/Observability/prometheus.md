@@ -78,9 +78,11 @@ Summary
 
 #### Jobs and instances
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source and decompress
@@ -103,9 +105,9 @@ curl 127.0.0.1:9090/-/reload -X POST
 
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 **/opt/observability/prometheus/prometheus.yml**
 
@@ -210,7 +212,7 @@ syntax-checking rules
 ./promtool check rules alerting.rules.yml recording.rules.yaml
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # boot
@@ -253,9 +255,7 @@ job_service:rpc_durations_seconds_count:avg_rate5m
 
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 mkdir /opt/prometheus
@@ -270,7 +270,7 @@ docker run --name prometheus --rm -p 9090:9090 -v /opt/prometheus/prometheus.yml
 
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+Jenkins is the leading open-source automation server, used to build, test, and deploy software through pipelines defined as code (Jenkinsfile). With over 1,800 community-contributed plugins, it integrates with virtually any version control system, build tool, and deployment target, and supports distributed builds across heterogeneous agent fleets.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download and decompression
@@ -30,9 +32,7 @@ cat /opt/jenkins-config/secrets/initialAdminPassword
 # https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # create bridge network
@@ -46,7 +46,7 @@ docker inspect jenkins_home
 cat /var/lib/docker/volumes/jenkins_home/_data/secrets/initialAdminPassword
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # Add and update repo

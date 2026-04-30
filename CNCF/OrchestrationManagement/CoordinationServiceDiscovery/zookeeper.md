@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+Apache ZooKeeper is a centralized coordination service for distributed systems, providing primitives for configuration management, naming, distributed synchronization, and group services. It exposes a hierarchical key-value namespace (znodes) with strong ordering guarantees and is widely used as the coordination backend for Kafka, HBase, Hadoop, and many legacy distributed systems.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source
@@ -21,9 +23,9 @@ wget https://dlcdn.apache.org/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1-b
 mv apache-zookeeper-3.7.1-bin zookeeper-3.7.1 && cd zookeeper-3.7.1
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 ```bash
 # create data and logs dir
@@ -50,7 +52,7 @@ EOF
 # echo 2 > /opt/zookeeper-3.7.1/data/myid
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 cat > /etc/systemd/system/zookeeper.service << "EOF"
@@ -79,15 +81,13 @@ systemctl start zookeeper.service
 systemctl enable zookeeper.service
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # https://hub.docker.com/_/zookeeper
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Install by Helm
 

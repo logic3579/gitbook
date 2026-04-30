@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+GitLab is an end-to-end DevOps platform that combines source code management, CI/CD pipelines, container and package registries, security scanning, and project management in a single application. It is offered as a SaaS service (gitlab.com) and as self-managed Community and Enterprise editions, and is widely used for hosting private Git repositories with integrated automation.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # Run On SourceCode
@@ -33,9 +35,7 @@ GITLAB_ROOT_PASSWORD="passwOrd123" EXTERNAL_URL="http://gitlab.example.com" apt 
 cat /etc/gitlab/initial_root_password
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # run container
@@ -62,7 +62,7 @@ gitlab/gitlab-ee
 [install by docker-compose](https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compose)
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Deploy by Kubernetes Manifest
 

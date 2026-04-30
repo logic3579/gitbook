@@ -8,10 +8,13 @@ tags:
 # Nginx
 
 ## Introduction
-...
 
-## Deploy By Binary
-### Quick Start
+Nginx is a high-performance, open-source web server, reverse proxy, load balancer, and HTTP cache. Its event-driven, asynchronous architecture handles tens of thousands of concurrent connections with a small memory footprint, and it is widely deployed as a static content server, TLS terminator, and L7 load balancer in front of application backends.
+
+## How to Install
+
+### Starting via Binary
+#### Quick Start
 ```bash
 # Ubuntu Package install
 https://nginx.org/en/linux_packages.html#Ubuntu
@@ -66,8 +69,8 @@ mkdir -p /opt/nginx/conf/vhosts/
 cd /opt/nginx
 ```
 
-### Config and Boot
-#### Config
+#### Config and Boot
+##### Config
 
 **Main Config** — `/opt/nginx/conf/nginx.conf`
 
@@ -420,7 +423,7 @@ set_real_ip_from 192.168.1.1/32;
 set_real_ip_from 192.168.1.2/32;
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 ```bash
 cat > /etc/systemd/system/nginx.service << EOF
 [Unit]
@@ -462,7 +465,7 @@ systemctl start nginx.service
 systemctl enable nginx.service
 ```
 
-### Verify
+#### Verify
 ```bash
 # syntax check
 /opt/nginx/sbin/nginx -t                 
@@ -471,7 +474,7 @@ nginx: configuration file /opt/nginx/conf/nginx.conf test is successful
 ```
 
 
-### Troubleshooting
+#### Troubleshooting
 ```bash
 # pcre zlib openssl ...
 apt install libpcre3-dev zlib1g zlib1g-dev openssl
@@ -529,13 +532,12 @@ cp -ar lua-resty-core/lib/resty/* /usr/local/luajit2/share/luajit-2.1.0-beta3/re
 cp -ar lua-resty-lrucache/lib/resty/* /usr/local/luajit2/share/luajit-2.1.0-beta3/resty/
 ```
 
-## Deploy By Container
-### Run On Docker
+### Starting via Docker
 ```bash
 docker run xxx
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 > For Kubernetes clusters, it is recommended to use ingress-nginx-controller
 ```bash
 ### for Nginx

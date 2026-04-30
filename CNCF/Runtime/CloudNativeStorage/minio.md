@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+MinIO is a high-performance, S3-compatible object storage system written in Go and released under the AGPLv3 license. It is designed for large-scale, software-defined private and hybrid clouds, offering erasure coding, bitrot protection, encryption at rest, and active-active replication. MinIO is commonly deployed for AI/ML data lakes, backup targets, and Kubernetes-native object storage via its Operator.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source
@@ -36,7 +38,7 @@ minio server /opt/minio/data
 minio server --console-address :9001 http://1.1.1.1/opt/minio/data http://2.2.2.2/opt/minio/data http://3.3.3.3/opt/minio/data
 ```
 
-### Storage Requirements
+#### Storage Requirements
 
 ```bash
 # Use local Storage
@@ -48,9 +50,9 @@ mount /dev/vg_name/lv_name /opt/minio/data
 cat /etc/fstab
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 ```bash
 cat > /etc/default/minio << "EOF"
@@ -84,7 +86,7 @@ MINIO_OPTS="-console-address :9001"
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 cat > /etc/systemd/system/minio.service << "EOF"
@@ -118,7 +120,7 @@ systemctl start minio.service
 systemctl enable minio.service
 ```
 
-### Verify
+#### Verify
 
 ```bash
 # download and install minio client
@@ -136,16 +138,14 @@ mc cp /tmp/1.txt myminio/mybucket/
 mc cat myminio/mybucket/1.txt
 ```
 
-### Troubleshooting
+#### Troubleshooting
 
 ```bash
 # problem 1
 #
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # single node test
@@ -153,7 +153,7 @@ docker run -p 9000:9000 -p 9001:9001 quay.io/minio/minio server /data --console-
 
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # add and update repo

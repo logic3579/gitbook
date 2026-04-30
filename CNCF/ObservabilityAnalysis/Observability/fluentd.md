@@ -11,11 +11,13 @@ tags:
 
 ### Introduction
 
-...
+Fluentd is an open-source data collector that unifies log collection and consumption from heterogeneous sources to multiple destinations. It uses a pluggable architecture with 1,000+ community plugins, structures all events as JSON, and is a CNCF graduated project frequently paired with Elasticsearch, Kafka, and S3 to build centralized logging pipelines.
 
-### Deploy By Binary
+### How to Install
 
-#### Quick Start
+#### Starting via Binary
+
+##### Quick Start
 
 ```bash
 # Ubuntu Package install
@@ -23,9 +25,9 @@ tags:
 
 ```
 
-#### Config and Boot
+##### Config and Boot
 
-#### Config
+##### Config
 
 **/etc/td-agent/td-agent.conf**
 
@@ -182,7 +184,7 @@ systemctl start td-agent.service
 systemctl enable td-agent.service
 ```
 
-#### Verify
+##### Verify
 
 ```bash
 # syntax check
@@ -192,15 +194,13 @@ td-agent -c td-agent.conf --dry-run
 fluentd -c fluentd.conf --dry-run
 ```
 
-#### Troubleshooting
+##### Troubleshooting
 
 ```bash
 #
 ```
 
-### Deploy By Container
-
-#### Run On Kubernetes
+#### Starting via Kubernetes
 
 ```bash
 # add and update repo
@@ -236,7 +236,9 @@ Today, the number of information sources in systems is continuously increasing. 
 **Differences between Fluent Bit & Fluentd**
 Both Fluentd and Fluent Bit can serve as aggregators or forwarders, and they can be used complementarily or independently as solutions. [Details](https://hulining.gitbook.io/fluentbit/about/fluentd-and-fluent-bit)
 
-### Deploy By Binary
+### How to Install
+
+#### Starting via Binary
 
 ```bash
 # source code download
@@ -266,9 +268,9 @@ systemctl enable td-agent-bit.service
 
 ```
 
-### Deploy By Container
+#### Starting via Kubernetes
 
-#### Related Concepts
+##### Related Concepts
 
 Kubernetes manages a cluster of nodes, so our log agent tool needs to run on every node to collect logs from each POD. Therefore, Fluent Bit is deployed as a DaemonSet (a POD that runs on every node in the cluster).
 When Fluent Bit runs, it reads, parses, and filters logs from each POD, and enriches each record with the following metadata:
@@ -280,14 +282,14 @@ When Fluent Bit runs, it reads, parses, and filters logs from each POD, and enri
 - Labels
 - Annotations
 
-#### Log Output Methods
+##### Log Output Methods
 
 Container logs in the current cluster environment are all console output, divided into two parts:
 
 - Output to Elasticsearch, for searching logs via the Kibana frontend.
 - Output to the forward interface, provided by the fluentd service for log persistence, with 15 days of local storage and 3 months of log archiving to cloud storage (e.g., S3, GCS, OSS).
 
-#### Download Helm Charts Package
+##### Download Helm Charts Package
 
 ```bash
 # create observability chart package directory
@@ -403,7 +405,7 @@ vim values.yaml
         end
 ```
 
-#### Configuration and Startup
+##### Configuration and Startup
 
 ```bash
 # config

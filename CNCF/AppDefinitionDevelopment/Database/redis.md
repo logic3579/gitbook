@@ -8,11 +8,15 @@ tags:
 # Redis
 
 ## Introduction
-...
 
+Redis is an open-source, in-memory data structure store used as a database, cache, message broker, and streaming engine. It supports strings, hashes, lists, sets, sorted sets, streams, bitmaps, and HyperLogLogs, with optional persistence via RDB snapshots and AOF logs. Redis is widely used for caching, session storage, leaderboards, and pub/sub messaging, with horizontal scalability through Redis Cluster and high availability through Sentinel.
 
-## Deploy By Binary
-### Quick Start
+## How to Install
+
+### Starting via Binary
+
+#### Quick Start
+
 ```bash
 # dependencies
 apt install pkgconf libsystemd-dev
@@ -46,8 +50,10 @@ cp /usr/local/src/redis-7.0.11/redis.conf /opt/redis/7001/redis.conf && cp /usr/
 ./bin/redis-cli --cluster create 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 --cluster-replicas 0 --cluster-yes
 ```
 
-### Config and Boot
-#### Config
+#### Config and Boot
+
+##### Config
+
 ```bash
 # single mode && cluster mode
 cat > /opt/redis/redis.conf << "EOF"
@@ -79,7 +85,8 @@ dir /opt/redis/7003
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
+
 ```bash
 cat > /etc/systemd/system/redis.service << "EOF"
 [Unit]
@@ -118,10 +125,12 @@ systemctl start redis.service
 systemctl enable redis.service
 ```
 
-### Verify
+#### Verify
+
 [Redis Command](/DevOps/CommandManual/database.md#redis)
 
-### Troubleshooting
+#### Troubleshooting
+
 ```bash
 # ../deps/jemalloc/lib/libjemalloc.a: No such file or directory
 apt install libjemalloc-dev
@@ -130,8 +139,8 @@ apt install libjemalloc-dev
 apt install libsystemd-dev
 ```
 
-## Deploy By Container
-### Run On Docker
+### Starting via Docker
+
 ```bash
 # Standlone
 docker run --rm --name redis \
@@ -146,7 +155,8 @@ docker run --rm --name redis-cluster \
   -d bitnami/redis-cluster
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
+
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -195,8 +205,6 @@ helm -n middleware install redis-cluster .
 kubectl -n middleware get secret uat-redis-cluster -o jsonpath="{.data.redis-password}" | base64 -d
 kubectl -n middleware get service |grep redis
 ```
-
-
 
 ## Configuration Reference
 

@@ -8,11 +8,13 @@ tags:
 # MongoDB
 
 ## Introduction
-...
 
+MongoDB is an open-source, document-oriented NoSQL database that stores data as flexible, JSON-like BSON documents. It supports rich queries, secondary indexes, aggregation pipelines, and horizontal scaling through sharding and replica sets, making it a popular choice for content management, IoT, and real-time analytics workloads.
 
-## Deploy By Binary
-### Quick Start
+## How to Install
+
+### Starting via Binary
+#### Quick Start
 ```bash
 # dependencies
 apt install python3-pip
@@ -38,8 +40,8 @@ mkdir /opt/mongodb/data /opt/mongodb/logs
 
 ```
 
-### Config and Boot
-#### Config
+#### Config and Boot
+##### Config
 
 **/etc/mongod.conf**
 
@@ -71,7 +73,7 @@ processManagement:
 #   replSetName: rs0
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 # boot
@@ -114,13 +116,13 @@ systemctl start mongod.service
 systemctl enable mongod.service
 ```
 
-### Verify
+#### Verify
 ```bash
 # syntax check
 
 ```
 
-### Troubleshooting
+#### Troubleshooting
 ```bash
 # problem 1
 # Cannot find system library 'lzma' required for use with libunwind
@@ -134,8 +136,7 @@ apt install libcurl4-openssl-dev
 ```
 
 
-## Deploy By Container
-### Run On Docker
+### Starting via Docker
 ```bash
 # WARNING: MongoDB 5.0+ requires a CPU with AVX support, and your current system does not appear to have that!
 cat /proc/cpuinfo |grep flags |grep avx
@@ -151,7 +152,7 @@ docker run --name mongo -d mongodb/mongodb-community-server:latest
 docker exec -it mongo mongosh
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 ```bash
 # add and update repo
 helm repo add bitnami https://charts.bitnami.com/bitnami

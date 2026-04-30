@@ -93,9 +93,11 @@ Each tier scales independently; `vmstorage` nodes do not communicate with each o
 - `@` modifier and `subquery` semantics that fix common PromQL footguns.
 - Native support for VictoriaMetrics histograms (`vmrange` buckets) in addition to Prometheus histograms.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start (single-node)
+### Starting via Binary
+
+#### Quick Start (single-node)
 
 ```bash
 VM_VERSION=1.140.0
@@ -120,9 +122,9 @@ curl http://127.0.0.1:8428/health
 curl 'http://127.0.0.1:8428/api/v1/query?query=vm_app_uptime_seconds'
 ```
 
-### Config and Boot
+#### Config and Boot
 
-#### Config
+##### Config
 
 VictoriaMetrics is configured via command-line flags. Run `victoria-metrics-prod -help` to see the full list. The most common ones:
 
@@ -163,7 +165,7 @@ scrape_configs:
         action: keep
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 sudo tee /etc/systemd/system/victoriametrics.service > /dev/null << 'EOF'
@@ -199,7 +201,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now victoriametrics.service
 ```
 
-### vmagent — scrape & remote_write
+#### vmagent — scrape & remote_write
 
 `vmagent` is a much lighter Prometheus replacement for the collection layer. It supports all `scrape_configs` plus `-remoteWrite.url` to fan out to one or many remote destinations with on-disk persistence.
 
@@ -211,7 +213,7 @@ sudo systemctl enable --now victoriametrics.service
   -remoteWrite.tmpDataPath=/var/lib/vmagent
 ```
 
-### vmalert — alerting & recording rules
+#### vmalert — alerting & recording rules
 
 ```bash
 /usr/local/bin/vmalert-prod \
@@ -243,9 +245,7 @@ groups:
         expr: sum by (job) (rate(http_requests_total[5m]))
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # Single-node
@@ -304,7 +304,7 @@ volumes:
   vmdata:
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Helm — single-node
 

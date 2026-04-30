@@ -9,19 +9,55 @@ tags:
 
 ## Introduction
 
-### Loki
+Grafana Loki is an open-source, horizontally scalable, multi-tenant log aggregation system inspired by Prometheus. Unlike traditional log systems, Loki indexes only metadata labels (not the log content itself), which keeps storage costs low and operational overhead minimal. Logs are typically collected by **Promtail**, **Grafana Alloy**, or **Fluent Bit**, stored in object storage (S3, GCS, Azure Blob), and queried via the **LogQL** query language directly inside Grafana — making Loki a natural pairing with Prometheus metrics and Tempo traces in the Grafana observability stack.
 
-Log aggregation system.
+## How to Install
 
-### Promtail
+### Starting via Binary
 
-Like Prometheus, but for logs.
+#### Quick Start
 
-#### Promtail Config
+```bash
+# download and decompression
+cd /opt && wget https://github.com/grafana/loki/releases/download/v3.0.1/loki-linux-amd64.zip
+unzip loki-linux-amd64.zip && rm -f loki-linux-amd64.zip
+mkdir /opt/loki/{bin,config}
 
-**/opt/observability/promtail/config.yml**
+# soft link
+mv /opt/loki/loki-linux-amd64 /opt/loki/bin/loki
 
-```yaml
+# configure
+wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-started/loki-config.yaml -O /opt/loki/config/loki-config.yaml
+
+# start
+/opt/loki/bin/loki -config.file=/opt/loki/config/loki-config.yaml
+
+# logcli
+# download
+LOGCLI_VERSION=v3.4.2
+wget https://github.com/grafana/loki/releases/download/${LOGCLI_VERSION}/logcli-linux-amd64.zip
+unzip logcli-linux-amd64.zip && rm -f logcli-linux-amd64.zip
+chmod +x logcli-linux-amd64 && mv logcli-linux-amd64 /usr/bin/logcli
+# query
+export LOKI_ADDR=http://localhost:3100
+kubectl port-forward services/loki-query -n logging 3100:3100
+logcli query --limit 10 '{namespace="default",instance="my-app"} |= "kube-probe"'
+logcli query --limit 10 --since=1h '{namespace="default",instance="my-app"} |= "kube-probe"'
+logcli query --limit 10 --from="2025-01-01T00:00:00Z" --to="2025-01-01T08:00:00Z" '{namespace="default",instance="my-app"} |= "kube-probe"'
+```
+
+#### Config and Boot
+
+##### Config
+
+```bash
+# loki config
+cat > /opt/loki/config/loki-config.yaml << "EOF"
+...
+EOF
+
+# promtail config
+cat > /opt/observability/promtail/config.yml << "EOF"
 server:
   log_level: info
   log_format: logfmt
@@ -62,52 +98,10 @@ scrape_configs:
 
   pipeline_stages:
   - docker: {}
-```
-
-## Deploy By Binary
-
-### Quick Start
-
-```bash
-# download and decompression
-cd /opt && wget https://github.com/grafana/loki/releases/download/v3.0.1/loki-linux-amd64.zip
-unzip loki-linux-amd64.zip && rm -f loki-linux-amd64.zip
-mkdir /opt/loki/{bin,config}
-
-# soft link
-mv /opt/loki/loki-linux-amd64 /opt/loki/bin/loki
-
-# configure
-wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-started/loki-config.yaml -O /opt/loki/config/loki-config.yaml
-
-# start
-/opt/loki/bin/loki -config.file=/opt/loki/config/loki-config.yaml
-
-# logcli
-# download
-LOGCLI_VERSION=v3.4.2
-wget https://github.com/grafana/loki/releases/download/${LOGCLI_VERSION}/logcli-linux-amd64.zip
-unzip logcli-linux-amd64.zip && rm -f logcli-linux-amd64.zip
-chmod +x logcli-linux-amd64 && mv logcli-linux-amd64 /usr/bin/logcli
-# query
-export LOKI_ADDR=http://localhost:3100
-kubectl port-forward services/loki-query -n logging 3100:3100
-logcli query --limit 10 '{namespace="default",instance="my-app"} |= "kube-probe"'
-logcli query --limit 10 --since=1h '{namespace="default",instance="my-app"} |= "kube-probe"'
-logcli query --limit 10 --from="2025-01-01T00:00:00Z" --to="2025-01-01T08:00:00Z" '{namespace="default",instance="my-app"} |= "kube-probe"'
-```
-
-### Config and Boot
-
-#### Config
-
-```bash
-echo > /opt/loki/config/loki-config.yaml << "EOF"
-...
 EOF
 ```
 
-#### Boot(systemd)
+##### Boot(systemd)
 
 ```bash
 cat > /etc/systemd/system/loki.service << "EOF"
@@ -151,9 +145,7 @@ systemctl start loki.service
 systemctl enable loki.service
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # Using by docker
@@ -170,7 +162,7 @@ wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-starte
 docker compose up -d
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 ```bash
 # Add and update repo

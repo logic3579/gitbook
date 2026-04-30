@@ -8,16 +8,18 @@ tags:
 # EMQX
 
 ## Introduction
-...
 
-## Deploy By Container
-### Run On Docker
+EMQX is an open-source, distributed MQTT broker designed for massively scalable IoT, IIoT, and connected vehicle workloads. It supports MQTT 3.1.1 / 5.0 along with MQTT-SN, CoAP, LwM2M, STOMP, WebSocket, and HTTP, and clusters horizontally to handle tens of millions of concurrent device connections with low latency.
+
+## How to Install
+
+### Starting via Docker
 ```bash
 docker run -d --name emqx -p 1883:1883 -p 8083:8083 -p 8084:8084 -p 8883:8883 -p 18083:18083 emqx/emqx:latest
 
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 ```bash
 # add and update repo
 # get charts package

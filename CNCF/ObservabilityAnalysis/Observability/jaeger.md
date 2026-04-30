@@ -9,9 +9,11 @@ tags:
 
 ## Introduction
 
-## Deploy By Container
+Jaeger is an open-source, end-to-end distributed tracing system originally developed at Uber and now a CNCF graduated project. It implements the OpenTracing and OpenTelemetry specifications, supporting context propagation, root cause analysis, performance optimization, and service dependency analysis for microservice architectures.
 
-### Run On Docker
+## How to Install
+
+### Starting via Docker
 
 All-in-one deployment, for testing environments
 
@@ -32,7 +34,7 @@ docker run -d --name jaeger \
   jaegertracing/all-in-one:1.45
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 > Must be installed: ingress & cert-manager
 

@@ -9,11 +9,13 @@ tags:
 
 ## Introduction
 
-...
+Envoy is a high-performance, open-source L4/L7 proxy and communication bus designed for cloud-native, service-oriented architectures. Originally built at Lyft and now a CNCF graduated project, it provides advanced load balancing, observability, traffic shaping, and dynamic configuration via xDS APIs. Envoy serves as the data plane for service meshes including Istio, Consul Connect, and AWS App Mesh.
 
-## Deploy By Binary
+## How to Install
 
-### Quick Start
+### Starting via Binary
+
+#### Quick Start
 
 ```bash
 # download source
@@ -31,9 +33,7 @@ EOF
 ./envoy -c /opt/envoy/config.yaml
 ```
 
-## Deploy By Container
-
-### Run On Docker
+### Starting via Docker
 
 ```bash
 # https://hub.docker.com/r/envoyproxy/envoy
@@ -47,7 +47,7 @@ docker run --rm --name=envoy -d -p 80:10000 -v /opt/envoy/envoy.yaml:/etc/envoy/
 curl -v 127.0.0.1:80
 ```
 
-### Run On Kubernetes
+### Starting via Kubernetes
 
 #### Deploy by Kubernetes Manifest
 
