@@ -8,53 +8,7 @@ tags:
 
 ## Git
 
-### branch
-
-```bash
-# get branch logs
-git log --graph --pretty=oneline --abbrev-commit
-
-# get all branch
-git branch -a
-# get all remote branch
-git branch -r
-
-# create branch
-git branch dev
-
-# create and switch to branch
-git fetch && git checkout -b dev
-# link local and remote branch
-git branch --set-upstream-to=origin/dev dev
-git push dev
-
-# create local branch and track remote branch
-git fetch && git switch -c dev origin/dev
-git push dev
-
-# fetch all remote branches (update local index)
-git fetch --all
-# update remote branch to local branch
-git pull
-
-# merge latest remote dev into current main
-git switch main
-git fetch origin dev:dev
-git merge dev
-
-# on dev branch, force update main to match dev
-git fetch origin
-git branch -f main develop
-git push origin main
-
-# delete local branch
-git branch -d --force dev
-# delete remote branch
-git push origin --delete dev
-
-```
-
-### config
+### Configuration
 
 ```bash
 # set alias
@@ -71,22 +25,53 @@ git remote add origin https://github.com/username/reponame.git
 git remote -v
 ```
 
-### cherry-pick
+### Branching
 
 ```bash
-# copy a specific commit to the current branch
-# useful for replaying a bug fix from main to dev, or vice versa
-git cherry-pick 4c805e2
+# list all branches / remote-only
+git branch -a
+git branch -r
+
+# create branch
+git branch dev
+
+# create and switch to branch
+git fetch && git checkout -b dev
+
+# create local branch and track remote branch
+git fetch && git switch -c dev origin/dev
+git push dev
+
+# delete local branch
+git branch -d --force dev
+# delete remote branch
+git push origin --delete dev
 ```
 
-### rebase
+### Syncing (fetch / pull / push)
 
 ```bash
-# rebase branch
-git rebase
+# link local and remote branch
+git branch --set-upstream-to=origin/dev dev
+git push dev
+
+# fetch all remote branches (update local index)
+git fetch --all
+# update remote branch to local branch
+git pull
+
+# merge latest remote dev into current main
+git switch main
+git fetch origin dev:dev
+git merge dev
+
+# on dev branch, force update main to match dev
+git fetch origin
+git branch -f main develop
+git push origin main
 ```
 
-### stash
+### Stashing
 
 ```bash
 # stash current work to the stack
@@ -97,7 +82,7 @@ git stash list
 git stash pop
 ```
 
-### tag
+### Tagging
 
 ```bash
 # tag based on Annotated Tag
@@ -117,11 +102,36 @@ git tag -d v1.0.0
 git push origin --delete tag v1.0.0
 ```
 
-### version control
+### Cherry-pick & Rebase
 
 ```bash
+# copy a specific commit to the current branch
+# useful for replaying a bug fix from main to dev, or vice versa
+git cherry-pick 4c805e2
+
+# rebase branch
+git rebase
+```
+
+### Undo & History
+
+```bash
+# view branch log graph
+git log --graph --pretty=oneline --abbrev-commit
+
 # view current version
 git rev-parse HEAD
+
+# show commit details with diff
+git show HEAD                          # latest commit
+git show 4c805e2                       # specific commit by hash
+git show HEAD~1                        # parent of HEAD
+# show only file change stats
+git show --stat HEAD
+# show only the names of changed files
+git show --name-only HEAD
+# show file content at a specific commit
+git show 4c805e2:path/to/file
 
 # undo commit but keep changes in staging area (staged)
 git reset --soft HEAD~1
@@ -329,7 +339,7 @@ gh gist edit <gist-id>
 gh gist delete <gist-id>
 ```
 
-### other
+### search
 
 ```bash
 # search repositories, issues, PRs, code
@@ -337,23 +347,39 @@ gh search repos "kubernetes language:go" --limit 10
 gh search issues "bug label:critical" --repo owner/repo
 gh search prs "review:required" --state open
 gh search code "func main" --repo owner/repo
+```
 
+### ssh-key & gpg-key
+
+```bash
 # manage SSH keys and GPG keys
 gh ssh-key list
 gh ssh-key add ~/.ssh/id_ed25519.pub --title "my-key"
 gh gpg-key list
+```
 
+### config
+
+```bash
 # view and set configuration
 gh config list
 gh config set editor vim
 gh config set git_protocol ssh
+```
 
+### codespace
+
+```bash
 # manage GitHub Codespaces
 gh codespace list
 gh codespace create --repo owner/repo
 gh codespace ssh -c <codespace-name>
+```
 
-# extensions
+### extension
+
+```bash
+# install / list / upgrade extensions
 gh extension install owner/gh-extension
 gh extension list
 gh extension upgrade --all
@@ -361,15 +387,104 @@ gh extension upgrade --all
 
 ## Subversion
 
+### Inspection
+
 ```bash
+# list directory entries on the server
 svn list svn://1.1.1.1:3690/my-repo/
+
+# show info about a working copy or URL
+svn info
+svn info svn://1.1.1.1:3690/my-repo/trunk
+
+# show local modification status
+svn status
+
+# show diff of local modifications / between revisions
+svn diff
+svn diff -r 100:HEAD path/to/file
+
+# annotate file lines with last-changed revision and author
+svn blame path/to/file
+
+# show file contents at a specific revision
+svn cat -r 100 path/to/file
+```
+
+### Working Copy Changes
+
+```bash
+# schedule files / dirs for addition
+svn add ./*
+
+# remove files / dirs (working copy + scheduled deletion)
+svn delete path/to/file
+
+# move or rename (preserves history)
+svn move old-name new-name
+
+# copy within a working copy (preserves history)
+svn copy src dst
+
+# discard local modifications
+svn revert path/to/file
+svn revert -R .                        # recursive
+```
+
+### Syncing (checkout / update / commit)
+
+```bash
+# initial checkout of a working copy
 svn checkout svn://1.1.1.1:3690/my-repo/
 
-svn add ./*
-svn commit -m 'commit message'
+# update working copy to latest revision
 svn update
 
-svn update -r xxx
+# update to a specific revision (time-travel the working copy)
+svn update -r 100
+
+# commit local modifications
+svn commit -m 'commit message'
+svn commit path/to/file -m 'message'   # commit only specific paths
+```
+
+### Branching & Tagging
+
+SVN creates branches and tags by copying URLs — typically under `branches/` and `tags/` by convention. Tags are immutable only by team agreement, not enforcement.
+
+```bash
+# create a branch from trunk
+svn copy svn://1.1.1.1:3690/my-repo/trunk \
+         svn://1.1.1.1:3690/my-repo/branches/feature-x \
+         -m "Create branch feature-x"
+
+# create a tag from trunk
+svn copy svn://1.1.1.1:3690/my-repo/trunk \
+         svn://1.1.1.1:3690/my-repo/tags/v1.0.0 \
+         -m "Tag v1.0.0"
+
+# switch working copy to another branch
+svn switch svn://1.1.1.1:3690/my-repo/branches/feature-x
+
+# merge changes from a branch into the working copy
+svn merge svn://1.1.1.1:3690/my-repo/branches/feature-x
+svn merge -r 100:120 svn://1.1.1.1:3690/my-repo/branches/feature-x
+```
+
+### Undo & History
+
+```bash
+# show commit log (limit / verbose / revision range)
+svn log
+svn log -l 10
+svn log -v
+svn log -r 100:HEAD
+
+# resolve conflicts after merge / update
+svn resolve --accept working path/to/file
+
+# clean up a stuck working copy (locks, interrupted operations)
+svn cleanup
 ```
 
 > Reference:
