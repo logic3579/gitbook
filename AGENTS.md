@@ -6,7 +6,7 @@ This is a **GitBook-based technical knowledge base** covering cloud-native techn
 
 - **Repository**: https://github.com/logic3579/gitbook/
 - **Format**: Markdown documents following CNCF landscape taxonomy
-- **Also used as**: Obsidian vault (`.obsidian/` config present) with [obsidian-skills](https://github.com/kepano/obsidian-skills) installed in `.claude/skills/`
+- **Also used as**: Obsidian vault (`.obsidian/` config present) with the [obsidian-skills](https://github.com/kepano/obsidian-skills) plugin installed
 - **Local Dev**: GitBook CLI
 
 ---
@@ -235,12 +235,11 @@ The `SUMMARY.md` file controls the GitBook navigation sidebar:
 
 ## Obsidian Integration
 
-This vault uses [obsidian-skills](https://github.com/kepano/obsidian-skills) (installed in `.claude/skills/`) providing five skills: `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `obsidian-cli`, and `defuddle`.
+This vault uses the [obsidian-skills](https://github.com/kepano/obsidian-skills) plugin, which provides `obsidian-markdown`, `obsidian-bases`, and `json-canvas` skills.
 
 - **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Root-level bases track the whole vault; section-level bases (e.g., `DevOps/CommandManual/command-index.base`) focus on specific directories.
 - **Canvas** (`.canvas` files): Used for visual architecture maps. Top-level canvas (e.g., `CNCF/cncf-landscape.canvas`) shows the full landscape; second-level canvas files (e.g., `CNCF/ObservabilityAnalysis/observability-stack.canvas`) zoom into specific domains with detailed data flows and dependencies.
 - **Compatibility**: Content files must use standard Markdown links (not wikilinks) for GitBook compatibility. Obsidian-specific features (tags, bases, canvas) are additive and do not affect GitBook rendering.
-- **Defuddle**: Prefer `npx defuddle parse <url> --md` over WebFetch for extracting clean content from web pages when adding new documentation.
 
 ---
 
