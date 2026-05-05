@@ -26,9 +26,3 @@ _book/
 # Obsidian
 .obsidian/workspace.json
 .obsidian/plugins/Claudian/data.json
-
-# Claude Code
-.claude/settings.local.json
-.claude/memory/
-.claude/sessions/
-.claude/claudian-settings.json
