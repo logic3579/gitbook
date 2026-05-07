@@ -69,7 +69,7 @@ parted /dev/sda -- set 1 boot on
 parted /dev/sda -- mkpart primary linux-swap -2GB 100%
 ```
 
-![nix-1](./attachements/nix-1.png)
+![nix-1](https://gitbook-r2.yakir.top/devops-system-nix-1.png)
 
 ##### Formatting
 

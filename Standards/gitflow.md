@@ -17,12 +17,10 @@ gitflow: A branch management strategy for versioning (essentially a wrapper arou
 
 
 ### 2. GitFlow Flowchart and Description
-![image](https://github.com/logic3579/knowledge/assets/30774576/f4811bbc-3c1f-476d-9257-c8e0404aec17)
-![image](https://github.com/logic3579/knowledge/assets/30774576/70fd63ab-8ad5-4234-8131-8b26b4067129)
+
+![GitFlow Branching Model](https://gitbook-r2.yakir.top/standards-gitflow-overview.svg)
 
 - master: Main branch
-![image](https://github.com/logic3579/knowledge/assets/30774576/e6745b38-ce61-410d-8b4c-4b1f31b6e7c6)
-
   - The most stable branch with complete functionality, ready to be released to production at any time (read-only branch, can only be merged from hotfix/release, cannot be directly modified)
   - Pushes to the master branch should be tagged for traceability;
 
@@ -33,21 +31,15 @@ gitflow: A branch management strategy for versioning (essentially a wrapper arou
   - After release/hotfix branches go live, they are merged into develop and pushed;
 
 - feature: Feature development branch
-![image](https://github.com/logic3579/knowledge/assets/30774576/1e012286-8b80-4351-95a4-a9995375078f)
-
   - For developing specific new features, cloned from the develop branch. After feature development is complete and local testing passes (compilation succeeds without errors), it is merged into the develop branch;
   - Multiple feature branches can exist simultaneously, i.e., multiple team members can create temporary branches for concurrent development. Branches can optionally be deleted after completion;
 
 - release: Testing branch
-![image](https://github.com/logic3579/knowledge/assets/30774576/c5b01f4a-8246-4815-9ec3-e9c07324e2bd)
-
   - Used for submitting to testers for functional testing, cloned from the develop branch after feature branches have been merged into develop;
   - Bugs found during testing are fixed on this branch by creating bugfix-* branches. After all bugs are fixed and the release goes live, it is merged into both develop/master and pushed (completing the feature). A tag is created when pushing to master;
   - Temporary branch, can optionally be deleted after going live (once release testing begins, new features from develop are not allowed to be merged into the release branch; new features must wait for the next release cycle);
 
 - hotfix: Patch branch
-![image](https://github.com/logic3579/knowledge/assets/30774576/68e94074-3fed-4320-8c28-705edaf80b46)
-
   - Cloned from the master branch, primarily used for fixing bugs in the production version;
   - After fixing bugs, merged into develop/master and pushed (all hotfix changes will be included in the next release). A tag is created when pushing to master;
   - Temporary branch, can optionally be deleted after the bug is fixed
@@ -66,33 +58,43 @@ gitflow: A branch management strategy for versioning (essentially a wrapper arou
 
 ## Testing Section
 
-- Local git flow init to initialize the repository, push the develop branch
-![image](https://github.com/logic3579/knowledge/assets/30774576/6de0f321-ff9f-4d54-b71d-88b01839794e)
-![image](https://github.com/logic3579/knowledge/assets/30774576/4b5defef-974e-4663-94f2-092dde3c3f82)
+A full cycle exercising the workflow: initialize a repo, push the long-running branches, develop a feature, and merge it back into `develop`.
 
+```bash
+# 1. Initialize gitflow locally and push the long-running branches
+git init
+git flow init -d                              # -d: accept default branch names (master/develop)
+git remote add origin git@github.com:owner/repo.git
+git push -u origin master
+git push -u origin develop
+```
 
-- Push to the remote test GitHub repository (using SSH public key authentication). The develop branch now has its first commit
-![image](https://github.com/logic3579/knowledge/assets/30774576/758592c7-5690-4751-bae0-8a79e7d9cc1f)
+```bash
+# 2. Simulate a separate developer cloning the repo
+mkdir -p ~/tmp/work && cd ~/tmp/work
+git clone git@github.com:owner/repo.git
+cd repo
+git flow init -d                              # required once per local clone
+```
 
+```bash
+# 3. Start a feature, commit work, and publish the branch
+git flow feature start TICKET-123             # creates & checks out feature/TICKET-123
+# ... edit files ...
+git add .
+git commit -m "feat: add login form"
+git flow feature publish TICKET-123           # pushes feature/TICKET-123 to origin
+git push                                      # subsequent commits track upstream
+```
 
-- Create a new working directory under tmp and clone the remote repository locally (simulating a developer's local development environment)
-![image](https://github.com/logic3579/knowledge/assets/30774576/5d0687f9-b737-4a14-a7c0-20731f5896f4)
+```bash
+# 4. Finish the feature: merge into develop and clean up
+git flow feature finish TICKET-123            # merges into develop, deletes local branch
+git push origin --delete feature/TICKET-123   # also remove the remote branch
+git push origin develop                       # push the merge commit
+```
 
-- After initializing the repository, pull the develop branch locally for development. At this point, you can create a feature branch for feature development
-![image](https://github.com/logic3579/knowledge/assets/30774576/47244919-fa8b-4542-884a-f3d20c5fe8ef)
-![image](https://github.com/logic3579/knowledge/assets/30774576/aa41d1a7-04f7-4b6c-8bb6-d1d899844513)
-
-
-- After committing the feature development, push to the remote repository and track the remote branch. Subsequent changes can be continuously pushed with git push
-![image](https://github.com/logic3579/knowledge/assets/30774576/5e7ac235-dafe-4d9b-9783-155f9c1c1a69)
-![image](https://github.com/logic3579/knowledge/assets/30774576/f30c3c26-7597-4789-a85d-f3206cc96880)
-
-
-- After feature development is complete, merge the branch into develop and delete the local feature branch (adding the -F flag will also delete the remote branch)
-![image](https://github.com/logic3579/knowledge/assets/30774576/243b61f3-4e4a-4907-9e24-e4247aafcad1)
-
-After the finish command, the new feature is merged into the develop branch, completing the new feature development. The subsequent release publishing operation follows similar steps
-
+After `feature finish`, the new feature is merged into `develop`. The release and hotfix cycles follow the same shape via `git flow release start/finish` and `git flow hotfix start/finish`.
 
 
 > Reference:

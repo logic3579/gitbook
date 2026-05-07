@@ -319,16 +319,16 @@ curl "https://api.telegram.org/bot<token>/sendMessage?chat_id=<chat_id>&text=<ms
 ### alerting config
 
 1. Dashboard --> edit panel --> create alert rule from this panel
-   ![Pasted image 20230821114504](./attachements/Pasted%20image%2020230821114504.png)
+   ![Pasted image 20230821114504](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230821114504.png)
 
 2. Notifications --> add Labels(related Contact points)
-   ![Pasted image 20230821114732](./attachements/Pasted%20image%2020230821114732.png)
-   ![Pasted image 20230821114429](./attachements/Pasted%20image%2020230821114429.png)
+   ![Pasted image 20230821114732](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230821114732.png)
+   ![Pasted image 20230821114429](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230821114429.png)
 
 3. Contact points --> Add template --> create notification template
-   ![Pasted image 20230821143025](./attachements/Pasted%20image%2020230821143025.png)
+   ![Pasted image 20230821143025](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230821143025.png)
 
-![Pasted image 20230822100216](./attachements/Pasted%20image%2020230822100216.png)
+![Pasted image 20230822100216](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230822100216.png)
 
 ```html
 {{ define "tg_alert_template" -}} {{/* firing info */}} {{- if gt (len
@@ -351,19 +351,19 @@ $alert.Labels.instance }} Current Value: {{ $alert.Values.B }} Silence Alert: {{
 ```
 
 4. Contact points --> Add contact point --> create telegram contact point
-   ![Pasted image 20230821115559](./attachements/Pasted%20image%2020230821115559.png)
+   ![Pasted image 20230821115559](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230821115559.png)
 
 ```html
 # Message {{ template "tg_alert_template" . }}
 ```
 
-![Pasted image 20230822100054](./attachements/Pasted%20image%2020230822100054.png)
+![Pasted image 20230822100054](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230822100054.png)
 
 5. Notification policies --> New nested policy --> create new notification policy
-   ![Pasted image 20230821115717](./attachements/Pasted%20image%2020230821115717.png)
+   ![Pasted image 20230821115717](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230821115717.png)
 
 6. Check alert notification
-   ![Pasted image 20230823080802](./attachements/Pasted%20image%2020230823080802.png)
+   ![Pasted image 20230823080802](https://gitbook-r2.yakir.top/cncf-observability-Pasted-image-20230823080802.png)
 
 > Reference:
 >

@@ -45,7 +45,7 @@ MSS (Maximum Segment Size): maximum TCP segment size
 
 ### TCP Header Format
 
-![Pasted image 20230905091738](./attachements/Pasted%20image%2020230905091738.png)
+![Pasted image 20230905091738](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230905091738.png)
 A TCP connection is defined by a five-tuple identifying the same connection (src_ip, src_port, dst_ip, dst_port, protocol)
 
 - Sequence Number is the packet sequence number, used to solve the network packet reordering problem.
@@ -55,15 +55,15 @@ A TCP connection is defined by a five-tuple identifying the same connection (src
 
 ### TCP State Machine
 
-![Pasted image 20230905101408](./attachements/Pasted%20image%2020230905101408.png)
+![Pasted image 20230905101408](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230905101408.png)
 
-![Pasted image 20230905101422](./attachements/Pasted%20image%2020230905101422.png)
+![Pasted image 20230905101422](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230905101422.png)
 
 - For the 3-way handshake to establish a connection, the main purpose is to initialize the Sequence Number's initial value. Both communicating parties must notify each other of their initialized Sequence Number (abbreviated as ISN: Initial Sequence Number) -- hence the name SYN, which stands for Synchronize Sequence Numbers. These are the x and y in the diagram above. This number will be used as the sequence number for subsequent data communication, ensuring that data received at the application layer will not be disordered due to network transmission issues (TCP uses this sequence number to reassemble data).
 
 - For the 4-way teardown, if you look carefully it is actually 2 rounds, because TCP is full-duplex, so both the sender and receiver need Fin and Ack. However, one side is passive, making it appear as the so-called 4-way teardown. If both sides disconnect simultaneously, they enter the CLOSING state, then reach the TIME_WAIT state. The diagram below shows simultaneous disconnection by both sides (you can also follow along with the TCP state machine)
 
-![Pasted image 20230905101514](./attachements/Pasted%20image%2020230905101514.png)
+![Pasted image 20230905101514](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230905101514.png)
 Important notes:
 
 - SYN_RECV state: When the server cannot receive the ACK for the connection establishment, it resends the SYN+ACK packet. **In Linux, the default is 5 retries, starting from 1s and doubling each time, totaling 1s + 2s + 4s + 8s + 16s + 32s = 2^6 - 1 = 63s. TCP only disconnects after the 63s timeout**. Optimization parameters: 1) tcp_synack_retries to reduce the retry count. 2) tcp_max_syn_backlog and net.core.somaxconn to increase the SYN half-connection queue. 3) tcp_abort_on_overflow to reject connections and drop ACKs when the full connection queue is full; tcp_syncookies hashes the five-tuple into a cookie and returns it, the client carries it back to establish the connection (not recommended to enable)
@@ -79,9 +79,9 @@ Important notes:
 ### Sequence Number in Data Transmission
 
 wireshark filter expression: ip.addr == 172.22.3.29 && tcp.port == 9000
-![Pasted image 20230906170656](./attachements/Pasted%20image%2020230906170656.png)
+![Pasted image 20230906170656](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230906170656.png)
 
-![Pasted image 20230906171805](./attachements/Pasted%20image%2020230906171805.png)
+![Pasted image 20230906171805](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230906171805.png)
 The SeqNum increment is related to the number of bytes transmitted.
 
 Note: Wireshark uses Relative SeqNum for friendlier display. You can uncheck it in the protocol preferences from the right-click menu to see the "Absolute SeqNum".
@@ -97,11 +97,11 @@ Note: The ACK from the receiver to the sender only acknowledges the last contigu
 
 2. Fast Retransmit mechanism
 The Fast Retransmit algorithm is data-driven rather than time-driven for retransmission. It only ACKs the last packet that may have been lost. The first segment arrives, so ACK 2 is sent back. Segment 2 is not received for some reason. Segment 3 arrives, so ACK 2 is still sent. Segments 4 and 5 arrive, but ACK 2 is still sent because segment 2 has not been received. The sender receives three ACK=2 confirmations and knows that segment 2 has not arrived, so it immediately retransmits segment 2. Then, the receiver gets segment 2. Since segments 3, 4, 5 have already been received, it ACKs 6
-![Pasted image 20230906172736](./attachements/Pasted%20image%2020230906172736.png)
+![Pasted image 20230906172736](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230906172736.png)
 Question: Does retransmission retransmit only the ACK-lost packet or all previous packets?
 
 3. Selective Acknowledgment (SACK): Requires adding a SACK option in the TCP header. The ACK is still the Fast Retransmit ACK, while SACK reports the received data fragments
-![Pasted image 20230906172757](./attachements/Pasted%20image%2020230906172757.png)
+![Pasted image 20230906172757](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230906172757.png)
 The sender can use the returned SACK to know which data has arrived and which has not, thus optimizing the Fast Retransmit algorithm. Of course, this protocol requires support on both sides.
 **Linux kernel parameter net.ipv4.tcp_sack=1 enables this feature**
 Note: Receiver reneging issue -- the receiver has the right to discard the sender's SACK data. The receiver may need memory for more important things, so the sender cannot fully rely on SACK. It still needs ACK and must maintain the timeout. If subsequent ACKs do not increase, the SACK data still needs to be retransmitted.
@@ -109,14 +109,14 @@ Note: Receiver reneging issue -- the receiver has the right to discard the sende
 4. Duplicate SACK (D-SACK): Addresses the problem of receiving duplicate data, primarily using SACK to tell the sender which data was received in duplicate
 
 - ACK packet loss: If the first SACK segment's range is covered by the ACK, it is a D-SACK. As shown in the diagram, two ACK packets (3500, 4000) were lost in the request. The third packet returns ACK=4000 SACK=3000-3500, making this SACK a D-SACK packet, indicating the data was not lost but the ACK packets were.
-  ![Pasted image 20230907091907](./attachements/Pasted%20image%2020230907091907.png)
+  ![Pasted image 20230907091907](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230907091907.png)
 
 - Network delay: If the first SACK segment's range is covered by the second SACK segment, it is a D-SACK. As shown in the diagram, the network packet (1000-1499) was delayed by the network, causing the sender not to receive the ACK. The three subsequent packets that arrived triggered the "Fast Retransmit algorithm", so retransmission occurred. But when the retransmission happened, the delayed packet also arrived, so a SACK=1000-1500 was sent back. Since the ACK had already reached 3000, this SACK is a D-SACK -- indicating that a duplicate packet was received.
 
 In this case, the sender knows that the retransmission triggered by the "Fast Retransmit algorithm" was not because the sent packet was lost, nor because the response ACK packet was lost, but because of network delay.
 
 **Linux kernel parameter net.ipv4.tcp_dsack=1 enables this feature**
-![Pasted image 20230907091442](./attachements/Pasted%20image%2020230907091442.png)
+![Pasted image 20230907091442](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230907091442.png)
 Benefits of using D-SACK:
 1) Lets the sender know whether the sent packet was lost or the returning ACK packet was lost.
 2) Whether the timeout was set too small, causing retransmission.
@@ -135,7 +135,7 @@ Algorithms: Classic algorithm (weighted moving average), Karn/Partridge algorith
 
 TCP header field Window (Advertised-Window): The receiver tells the sender how much buffer space it has available to receive data
 
-![Pasted image 20230907171639](./attachements/Pasted%20image%2020230907171639.png)
+![Pasted image 20230907171639](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230907171639.png)
 
 - On the receiver side, LastByteRead points to the position read in the TCP buffer, NextByteExpected points to the last position of contiguous received packets, and LastByteRcved points to the last position of received packets. We can see there are some data gaps in between where data has not yet arrived.
 
@@ -148,11 +148,11 @@ TCP header field Window (Advertised-Window): The receiver tells the sender how m
 
 Sender sliding window example:
 Before sliding
-![Pasted image 20230908140914](./attachements/Pasted%20image%2020230908140914.png)
+![Pasted image 20230908140914](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230908140914.png)
 After sliding
-![Pasted image 20230908141002](./attachements/Pasted%20image%2020230908141002.png)
+![Pasted image 20230908141002](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230908141002.png)
 
-![Pasted image 20230908141907](./attachements/Pasted%20image%2020230908141907.png)
+![Pasted image 20230908141907](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230908141907.png)
 
 #### Zero window
 
@@ -209,7 +209,7 @@ Generally, ssthresh is set to 65535 bytes. When cwnd reaches this value, the alg
 4. If a new ACK is received, cwnd = sshthresh, then enter the congestion avoidance algorithm.
 
 Algorithm diagram
-![Pasted image 20230908161112](./attachements/Pasted%20image%2020230908161112.png)
+![Pasted image 20230908161112](https://gitbook-r2.yakir.top/devops-network-Pasted-image-20230908161112.png)
 
 ## TCP Full Connection and Half-Connection Queues
 

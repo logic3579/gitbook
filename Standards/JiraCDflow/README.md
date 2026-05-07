@@ -27,13 +27,13 @@ Automate the upgrade of SQL, configuration, and code using a workflow approach. 
    > New field data is obtained from the JSON data submitted by the release system; old data is retrieved from the database saved during the last upgrade
 
 - When sql_info field data is not empty or differs from the last upgrade, the Jira ticket status enters `<Pending SQL Execution>`. The sql_info data is submitted to the Archery backend for DBA review and execution (review and execution permissions can be separated; subsequent execution can be delegated to ops or testers). The Jira workflow triggers `<Submit SQL>` to enter `<SQL Executing>` status, waiting for SQL execution success to be manually confirmed via `<SQL Execution Successful>` to proceed to the next step.
-  ![Pasted image 20230316145506](../attachements/Pasted%20image%2020230316145506.png)
+  ![Pasted image 20230316145506](https://gitbook-r2.yakir.top/standards-Pasted-image-20230316145506.png)
 
 - When apollo_info or config_info field data is not empty or differs from the last upgrade, the Jira workflow status enters `<CONFIG Executing>`, waiting for manual configuration updates and then manually triggering `<Config Upgrade Successful>` to enter `<CODE Executing>` status.
-  ![Pasted image 20230317165145](../attachements/Pasted%20image%2020230317165145.png)
+  ![Pasted image 20230317165145](https://gitbook-r2.yakir.top/standards-Pasted-image-20230317165145.png)
 
 - When code_info field data is not empty or differs from the last upgrade, the Jira workflow status enters `<CODE Executing>`. The program calls cmdb_api to execute the code upgrade operation. Upon successful upgrade, it automatically triggers `<Code Upgrade Successful>` to enter `<UAT Upgrade Complete>` status.
-  ![Pasted image 20230317170610](../attachements/Pasted%20image%2020230317170610.png)
+  ![Pasted image 20230317170610](https://gitbook-r2.yakir.top/standards-Pasted-image-20230317170610.png)
 
 ### b) Prerequisites
 
@@ -328,32 +328,32 @@ vim ./jira/atlassian/dbconfig.xml
 ##### 系统配置
 
 - baseUrl：修改为与前台访问地址一致
-  ![Pasted image 20230809165349](../attachements/Pasted%20image%2020230809165349.png)
+  ![Pasted image 20230809165349](https://gitbook-r2.yakir.top/standards-Pasted-image-20230809165349.png)
 - 添加电子邮件
-  ![Pasted image 20230320172954](../attachements/Pasted%20image%2020230320172954.png)
+  ![Pasted image 20230320172954](https://gitbook-r2.yakir.top/standards-Pasted-image-20230320172954.png)
 - 添加 webhook：问题类型选择已新建与已更新，JQL 过滤工作流的事件
   AC webhook：project = AC and issuetype in (升级) and status in (SQL待执行, SQL执行中, CONFIG执行中,CODE执行中,"开发/运维修改")
 
 QC webhook：project = QC and issuetype in (升级) and status in (SQL待执行, SQL执行中, CONFIG执行中,CODE执行中,"开发/运维修改")
-![Pasted image 20230321082706](../attachements/Pasted%20image%2020230321082706.png)
+![Pasted image 20230321082706](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321082706.png)
 
 > 清理 webhook：delete from ao_4aeacd_webhook_dao;
 
 #### 问题配置
 
 - 问题类型：新建升级类型，关联问题类型方案到项目。问题类型方案设置 升级 为默认问题
-  ![Pasted image 20230321083556](../attachements/Pasted%20image%2020230321083556.png)
+  ![Pasted image 20230321083556](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321083556.png)
 - 工作流：新建 cdflow 工作流，关联工作流方案到项目
-  ![Pasted image 20230321084354](../attachements/Pasted%20image%2020230321084354.png)
+  ![Pasted image 20230321084354](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321084354.png)
 - 界面：修改界面字段配置，关联界面方案到项目
-  ![Pasted image 20230321084438](../attachements/Pasted%20image%2020230321084438.png)
+  ![Pasted image 20230321084438](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321084438.png)
 - 字段 + 自定义字段：新增字段，将字段关联到问题类型、项目、界面
-  ![Pasted image 20230413143904](../attachements/Pasted%20image%2020230413143904.png) + 新增字段配置与字段配置方案，进行关联
-  ![Pasted image 20230321090812](../attachements/Pasted%20image%2020230321090812.png)
+  ![Pasted image 20230413143904](https://gitbook-r2.yakir.top/standards-Pasted-image-20230413143904.png) + 新增字段配置与字段配置方案，进行关联
+  ![Pasted image 20230321090812](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321090812.png)
 - 通知方案：新建通知方案，关联项目到通知方案中（通知方案通知组为新增 notice 组）
-  ![Pasted image 20230321093338](../attachements/Pasted%20image%2020230321093338.png)
+  ![Pasted image 20230321093338](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321093338.png)
 - 权限方案：新建权限方案，根据需求设置用户与组对项目操作的权限，关联权限方案到项目中
-  ![Pasted image 20230321093710](../attachements/Pasted%20image%2020230321093710.png)
+  ![Pasted image 20230321093710](https://gitbook-r2.yakir.top/standards-Pasted-image-20230321093710.png)
 
 > cdflow 工作流：
 > 转换配置后处理功能：环境更改为 UAT 或 PRO

@@ -11,17 +11,17 @@ tags:
 
 Containerd is an industry-standard container runtime that manages the complete container lifecycle on a host system — from image transfer and storage to container execution, supervision, and networking.
 
-![Container runtime architecture overview](./attachements/docker-fsdfsolnn.webp)
+![Container runtime architecture overview](https://gitbook-r2.yakir.top/cncf-runtime-docker-fsdfsolnn.webp)
 
-![Containerd components and interfaces](./attachements/docker-fsdsdf.webp)
+![Containerd components and interfaces](https://gitbook-r2.yakir.top/cncf-runtime-docker-fsdsdf.webp)
 
-![Containerd and Docker relationship](./attachements/docker-fdsfcv.webp)
+![Containerd and Docker relationship](https://gitbook-r2.yakir.top/cncf-runtime-docker-fdsfcv.webp)
 
-![Container lifecycle management](./attachements/docker-fsdfsobgb.webp)
+![Container lifecycle management](https://gitbook-r2.yakir.top/cncf-runtime-docker-fsdfsobgb.webp)
 
-![CRI plugin architecture](./attachements/docker-fsdfdfsckl.webp)
+![CRI plugin architecture](https://gitbook-r2.yakir.top/cncf-runtime-docker-fsdfdfsckl.webp)
 
-![Containerd snapshotter and storage](./attachements/docker-fsdfsoasdaw.webp)
+![Containerd snapshotter and storage](https://gitbook-r2.yakir.top/cncf-runtime-docker-fsdfsoasdaw.webp)
 
 
 

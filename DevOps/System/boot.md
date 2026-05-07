@@ -85,7 +85,7 @@ GUID Partition Table
 - LBA-33~LBA-2: Backup of the GPT partition table, backup of LBA2~LBA33
 - LBA-1: Backup of the GPT table header record, backup of LBA1
 
-![boot-1](./attachements/boot-1.png)
+![boot-1](https://gitbook-r2.yakir.top/devops-system-boot-1.png)
 
 ## Kernel
 

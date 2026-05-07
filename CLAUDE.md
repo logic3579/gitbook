@@ -104,7 +104,7 @@ Some documents point to external repositories instead of containing inline conte
 
 - **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
 - **Documents/files**: kebab-case (e.g., `big-data.md`, `container-runtime.md`, `naming-conventions.md`). Single-word names are just lowercase (e.g., `helm.md`, `docker.md`).
-- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md` follow their respective conventions. Non-documentation directories (code, config, assets like `attachements/`, `iplib/`, `archery/`) are excluded from the PascalCase rule.
+- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md` follow their respective conventions. Non-documentation directories (code, config, assets like `iplib/`, `archery/`) are excluded from the PascalCase rule.
 
 ## Conventions for Adding Content
 
@@ -113,7 +113,7 @@ Some documents point to external repositories instead of containing inline conte
 3. Each category directory has a `README.md` that serves as the section overview page, following this format: frontmatter (`icon` + `description`) → H1 title → one-line description → sub-page list with brief descriptions.
 4. Embedded YAML configurations and code examples are used extensively throughout the docs — maintain that style.
 5. For tools with dedicated external repositories, use the reference format (frontmatter + brief description + repository link + official references) instead of inline content. See `ansible.md` as a template.
-6. Image attachments are stored in `attachements/` subdirectories alongside the referencing documents.
+6. Images are hosted on Cloudflare R2 (`https://gitbook-r2.yakir.top/`). See **Markdown Conventions → Images** below for the upload workflow. Local `attachements/` directories are no longer used.
 
 ### Markdown Conventions
 
@@ -133,7 +133,21 @@ Some documents point to external repositories instead of containing inline conte
   > 1. [Official Website](https://example.com/)
   > 2. [Repository](https://github.com/org/repo)
   ```
-- **Images**: Use standard Markdown image syntax (`![alt](attachements/image.png)`), not Hexo `asset_img` or other template syntax
+- **Images**: Hosted on Cloudflare R2 at `https://gitbook-r2.yakir.top/<prefix><filename>`. Reference with absolute URL via standard Markdown syntax: `![alt](https://gitbook-r2.yakir.top/devops-network-tcp-handshake.png)`. Do not use Hexo `asset_img` or other template syntax. To add a new image:
+  1. Pick the section prefix from the table below.
+  2. Use a URL-safe filename (lowercase, hyphens — no spaces or `%20`).
+  3. Upload via rclone: `rclone copyto path/to/image.png logic-r2:gitbook/<prefix><filename>`.
+  4. Reference the resulting `https://gitbook-r2.yakir.top/<prefix><filename>` URL in markdown.
+
+  | Section | Prefix |
+  |---------|--------|
+  | `CNCF/ObservabilityAnalysis/Observability/` | `cncf-observability-` |
+  | `CNCF/OrchestrationManagement/SchedulingOrchestration/Kubernetes/` | `cncf-kubernetes-` |
+  | `CNCF/Runtime/ContainerRuntime/` | `cncf-runtime-` |
+  | `DevOps/Network/` | `devops-network-` |
+  | `DevOps/System/` | `devops-system-` |
+  | `Platform/AlibabaCloud/` | `platform-alibaba-` |
+  | `Standards/` | `standards-` |
 - **Links**: Use standard Markdown links, not Obsidian WikiLink format (`[[...]]`)
 
 ### Obsidian Integration
