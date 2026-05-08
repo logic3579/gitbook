@@ -1,4 +1,5 @@
 ---
+icon: arrows-rotate
 description: GitHub Actions CI/CD workflow standard for monorepo architecture with path-based triggering, Docker build, GHCR publish, and ArgoCD GitOps deployment
 tags:
   - standards

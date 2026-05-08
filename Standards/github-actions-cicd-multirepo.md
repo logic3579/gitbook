@@ -1,4 +1,5 @@
 ---
+icon: arrows-rotate
 description: GitHub Actions CI/CD workflow standard for multirepo architecture with multi-platform Docker build, GHCR publish, and ArgoCD GitOps deployment
 tags:
   - standards

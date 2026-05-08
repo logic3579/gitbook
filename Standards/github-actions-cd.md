@@ -1,4 +1,5 @@
 ---
+icon: rocket
 description: GitHub Actions CD workflow standard for ArgoCD GitOps deployment, triggered by repository-dispatch from CI pipelines
 tags:
   - standards

@@ -1,4 +1,5 @@
 ---
+icon: terminal
 description: Bash record
 tags:
   - devops/language

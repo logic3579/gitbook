@@ -1,4 +1,5 @@
 ---
+icon: code-branch
 description: Git branching strategy and workflow
 tags:
   - standards

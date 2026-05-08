@@ -1,4 +1,5 @@
 ---
+icon: user-tie
 description: interview
 tags:
   - misc/interview

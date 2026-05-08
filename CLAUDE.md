@@ -117,7 +117,7 @@ Some documents point to external repositories instead of containing inline conte
 
 ### Markdown Conventions
 
-- **Frontmatter**: Every document should have `description` field. First-level and second-level directory `README.md` files should include an `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names). Regular content documents (non-README) do not need `icon`.
+- **Frontmatter**: Every document should have `description` field. The `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names) is required on every entry that appears as a top-level item in any GitBook sidebar group from `SUMMARY.md` — this includes the root `README.md`, every section landing `README.md`, and any single-file top-level page (e.g. `DevOps/golang.md`, `Standards/gitflow.md`, `Misc/interview.md`, `Platform/distribution-installer.md`). Nested README files inside a collapsed group, and regular content documents that live under a collapsed group, do not need `icon`.
 - **Tags**: All content files (non-README) should include `tags` in frontmatter for Obsidian navigation. Use hierarchical nested tags with `/` separator:
   - CNCF section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`
   - DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/system`

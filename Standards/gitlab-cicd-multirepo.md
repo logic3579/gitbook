@@ -1,4 +1,5 @@
 ---
+icon: arrows-rotate
 description: GitLab CI/CD workflow standard for multirepo architecture with multi-platform Docker build, Container Registry publish, and ArgoCD GitOps deployment
 tags:
   - standards
