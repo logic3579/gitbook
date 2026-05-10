@@ -7,5 +7,5 @@ description: Misc
 
 VPN/tunnel technologies, hosting, and interviews.
 
-- [Science](Science/README.md) — VPN/tunnel technologies, hosting, and proxy services
+- [Science Surf](ScienceSurf/README.md) — VPN/tunnel technologies, hosting, and proxy services
 - [Interview](interview.md) — Interview preparation

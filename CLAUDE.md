@@ -45,7 +45,7 @@ The documentation is organized into six top-level sections:
 | `DevOps/` | Programming languages, command manuals, network concepts, Linux system topics |
 | `Platform/` | Cloud provider guides (AWS, GCP, Alibaba Cloud) and Kubernetes distribution installers |
 | `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
-| `Misc/` | VPN/tunnel technologies and hosting (Science), interviews |
+| `Misc/` | VPN/tunnel technologies and hosting (ScienceSurf), interviews |
 | `Environment/` | Development environment setup (references external repository [logic3579/environment](https://github.com/logic3579/environment)) |
 
 ### CNCF Section Structure
@@ -89,7 +89,7 @@ The documentation is organized into six top-level sections:
 
 ### Misc Section Structure
 
-- `Science/` — VPN/tunnel technologies (V2Ray, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
+- `ScienceSurf/` — VPN/tunnel technologies (V2Ray, sing-box, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
 - `interview.md` — Interview preparation
 
 ### External Repository References
