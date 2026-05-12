@@ -111,9 +111,11 @@ docker run -d --name sing-box \
 
 ## Configuration
 
+> Targeting **sing-box 1.12+**. Two breaking changes that affect every client below: (1) empty `direct` / `block` outbounds are deprecated — use route `action: "direct"` / `action: "reject"` instead; (2) a DNS server may not use `detour` to an empty direct outbound — drop the `detour` and let the route rules handle it.
+
 ### Server (Shadowsocks, Multi-User)
 
-Server-level `password` is the master key (used by relay/derivation in Shadowsocks 2022); each entry in `users` is an individual subscriber with its own password and tag, which can be matched in routing rules via `user`.
+Server-level `password` is the master key (used by relay/derivation in Shadowsocks 2022); each entry in `users` is an individual subscriber with its own password and tag, which can be matched in routing rules via `user`. No `outbounds` is needed — sing-box 1.12+ direct-routes by default.
 
 ```json
 {
@@ -140,14 +142,13 @@ Server-level `password` is the master key (used by relay/derivation in Shadowsoc
         "enabled": true
       }
     }
-  ],
-  "outbounds": [{ "type": "direct", "tag": "direct" }]
+  ]
 }
 ```
 
 ### Client (Shadowsocks)
 
-Each client uses its own user password (not the server master password).
+Each client uses its own user password (not the server master password). Route rules use `action: "direct"` — no empty `direct` / `block` outbounds.
 
 ```json
 {
@@ -176,9 +177,7 @@ Each client uses its own user password (not the server master password).
         "protocol": "smux",
         "max_streams": 32
       }
-    },
-    { "type": "direct", "tag": "direct" },
-    { "type": "block", "tag": "blocked" }
+    }
   ],
   "route": {
     "rule_set": [
@@ -198,8 +197,10 @@ Each client uses its own user password (not the server master password).
       }
     ],
     "rules": [
-      { "ip_is_private": true, "outbound": "direct" },
-      { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" }
+      { "action": "sniff" },
+      { "protocol": "dns", "action": "hijack-dns" },
+      { "ip_is_private": true, "action": "direct" },
+      { "rule_set": ["geosite-cn", "geoip-cn"], "action": "direct" }
     ],
     "final": "proxy",
     "auto_detect_interface": true,
@@ -263,20 +264,29 @@ VLESS with XTLS Vision flow over REALITY transport — no real certificate neede
         }
       }
     }
-  ],
-  "outbounds": [{ "type": "direct", "tag": "direct" }]
+  ]
 }
 ```
 
-### Client (VLESS + Vision + REALITY)
+### Client (VLESS + Vision + REALITY, url-test across multiple servers)
 
-uTLS fingerprint must match a real browser; the public key/short ID pair must match the server.
+This is the production-shape client: `proxy` is a manual `selector`, `auto` is a `urltest` that latency-tests each VLESS outbound on a loop. DNS uses the 1.12+ schema (`type` + `server`, no legacy `address: "tls://..."`); the `local` DNS has **no** `detour` (sing-box 1.12+ rejects detour to an empty direct outbound) — the route rules below send it direct via `action: "direct"`. The `experimental.cache_file` persists rule-sets and the urltest's last-pick across restarts.
 
 ```json
 {
   "log": {
     "level": "info",
     "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      { "tag": "google", "type": "tls",   "server": "8.8.8.8",   "detour": "proxy" },
+      { "tag": "local",  "type": "https", "server": "223.5.5.5" }
+    ],
+    "rules": [
+      { "rule_set": "geosite-cn", "server": "local" }
+    ],
+    "strategy": "ipv4_only"
   },
   "inbounds": [
     {
@@ -288,19 +298,32 @@ uTLS fingerprint must match a real browser; the public key/short ID pair must ma
   ],
   "outbounds": [
     {
-      "type": "vless",
+      "type": "selector",
       "tag": "proxy",
-      "server": "server.com",
+      "outbounds": ["auto", "vps-a", "vps-b"],
+      "default": "auto"
+    },
+    {
+      "type": "urltest",
+      "tag": "auto",
+      "outbounds": ["vps-a", "vps-b"],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "1m",
+      "tolerance": 50,
+      "idle_timeout": "30m",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "vless",
+      "tag": "vps-a",
+      "server": "vps-a.example.com",
       "server_port": 443,
       "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
       "flow": "xtls-rprx-vision",
       "tls": {
         "enabled": true,
         "server_name": "www.cloudflare.com",
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        },
+        "utls": { "enabled": true, "fingerprint": "chrome" },
         "reality": {
           "enabled": true,
           "public_key": "rR7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M",
@@ -308,8 +331,24 @@ uTLS fingerprint must match a real browser; the public key/short ID pair must ma
         }
       }
     },
-    { "type": "direct", "tag": "direct" },
-    { "type": "block",  "tag": "blocked" }
+    {
+      "type": "vless",
+      "tag": "vps-b",
+      "server": "vps-b.example.com",
+      "server_port": 443,
+      "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com",
+        "utls": { "enabled": true, "fingerprint": "chrome" },
+        "reality": {
+          "enabled": true,
+          "public_key": "9aB1c2D3e4F5g6H7i8J9k0L1m2N3o4P5q6R7s8T9uVw",
+          "short_id": "fedcba9876543210"
+        }
+      }
+    }
   ],
   "route": {
     "rule_set": [
@@ -329,12 +368,21 @@ uTLS fingerprint must match a real browser; the public key/short ID pair must ma
       }
     ],
     "rules": [
-      { "ip_is_private": true, "outbound": "direct" },
-      { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" }
+      { "action": "sniff" },
+      { "protocol": "dns", "action": "hijack-dns" },
+      { "ip_is_private": true, "action": "direct" },
+      { "ip_cidr": ["223.5.5.5/32", "223.6.6.6/32", "119.29.29.29/32"], "action": "direct" },
+      { "rule_set": ["geosite-cn", "geoip-cn"], "action": "direct" }
     ],
     "final": "proxy",
     "auto_detect_interface": true,
     "default_domain_resolver": "local"
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true,
+      "path": "/tmp/sing-box-cache.db"
+    }
   }
 }
 ```
