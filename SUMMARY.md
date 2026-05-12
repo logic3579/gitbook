@@ -177,7 +177,6 @@
 
 - [Overview](./Misc/README.md)
 - [Science Surf](./Misc/ScienceSurf/README.md)
-  - [V2Ray](./Misc/ScienceSurf/v2ray.md)
   - [sing-box](./Misc/ScienceSurf/sing-box.md)
   - [Xray](./Misc/ScienceSurf/xray.md)
   - [IPsec](./Misc/ScienceSurf/ipsec.md)

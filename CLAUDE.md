@@ -89,7 +89,7 @@ The documentation is organized into six top-level sections:
 
 ### Misc Section Structure
 
-- `ScienceSurf/` — VPN/tunnel technologies (V2Ray, sing-box, Xray, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
+- `ScienceSurf/` — VPN/tunnel technologies (sing-box, Xray, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
 - `interview.md` — Interview preparation
 
 ### External Repository References
@@ -104,7 +104,7 @@ Some documents point to external repositories instead of containing inline conte
 
 - **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
 - **Documents/files**: kebab-case (e.g., `big-data.md`, `container-runtime.md`, `naming-conventions.md`). Single-word names are just lowercase (e.g., `helm.md`, `docker.md`).
-- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md` follow their respective conventions. Non-documentation directories (code, config, assets like `iplib/`, `archery/`) are excluded from the PascalCase rule.
+- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md`, `AGENTS.md` follow their respective conventions. Non-documentation directories (code, config, assets like `iplib/`, `archery/`) are excluded from the PascalCase rule.
 
 ## Conventions for Adding Content
 
@@ -160,4 +160,4 @@ This vault uses the [obsidian-skills](https://github.com/kepano/obsidian-skills)
 
 ## Pre-commit Checklist
 
-Before every git commit and push, **always update `CLAUDE.md`** to reflect any structural changes made in the session (new files, moved directories, updated conventions, etc.). This ensures the project documentation stays in sync with the actual codebase.
+Before every git commit and push, **always update `CLAUDE.md` and `AGENTS.md`** to reflect any structural changes made in the session (new files, moved directories, updated conventions, etc.). The two files must stay in sync with each other and with the actual codebase.

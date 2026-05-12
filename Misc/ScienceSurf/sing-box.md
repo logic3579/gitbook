@@ -132,8 +132,8 @@ Server-level `password` is the master key (used by relay/derivation in Shadowsoc
       "method": "2022-blake3-aes-128-gcm",
       "password": "8JCsPssfgS8tiRwiMlhARg==",
       "users": [
-        { "name": "sekai",  "password": "L8tiRwi8JCsPssfgSMlhARg==" },
-        { "name": "ayaka",  "password": "QwErTyUiOpAsDfGhJkLzXcVb==" },
+        { "name": "sekai", "password": "L8tiRwi8JCsPssfgSMlhARg==" },
+        { "name": "ayaka", "password": "QwErTyUiOpAsDfGhJkLzXcVb==" },
         { "name": "miyuki", "password": "ZxCvBnMqWeRtYuIoPaSdFgHj==" }
       ],
       "multiplex": {
@@ -141,9 +141,7 @@ Server-level `password` is the master key (used by relay/derivation in Shadowsoc
       }
     }
   ],
-  "outbounds": [
-    { "type": "direct", "tag": "direct" }
-  ]
+  "outbounds": [{ "type": "direct", "tag": "direct" }]
 }
 ```
 
@@ -180,13 +178,163 @@ Each client uses its own user password (not the server master password).
       }
     },
     { "type": "direct", "tag": "direct" },
+    { "type": "block", "tag": "blocked" }
+  ],
+  "route": {
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geosite-cn",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
+        "download_detour": "proxy"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
+        "download_detour": "proxy"
+      }
+    ],
+    "rules": [
+      { "ip_is_private": true, "outbound": "direct" },
+      { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" }
+    ],
+    "final": "proxy",
+    "auto_detect_interface": true,
+    "default_domain_resolver": "local"
+  }
+}
+```
+
+### Generating Keys (VLESS + REALITY)
+
+Before writing the VLESS + REALITY config below, generate one UUID per user, an x25519 key pair (private key stays on the server, public key goes to the client), and one or more 0–8 byte hex `short_id`s shared between both sides.
+
+```bash
+# UUID — one per user
+sing-box generate uuid
+# 1a85919c-6ee8-431d-aff4-436a45dc8d2e
+
+# REALITY x25519 key pair — generate once, keep the private key on the server
+sing-box generate reality-keypair
+# PrivateKey: 0J7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M
+# PublicKey:  rR7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M
+
+# short_id — any hex string of 0–16 chars (i.e. 0–8 bytes); empty "" is also valid
+sing-box generate rand --hex 8
+# 0123456789abcdef
+```
+
+### Server (VLESS + Vision + REALITY, Multi-User)
+
+VLESS with XTLS Vision flow over REALITY transport — no real certificate needed; the server steals the TLS handshake of `handshake.server` (e.g. `www.cloudflare.com`) so the connection is indistinguishable from a real TLS session to that site.
+
+```json
+{
+  "log": {
+    "level": "info",
+    "output": "/var/log/sing-box.log",
+    "timestamp": true
+  },
+  "inbounds": [
+    {
+      "type": "vless",
+      "tag": "vless-in",
+      "listen": "::",
+      "listen_port": 443,
+      "users": [
+        { "name": "sekai",  "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e", "flow": "xtls-rprx-vision" },
+        { "name": "ayaka",  "uuid": "2b96a2ad-7ff9-542e-bff5-547b56ed9e3f", "flow": "xtls-rprx-vision" },
+        { "name": "miyuki", "uuid": "3ca7b3be-800a-653f-c006-658c67fea040", "flow": "xtls-rprx-vision" }
+      ],
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com",
+        "reality": {
+          "enabled": true,
+          "handshake": {
+            "server": "www.cloudflare.com",
+            "server_port": 443
+          },
+          "private_key": "0J7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M",
+          "short_id": ["0123456789abcdef"]
+        }
+      }
+    }
+  ],
+  "outbounds": [{ "type": "direct", "tag": "direct" }]
+}
+```
+
+### Client (VLESS + Vision + REALITY)
+
+uTLS fingerprint must match a real browser; the public key/short ID pair must match the server.
+
+```json
+{
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 1080
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "vless",
+      "tag": "proxy",
+      "server": "server.com",
+      "server_port": 443,
+      "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+      "flow": "xtls-rprx-vision",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "reality": {
+          "enabled": true,
+          "public_key": "rR7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M",
+          "short_id": "0123456789abcdef"
+        }
+      }
+    },
+    { "type": "direct", "tag": "direct" },
     { "type": "block",  "tag": "blocked" }
   ],
   "route": {
-    "rules": [
-      { "ip_is_private": true, "outbound": "direct" }
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geosite-cn",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
+        "download_detour": "proxy"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-cn.srs",
+        "download_detour": "proxy"
+      }
     ],
-    "final": "proxy"
+    "rules": [
+      { "ip_is_private": true, "outbound": "direct" },
+      { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" }
+    ],
+    "final": "proxy",
+    "auto_detect_interface": true,
+    "default_domain_resolver": "local"
   }
 }
 ```

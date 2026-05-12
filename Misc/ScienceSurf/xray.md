@@ -1,12 +1,12 @@
 ---
-description: XTLS-powered proxy platform forked from V2Ray with VLESS, REALITY, XTLS Vision, and more
+description: XTLS-powered proxy platform with VLESS, REALITY, XTLS Vision, and more
 tags:
   - misc/vpn
 ---
 
 # Xray
 
-Xray is the network proxy platform from Project X, forked from V2Ray and extended with the XTLS protocol family. It supports VMess, VLESS, Trojan, Shadowsocks (including Shadowsocks 2022), SOCKS, and HTTP inbounds/outbounds, plus XTLS Vision and REALITY for unobservable TLS, while remaining backward compatible with V2Ray's JSON configuration model.
+Xray is the network proxy platform from Project X, built around the XTLS protocol family. It supports VLESS, VMess, Trojan, Shadowsocks (including Shadowsocks 2022), SOCKS, and HTTP inbounds/outbounds, plus XTLS Vision and REALITY for unobservable TLS.
 
 ## System Optimization (Linux)
 
@@ -138,17 +138,24 @@ Server-level `password` is the master PSK (Shadowsocks 2022 base64 key — 16 by
         "method": "2022-blake3-aes-128-gcm",
         "password": "8JCsPssfgS8tiRwiMlhARg==",
         "clients": [
-          { "email": "sekai@example.com",  "password": "L8tiRwi8JCsPssfgSMlhARg==" },
-          { "email": "ayaka@example.com",  "password": "QwErTyUiOpAsDfGhJkLzXcVb==" },
-          { "email": "miyuki@example.com", "password": "ZxCvBnMqWeRtYuIoPaSdFgHj==" }
+          {
+            "email": "sekai@example.com",
+            "password": "L8tiRwi8JCsPssfgSMlhARg=="
+          },
+          {
+            "email": "ayaka@example.com",
+            "password": "QwErTyUiOpAsDfGhJkLzXcVb=="
+          },
+          {
+            "email": "miyuki@example.com",
+            "password": "ZxCvBnMqWeRtYuIoPaSdFgHj=="
+          }
         ],
         "network": "tcp,udp"
       }
     }
   ],
-  "outbounds": [
-    { "protocol": "freedom", "tag": "direct" }
-  ]
+  "outbounds": [{ "protocol": "freedom", "tag": "direct" }]
 }
 ```
 
@@ -191,7 +198,7 @@ For multi-user mode, the client password is `<server psk>:<user psk>` joined wit
         ]
       }
     },
-    { "protocol": "freedom",   "tag": "direct" },
+    { "protocol": "freedom", "tag": "direct" },
     { "protocol": "blackhole", "tag": "blocked" }
   ],
   "routing": {
@@ -201,7 +208,165 @@ For multi-user mode, the client password is `<server psk>:<user psk>` joined wit
         "type": "field",
         "ip": ["geoip:private"],
         "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": ["geosite:cn"],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": ["geoip:cn"],
+        "outboundTag": "direct"
       }
+    ]
+  }
+}
+```
+
+### Generating Keys (VLESS + REALITY)
+
+Before writing the VLESS + REALITY config below, generate one UUID per user, an x25519 key pair (private key stays on the server, public key goes to the client), and one or more 0–8 byte hex `shortId`s shared between both sides.
+
+```bash
+# UUID — one per user (deterministic form maps any string to a UUIDv5)
+xray uuid
+# 1a85919c-6ee8-431d-aff4-436a45dc8d2e
+xray uuid -i "sekai@example.com"
+# 8a7d20b3-9f3a-5a4e-bb2d-3c4f5a6b7c8d
+
+# REALITY x25519 key pair — generate once, keep the private key on the server
+xray x25519
+# Private key: 0J7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M
+# Public key:  rR7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M
+
+# shortId — any hex string of 0–16 chars (i.e. 0–8 bytes); empty "" is also valid
+openssl rand -hex 8
+# 0123456789abcdef
+```
+
+### Server (VLESS + Vision + REALITY, Multi-User)
+
+VLESS with `xtls-rprx-vision` flow over REALITY — no certificate required; the server forwards (and steals) the TLS handshake of `dest` (e.g. `www.cloudflare.com:443`) so to a probe the connection is indistinguishable from a real TLS session to that site.
+
+```json
+{
+  "log": {
+    "loglevel": "warning",
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log"
+  },
+  "inbounds": [
+    {
+      "tag": "vless-in",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "email": "sekai@example.com",
+            "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "email": "ayaka@example.com",
+            "id": "2b96a2ad-7ff9-542e-bff5-547b56ed9e3f",
+            "flow": "xtls-rprx-vision"
+          },
+          {
+            "email": "miyuki@example.com",
+            "id": "3ca7b3be-800a-653f-c006-658c67fea040",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.cloudflare.com:443",
+          "xver": 0,
+          "serverNames": ["www.cloudflare.com"],
+          "privateKey": "0J7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M",
+          "shortIds": ["0123456789abcdef"]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
+      }
+    }
+  ],
+  "outbounds": [{ "protocol": "freedom", "tag": "direct" }]
+}
+```
+
+### Client (VLESS + Vision + REALITY)
+
+`fingerprint` must impersonate a real browser; `publicKey` / `shortId` / `serverName` must match the server.
+
+```json
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "tag": "socks-in",
+      "port": 1080,
+      "listen": "127.0.0.1",
+      "protocol": "socks",
+      "settings": {
+        "udp": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "proxy",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "server.com",
+            "port": 443,
+            "users": [
+              {
+                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+                "flow": "xtls-rprx-vision",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "www.cloudflare.com",
+          "publicKey": "rR7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M",
+          "shortId": "0123456789abcdef",
+          "spiderX": "/"
+        }
+      }
+    },
+    { "protocol": "freedom", "tag": "direct" },
+    { "protocol": "blackhole", "tag": "blocked" }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      { "type": "field", "ip": ["geoip:private"], "outboundTag": "direct" },
+      { "type": "field", "domain": ["geosite:cn"], "outboundTag": "direct" },
+      { "type": "field", "ip": ["geoip:cn"], "outboundTag": "direct" }
     ]
   }
 }
