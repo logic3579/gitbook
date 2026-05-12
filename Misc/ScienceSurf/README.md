@@ -9,10 +9,7 @@ VPN/tunnel technologies, proxy services, and hosting.
 
 - [sing-box](sing-box.md) — Universal proxy platform supporting VMess, VLESS, Trojan, Hysteria2, TUIC, Shadowsocks, and more
 - [Xray](xray.md) — XTLS-powered proxy platform with VLESS, REALITY, XTLS Vision, and more
-- [IPsec](ipsec.md) — IPsec/L2TP VPN server via Docker
-- [OpenVPN](openvpn.md) — Open-source VPN solution
-- [SSH Tunnel](sshtunnel.md) — Layer 2/3 tunneling over SSH
 - [WireGuard](wireguard.md) — Modern, high-performance VPN tunnel
 - [Outline](outline.md) — Shadowsocks-based VPN by Jigsaw for secure internet access
-- [ShadowsocksR](ssr.md) — ShadowsocksR proxy with obfuscation and protocol plugins
+- [Legacy VPN](legacy-vpn.md) — Traditional solutions: IPsec/L2TP, OpenVPN, SSH Tunnel, ShadowsocksR
 - [Hosting](hosting.md) — VPS hosting and domain name services
