@@ -179,6 +179,7 @@
 - [Science Surf](./Misc/ScienceSurf/README.md)
   - [V2Ray](./Misc/ScienceSurf/v2ray.md)
   - [sing-box](./Misc/ScienceSurf/sing-box.md)
+  - [Xray](./Misc/ScienceSurf/xray.md)
   - [IPsec](./Misc/ScienceSurf/ipsec.md)
   - [OpenVPN](./Misc/ScienceSurf/openvpn.md)
   - [SSH Tunnel](./Misc/ScienceSurf/sshtunnel.md)

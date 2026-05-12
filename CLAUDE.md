@@ -89,7 +89,7 @@ The documentation is organized into six top-level sections:
 
 ### Misc Section Structure
 
-- `ScienceSurf/` — VPN/tunnel technologies (V2Ray, sing-box, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
+- `ScienceSurf/` — VPN/tunnel technologies (V2Ray, sing-box, Xray, IPsec, OpenVPN, SSH Tunnel, WireGuard, Outline, ShadowsocksR), hosting
 - `interview.md` — Interview preparation
 
 ### External Repository References

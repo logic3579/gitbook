@@ -8,6 +8,59 @@ tags:
 
 sing-box is the universal proxy platform from SagerNet. It unifies modern proxy protocols (VMess, VLESS, Trojan, Shadowsocks, Hysteria2, TUIC, ShadowTLS, AnyTLS, Naive) with TUN inbound, rule-based routing, rule-sets (geosite/geoip), and a clean JSON configuration model.
 
+## System Optimization (Linux)
+
+Before installing on a Linux server, enable BBR congestion control and raise network/file-descriptor limits — relevant for any proxy node, and especially important for QUIC-based protocols (Hysteria2 / TUIC) which rely on large UDP buffers. Requires kernel ≥ 4.9 for BBR.
+
+```bash
+# Persist sysctl tunables
+sudo tee /etc/sysctl.d/99-singbox.conf > /dev/null <<'EOF'
+# BBR + fair queueing
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+
+# TCP buffers (autotuned up to these maxes)
+net.core.rmem_max = 67108864
+net.core.wmem_max = 67108864
+net.ipv4.tcp_rmem = 4096 87380 67108864
+net.ipv4.tcp_wmem = 4096 65536 67108864
+
+# UDP buffers (required for Hysteria2 / TUIC throughput)
+net.core.rmem_default = 26214400
+net.core.wmem_default = 26214400
+
+# Connection table + backlog
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 32768
+net.ipv4.tcp_max_syn_backlog = 16384
+net.ipv4.tcp_fastopen = 3
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.ip_local_port_range = 1024 65535
+EOF
+
+sudo sysctl --system
+
+# File descriptor limit
+sudo tee /etc/security/limits.d/99-singbox.conf > /dev/null <<'EOF'
+* soft nofile 1048576
+* hard nofile 1048576
+root soft nofile 1048576
+root hard nofile 1048576
+EOF
+
+# For the systemd unit specifically (survives without re-login)
+sudo mkdir -p /etc/systemd/system/sing-box.service.d
+sudo tee /etc/systemd/system/sing-box.service.d/override.conf > /dev/null <<'EOF'
+[Service]
+LimitNOFILE=1048576
+EOF
+sudo systemctl daemon-reload
+
+# Verify
+sysctl net.ipv4.tcp_congestion_control net.core.default_qdisc
+# expected: bbr / fq
+```
+
 ## Install
 
 ```bash
@@ -58,7 +111,9 @@ docker run -d --name sing-box \
 
 ## Configuration
 
-### Server (VMess + WebSocket + TLS)
+### Server (Shadowsocks, Multi-User)
+
+Server-level `password` is the master key (used by relay/derivation in Shadowsocks 2022); each entry in `users` is an individual subscriber with its own password and tag, which can be matched in routing rules via `user`.
 
 ```json
 {
@@ -69,38 +124,32 @@ docker run -d --name sing-box \
   },
   "inbounds": [
     {
-      "type": "vmess",
-      "tag": "vmess-in",
+      "type": "shadowsocks",
+      "tag": "ss-in",
       "listen": "::",
-      "listen_port": 443,
+      "listen_port": 8080,
+      "network": "tcp",
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "8JCsPssfgS8tiRwiMlhARg==",
       "users": [
-        {
-          "name": "default",
-          "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e"
-        }
+        { "name": "sekai",  "password": "L8tiRwi8JCsPssfgSMlhARg==" },
+        { "name": "ayaka",  "password": "QwErTyUiOpAsDfGhJkLzXcVb==" },
+        { "name": "miyuki", "password": "ZxCvBnMqWeRtYuIoPaSdFgHj==" }
       ],
-      "transport": {
-        "type": "ws",
-        "path": "/ws"
-      },
-      "tls": {
-        "enabled": true,
-        "server_name": "server.com",
-        "certificate_path": "/opt/sing-box/server.crt",
-        "key_path": "/opt/sing-box/server.key"
+      "multiplex": {
+        "enabled": true
       }
     }
   ],
   "outbounds": [
-    {
-      "type": "direct",
-      "tag": "direct"
-    }
+    { "type": "direct", "tag": "direct" }
   ]
 }
 ```
 
-### Client (TUN + VMess + Rule Sets)
+### Client (Shadowsocks)
+
+Each client uses its own user password (not the server master password).
 
 ```json
 {
@@ -108,137 +157,37 @@ docker run -d --name sing-box \
     "level": "info",
     "timestamp": true
   },
-  "dns": {
-    "servers": [
-      { "tag": "google", "address": "tls://8.8.8.8", "detour": "proxy" },
-      { "tag": "local",  "address": "https://223.5.5.5/dns-query", "detour": "direct" }
-    ],
-    "rules": [
-      { "rule_set": "geosite-cn", "server": "local" },
-      { "clash_mode": "direct",   "server": "local" },
-      { "clash_mode": "global",   "server": "google" }
-    ],
-    "strategy": "ipv4_only"
-  },
   "inbounds": [
     {
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
       "listen_port": 1080
-    },
-    {
-      "type": "tun",
-      "tag": "tun-in",
-      "address": ["172.18.0.1/30", "fdfe:dcba:9876::1/126"],
-      "auto_route": true,
-      "strict_route": true,
-      "stack": "system",
-      "sniff": true
     }
   ],
   "outbounds": [
     {
-      "type": "vmess",
+      "type": "shadowsocks",
       "tag": "proxy",
       "server": "server.com",
-      "server_port": 443,
-      "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
-      "security": "auto",
-      "transport": {
-        "type": "ws",
-        "path": "/ws"
-      },
-      "tls": {
+      "server_port": 8080,
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "8JCsPssfgS8tiRwiMlhARg==:L8tiRwi8JCsPssfgSMlhARg==",
+      "multiplex": {
         "enabled": true,
-        "server_name": "server.com"
+        "protocol": "smux",
+        "max_streams": 32
       }
     },
     { "type": "direct", "tag": "direct" },
     { "type": "block",  "tag": "blocked" }
   ],
   "route": {
-    "rule_set": [
-      {
-        "type": "remote",
-        "tag": "geosite-cn",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-cn.srs",
-        "download_detour": "proxy"
-      },
-      {
-        "type": "remote",
-        "tag": "geoip-cn",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/cn.srs",
-        "download_detour": "proxy"
-      },
-      {
-        "type": "remote",
-        "tag": "geosite-ads",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
-        "download_detour": "proxy"
-      }
-    ],
     "rules": [
-      { "action": "sniff" },
-      { "protocol": "dns", "action": "hijack-dns" },
-      { "rule_set": "geosite-ads", "outbound": "blocked" },
-      { "rule_set": ["geosite-cn", "geoip-cn"], "outbound": "direct" },
       { "ip_is_private": true, "outbound": "direct" }
     ],
-    "auto_detect_interface": true,
     "final": "proxy"
   }
-}
-```
-
-### Server (Hysteria2)
-
-```json
-{
-  "inbounds": [
-    {
-      "type": "hysteria2",
-      "tag": "hy2-in",
-      "listen": "::",
-      "listen_port": 443,
-      "users": [
-        { "name": "default", "password": "your-password" }
-      ],
-      "masquerade": "https://www.bing.com",
-      "tls": {
-        "enabled": true,
-        "alpn": ["h3"],
-        "certificate_path": "/opt/sing-box/server.crt",
-        "key_path": "/opt/sing-box/server.key"
-      }
-    }
-  ],
-  "outbounds": [
-    { "type": "direct", "tag": "direct" }
-  ]
-}
-```
-
-### Server (Shadowsocks 2022)
-
-```json
-{
-  "inbounds": [
-    {
-      "type": "shadowsocks",
-      "tag": "ss-in",
-      "listen": "::",
-      "listen_port": 8388,
-      "method": "2022-blake3-aes-128-gcm",
-      "password": "8JCsPssfgS8tiRwiMlhARg=="
-    }
-  ],
-  "outbounds": [
-    { "type": "direct", "tag": "direct" }
-  ]
 }
 ```
 

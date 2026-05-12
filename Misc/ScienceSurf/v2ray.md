@@ -16,6 +16,32 @@ wget https://github.com/v2fly/v2ray-core/releases/download/v5.29.3/v2ray-windows
 
 # macos
 brew install v2ray
+
+# linux (Debian / CentOS / Fedora / openSUSE with systemd, via fhs-install-v2ray)
+## install / update binary and .dat data files
+bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
+
+## only update geoip.dat and geosite.dat
+bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-dat-release.sh)
+
+## remove v2ray
+bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh) --remove
+
+## manage service via systemd
+systemctl enable --now v2ray
+systemctl status v2ray
+```
+
+Files installed by the script follow FHS:
+
+```
+/usr/local/bin/v2ray
+/usr/local/share/v2ray/geoip.dat
+/usr/local/share/v2ray/geosite.dat
+/usr/local/etc/v2ray/config.json
+/var/log/v2ray/{access,error}.log
+/etc/systemd/system/v2ray.service
+/etc/systemd/system/v2ray@.service
 ```
 
 ## Start
@@ -266,3 +292,4 @@ docker run \
 > 1. [v2fly Guide](https://guide.v2fly.org/)
 > 2. [v2fly Rules](https://github.com/Loyalsoldier/v2ray-rules-dat)
 > 3. [Repository](https://github.com/v2fly/v2ray-core)
+> 4. [fhs-install-v2ray](https://github.com/v2fly/fhs-install-v2ray)
