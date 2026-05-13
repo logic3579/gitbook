@@ -161,7 +161,7 @@ Each client uses its own user password (not the server master password). Route r
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 1080
+      "listen_port": 10808
     }
   ],
   "outbounds": [
@@ -230,7 +230,7 @@ sing-box generate rand --hex 8
 
 ### Server (VLESS + Vision + REALITY, Multi-User)
 
-VLESS with XTLS Vision flow over REALITY transport — no real certificate needed; the server steals the TLS handshake of `handshake.server` (e.g. `www.cloudflare.com`) so the connection is indistinguishable from a real TLS session to that site.
+VLESS with XTLS Vision flow over REALITY transport — no real certificate needed; the server steals the TLS handshake of `handshake.server` (e.g. `www.microsoft.com`) so the connection is indistinguishable from a real TLS session to that site. Pick a target that supports TLS 1.3 + H2 + X25519, is geographically close to the server, and is unlikely to be blocked — `www.microsoft.com`, `www.bing.com`, `www.apple.com` are common choices; avoid Cloudflare-fronted sites and anything already censored in your server's region.
 
 ```json
 {
@@ -239,6 +239,10 @@ VLESS with XTLS Vision flow over REALITY transport — no real certificate neede
     "output": "/var/log/sing-box.log",
     "timestamp": true
   },
+  "dns": {
+    "servers": [{ "tag": "local", "type": "local" }],
+    "strategy": "prefer_ipv4"
+  },
   "inbounds": [
     {
       "type": "vless",
@@ -246,17 +250,29 @@ VLESS with XTLS Vision flow over REALITY transport — no real certificate neede
       "listen": "::",
       "listen_port": 443,
       "users": [
-        { "name": "sekai",  "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e", "flow": "xtls-rprx-vision" },
-        { "name": "ayaka",  "uuid": "2b96a2ad-7ff9-542e-bff5-547b56ed9e3f", "flow": "xtls-rprx-vision" },
-        { "name": "miyuki", "uuid": "3ca7b3be-800a-653f-c006-658c67fea040", "flow": "xtls-rprx-vision" }
+        {
+          "name": "sekai",
+          "uuid": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+          "flow": "xtls-rprx-vision"
+        },
+        {
+          "name": "ayaka",
+          "uuid": "2b96a2ad-7ff9-542e-bff5-547b56ed9e3f",
+          "flow": "xtls-rprx-vision"
+        },
+        {
+          "name": "miyuki",
+          "uuid": "3ca7b3be-800a-653f-c006-658c67fea040",
+          "flow": "xtls-rprx-vision"
+        }
       ],
       "tls": {
         "enabled": true,
-        "server_name": "www.cloudflare.com",
+        "server_name": "www.microsoft.com",
         "reality": {
           "enabled": true,
           "handshake": {
-            "server": "www.cloudflare.com",
+            "server": "www.microsoft.com",
             "server_port": 443
           },
           "private_key": "0J7lL5pXn1u3W2vQ8dRfYsTiB6cHmKqA9oEgVxZjN4M",
@@ -264,7 +280,14 @@ VLESS with XTLS Vision flow over REALITY transport — no real certificate neede
         }
       }
     }
-  ]
+  ],
+  "route": {
+    "rules": [
+      { "action": "sniff" },
+      { "ip_is_private": true, "action": "reject" }
+    ],
+    "default_domain_resolver": "local"
+  }
 }
 ```
 
@@ -280,12 +303,15 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
   },
   "dns": {
     "servers": [
-      { "tag": "google", "type": "tls",   "server": "8.8.8.8",   "detour": "proxy" },
-      { "tag": "local",  "type": "https", "server": "223.5.5.5" }
+      {
+        "tag": "google",
+        "type": "tls",
+        "server": "8.8.8.8",
+        "detour": "proxy"
+      },
+      { "tag": "local", "type": "udp", "server": "223.5.5.5" }
     ],
-    "rules": [
-      { "rule_set": "geosite-cn", "server": "local" }
-    ],
+    "rules": [{ "rule_set": "geosite-cn", "server": "local" }],
     "strategy": "ipv4_only"
   },
   "inbounds": [
@@ -293,7 +319,7 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 1080
+      "listen_port": 10808
     }
   ],
   "outbounds": [
@@ -322,7 +348,7 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
       "flow": "xtls-rprx-vision",
       "tls": {
         "enabled": true,
-        "server_name": "www.cloudflare.com",
+        "server_name": "www.microsoft.com",
         "utls": { "enabled": true, "fingerprint": "chrome" },
         "reality": {
           "enabled": true,
@@ -340,7 +366,7 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
       "flow": "xtls-rprx-vision",
       "tls": {
         "enabled": true,
-        "server_name": "www.cloudflare.com",
+        "server_name": "www.microsoft.com",
         "utls": { "enabled": true, "fingerprint": "chrome" },
         "reality": {
           "enabled": true,
@@ -352,6 +378,13 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
   ],
   "route": {
     "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geosite-category-ads-all",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ads-all.srs",
+        "download_detour": "proxy"
+      },
       {
         "type": "remote",
         "tag": "geosite-cn",
@@ -370,8 +403,15 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
     "rules": [
       { "action": "sniff" },
       { "protocol": "dns", "action": "hijack-dns" },
+      {
+        "rule_set": "geosite-category-ads-all",
+        "action": "reject"
+      },
       { "ip_is_private": true, "action": "direct" },
-      { "ip_cidr": ["223.5.5.5/32", "223.6.6.6/32", "119.29.29.29/32"], "action": "direct" },
+      {
+        "ip_cidr": ["223.5.5.5/32", "223.6.6.6/32", "119.29.29.29/32"],
+        "action": "direct"
+      },
       { "rule_set": ["geosite-cn", "geoip-cn"], "action": "direct" }
     ],
     "final": "proxy",
