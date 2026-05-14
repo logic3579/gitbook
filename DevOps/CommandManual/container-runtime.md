@@ -10,9 +10,10 @@ tags:
 
 ## docker / podman
 
-### busybox chroot
+### Chroot Jail Demo
 
 ```bash
+# export busybox rootfs and chroot into it
 mkdir rootfs
 docker export $(docker create busybox) | tar -C rootfs -xvf -
 chroot rootfs /bin/ls
@@ -20,8 +21,7 @@ chroot rootfs /bin/pwd
 chroot rootfs /bin/sh
 ls -ld /proc/$(pidof -s sh)/root
 
-
-# principle: use chroot jail
+# build a minimal jail from scratch (illustrates the chroot principle)
 mkdir jail/{bin,lib,lib64} -p
 ldd $(which bash)
 cp -r /lib/* jail/lib
@@ -33,49 +33,62 @@ chroot jail /bin/bash
 bin  lib  lib64
 ```
 
-### common command
+### Common Options
 
 ```bash
-# common parameters
---env-file strings      Read in a file of environment variables
--p, --publish strings   Publish a containers port
---restart               Restart policy to apply when a container exits
---rm                    Remove container (and pod if created) after exit
--v, --volume stringArray   Bind mount a volume into the container.
+--env-file strings         # read in a file of environment variables
+-p, --publish strings      # publish a container's port
+--restart                  # restart policy to apply when a container exits
+--rm                       # remove container (and pod if created) after exit
+-v, --volume stringArray   # bind mount a volume into the container
+```
 
+### Container Inspection
+
+```bash
 # overwrite the default ENTRYPOINT
 docker run --rm -it --entrypoint sh hashicorp/terraform:latest
 
-# get container ip
+# get container IP
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container
 
 # reverse-engineer Dockerfile content from image history
-docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true |sed "s#/bin/sh -c \#(nop) *##g" |tac
+docker history db6effbaf70b --format {{.CreatedBy}} --no-trunc=true \
+  | sed "s#/bin/sh -c \#(nop) *##g" | tac
+```
 
-# commit
+### Image Operations
+
+```bash
+# commit a running container into an image
 docker commit -m 'commit message' container_id repository/xxx/xxx:tag
 
 # build image
 docker build -t example/container:latest . -f Dockerfile
+```
 
-# buildx plugin
+### Build (buildx)
+
+```bash
+# multi-arch build
 docker buildx build --platform linux/amd64,linux/arm64 -t example/container:latest . -f Dockerfile
+```
 
-# compose plugin
+### Compose
+
+```bash
 docker compose up -d
 docker compose down
 docker compose restart
-
 ```
 
-### Quick test container
+### Quick Test Container
 
 ```bash
-# busybox
-# option1
+# busybox (option 1: detached + exec in)
 docker run --name busybox --rm -d docker.io/busybox sleep infinity
 docker exec -it busybox sh
-# option2
+# busybox (option 2: interactive)
 docker run --name busybox --rm -it busybox sh
 
 # kafka-client
@@ -103,24 +116,40 @@ docker run --name mysql \
 
 ## containerd
 
+### Daemon
+
 ```bash
-# default(systemd)
+# default (systemd)
 systemctl start containerd.service
-# run on k3s
-containerd -c /var/lib/rancher/k3s/agent/etc/containerd/config.toml -a /run/k3s/containerd/containerd.sock --state /run/k3s/containerd --root /var/lib/rancher/k3s/agent/containerd
 
+# run on k3s (custom socket / state / root paths)
+containerd \
+  -c /var/lib/rancher/k3s/agent/etc/containerd/config.toml \
+  -a /run/k3s/containerd/containerd.sock \
+  --state /run/k3s/containerd \
+  --root /var/lib/rancher/k3s/agent/containerd
+```
 
-# ctr (see pause container)
-## default
+### ctr
+
+`ctr` is containerd's native debugging tool — note the `k8s.io` namespace is what kubelet uses.
+
+```bash
+# default socket
 ctr --address /run/containerd/containerd.sock namespace ls
 ctr --address /run/containerd/containerd.sock -n k8s.io images ls
-## run on k3s
+
+# k3s socket
 ctr --address /run/k3s/containerd/containerd.sock namespace ls
 ctr --address /run/k3s/containerd/containerd.sock -n k8s.io images ls
 ctr --address /run/k3s/containerd/containerd.sock -n k8s.io container ls
+```
 
+### crictl
 
-# crictl
+`crictl` talks to any CRI-compatible runtime via the CRI socket.
+
+```bash
 endpoint="/run/k3s/containerd/containerd.sock" URL="unix:///run/k3s/containerd/containerd.sock"
 crictl ps
 crictl images
@@ -274,8 +303,6 @@ kubectl patch ingress gitlab-webservice-default --patch '{"spec":{"ingressClassN
 # replace
 kubectl replace -f FILENAME [options]
 
-# wait
-
 # kustomize(need kustomization.yaml)
 kubectl kustomize <kustomization_directory>
 kubectl kustomize ./ |kubectl apply -f -
@@ -322,7 +349,7 @@ kubectl config set-context NAME [--cluster=cluster_nickname] [--user=user_nickna
 kubectl version
 ```
 
-### Quick test container
+### Quick Test Container
 
 ```bash
 # busybox
@@ -347,8 +374,9 @@ kubectl run netshoot --rm -it --image=nicolaka/netshoot -- bash
 
 ## helm
 
+### Common Options
+
 ```bash
-# parameter
 -n namespace
 --create-namespace
 --set hostname=xxx
@@ -356,73 +384,90 @@ kubectl run netshoot --rm -it --image=nicolaka/netshoot -- bash
 # completion
 source <(helm completion bash)
 
-# create
-helm create mychart
-
-# dependency
-helm dependency update
+# version
+helm version
 
 # env
 helm env
+```
 
-# get
-helm get (all|manifest) chart_name --revision int
+### Chart Authoring
 
-# history
-helm -n cattle-system history rancher
+```bash
+# scaffold a new chart
+helm create mychart
 
-# install,upgrade,uninstall
+# resolve chart dependencies declared in Chart.yaml
+helm dependency update
+
+# package a chart directory into a .tgz
+helm package /opt/helm-charts/*
+
+# lint chart structure and values
+helm lint /opt/helm-charts/*
+
+# render templates locally without installing
+helm template [NAME] [CHART] [flags]
+```
+
+### Repo & Registry
+
+```bash
+# classic repos
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+# OCI registry
+helm registry [command]
+
+# pull / push
+helm pull --version=x.x.x rancher-stable/rancher --untar
+helm push [chart] [remote] [flags]
+```
+
+### Install / Upgrade / Rollback
+
+```bash
 helm install [RELEASE_NAME] ingress-nginx/ingress-nginx
 helm upgrade [RELEASE_NAME] [CHART] --install
 helm uninstall [RELEASE_NAME]
 
-# lint
-helm lint /opt/helm-charts/*
+# rollback to a previous revision
+helm rollback [RELEASE_NAME] [REVISION]
+```
 
-# list
+### Inspect (get / list / status / show)
+
+```bash
+# get rendered manifest or all resources of a release
+helm get (all|manifest) chart_name --revision int
+
+# release history
+helm -n cattle-system history rancher
+
+# list releases across namespaces
 helm list -A
 
-# package
-helm package /opt/helm-charts/*
+# release status
+helm status RELEASE_NAME [flags]
 
-# pull,fetch and push
-helm pull --version=x.x.x rancher-stable/rancher --untar
-helm push [chart] [remote] [flags]
-
-# registry
-helm registry [command]
-
-# repo
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm update
-
-# rollback
-
-# search
-helm search hub ingress-nginx
-helm search repo ingress-nginx
---versions           # search repo all charts version
---max-col-width 150  # search display width
-
-# show
-helm show values [CHART] [flags]
-## example
-crane ls oci://registry-1.docker.io/cloudpirates/zookeeper
+# show chart metadata / default values
 helm show chart oci://registry-1.docker.io/cloudpirates/zookeeper
 helm show values oci://registry-1.docker.io/cloudpirates/zookeeper
 
-# status
-helm status RELEASE_NAME [flags]
+# (extra) list image tags in an OCI repo using crane
+crane ls oci://registry-1.docker.io/cloudpirates/zookeeper
+```
 
-# template
-helm template [NAME] [CHART] [flags]
+### Search
 
-# test
+```bash
+helm search hub ingress-nginx
+helm search repo ingress-nginx
 
-# verify
-
-# version
-helm version
+# flags
+--versions           # search repo all charts version
+--max-col-width 150  # search display width
 ```
 
 > Reference:

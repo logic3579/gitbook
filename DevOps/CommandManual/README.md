@@ -20,7 +20,6 @@ CLI references and command snippets for common DevOps tools.
 - [Package](package.md) — apt, dnf, rpm, and pacman package managers
 - [Streaming & Messaging](streaming-messaging.md) — Kafka and RocketMQ CLI
 - [Systemd](systemd.md) — Systemd service management and system control
-- [System Tools](system-tools.md) — System performance analysis and debugging
 - [Text Swordsman](text-swordsman.md) — Text processing with awk, grep, and sed
 - [Version Control](version-control.md) — Git, GitHub CLI, and Subversion
 - [Video Tools](video-tools.md) — FFmpeg video and audio processing

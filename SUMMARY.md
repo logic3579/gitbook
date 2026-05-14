@@ -121,7 +121,6 @@
   - [OpenSSL](./DevOps/CommandManual/openssl.md)
   - [Package](./DevOps/CommandManual/package.md)
   - [Streaming Messaging](./DevOps/CommandManual/streaming-messaging.md)
-  - [System Tools](./DevOps/CommandManual/system-tools.md)
   - [Systemd](./DevOps/CommandManual/systemd.md)
   - [Text Swordsman](./DevOps/CommandManual/text-swordsman.md)
   - [Version Control](./DevOps/CommandManual/version-control.md)
