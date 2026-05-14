@@ -305,7 +305,7 @@ VLESS with `xtls-rprx-vision` flow over REALITY — no certificate required; the
 
 ### Client (VLESS + Vision + REALITY, leastPing across multiple servers)
 
-Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observatory` that probes them on a loop and feeds latency into the `leastPing` balancer, so the catch-all routing rule's `balancerTag: "auto"` always picks the fastest server. DNS is split — CN domains resolve via `223.5.5.5` (and `expectIPs: ["geoip:cn"]` filters poisoned answers), everything else falls back to DoH at `8.8.8.8/dns-query`. Inbound port-53 traffic is hijacked to the built-in `dns` outbound; ads are dropped via `geosite:category-ads-all`. `fingerprint` must impersonate a real browser; `publicKey` / `shortId` / `serverName` must match each server.
+Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observatory` that probes them on a loop and feeds latency into the `leastPing` balancer, so the catch-all routing rule's `balancerTag: "auto"` always picks the fastest server. DNS follows the canonical four-tier chain — non-CN domains resolve via Cloudflare DoH at `1.1.1.1/dns-query`; CN domains hit `223.5.5.5` with `expectIPs: ["geoip:cn"]` to drop poisoned answers; on drop, `114.114.114.114` serves as backup (no `expectIPs`, so a single bad upstream never cascades to total failure); `localhost` (system DNS) is the final safety net. Inbound port-53 traffic is hijacked to the built-in `dns` outbound; ads are dropped via `geosite:category-ads-all`. `fingerprint` must impersonate a real browser; `publicKey` / `shortId` / `serverName` must match each server.
 
 ```json
 {
@@ -314,13 +314,22 @@ Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observa
   },
   "dns": {
     "servers": [
-      "https://8.8.8.8/dns-query",
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "domains": ["geosite:geolocation-!cn"]
+      },
       {
         "address": "223.5.5.5",
         "port": 53,
         "domains": ["geosite:cn"],
         "expectIPs": ["geoip:cn"]
-      }
+      },
+      {
+        "address": "114.114.114.114",
+        "port": 53,
+        "domains": ["geosite:cn"]
+      },
+      "localhost"
     ],
     "queryStrategy": "UseIPv4"
   },

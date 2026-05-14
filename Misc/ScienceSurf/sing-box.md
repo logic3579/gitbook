@@ -293,7 +293,7 @@ VLESS with XTLS Vision flow over REALITY transport — no real certificate neede
 
 ### Client (VLESS + Vision + REALITY, url-test across multiple servers)
 
-This is the production-shape client: `proxy` is a manual `selector`, `auto` is a `urltest` that latency-tests each VLESS outbound on a loop. DNS uses the 1.12+ schema (`type` + `server`, no legacy `address: "tls://..."`); the `local` DNS has **no** `detour` (sing-box 1.12+ rejects detour to an empty direct outbound) — the route rules below send it direct via `action: "direct"`. The `experimental.cache_file` persists rule-sets and the urltest's last-pick across restarts.
+Production-shape client: `proxy` is a manual `selector`, `auto` is a `urltest` that latency-tests each VLESS outbound on a loop. DNS uses the 1.12+ schema (`type` + `server`, no legacy `address: "tls://..."`) and approximates the Xray three-tier pattern — `cloudflare` (DoT via `detour: "proxy"`) handles non-CN domains as `final`, `alidns` (UDP) handles CN domains matched by `geosite-cn`, `system` (`type: "local"`, reads `/etc/resolv.conf`) is the last-resort fallback. sing-box has no `expectIPs` equivalent, so anti-pollution relies on routing the foreign DNS query through the encrypted tunnel rather than filtering responses by IP CIDR. The `alidns` DNS has **no** `detour` (sing-box 1.12+ rejects detour to an empty direct outbound) — the route rules below send it direct via `action: "direct"`. The `experimental.cache_file` persists rule-sets and the urltest's last-pick across restarts.
 
 ```json
 {
@@ -304,14 +304,16 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
   "dns": {
     "servers": [
       {
-        "tag": "google",
+        "tag": "cloudflare",
         "type": "tls",
-        "server": "8.8.8.8",
+        "server": "1.1.1.1",
         "detour": "proxy"
       },
-      { "tag": "local", "type": "udp", "server": "223.5.5.5" }
+      { "tag": "alidns", "type": "udp", "server": "223.5.5.5" },
+      { "tag": "system", "type": "local" }
     ],
-    "rules": [{ "rule_set": "geosite-cn", "server": "local" }],
+    "rules": [{ "rule_set": "geosite-cn", "server": "alidns" }],
+    "final": "cloudflare",
     "strategy": "ipv4_only"
   },
   "inbounds": [
@@ -416,7 +418,7 @@ This is the production-shape client: `proxy` is a manual `selector`, `auto` is a
     ],
     "final": "proxy",
     "auto_detect_interface": true,
-    "default_domain_resolver": "local"
+    "default_domain_resolver": "alidns"
   },
   "experimental": {
     "cache_file": {
