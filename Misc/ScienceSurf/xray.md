@@ -171,7 +171,7 @@ For multi-user mode, the client password is `<server psk>:<user psk>` joined wit
   "inbounds": [
     {
       "tag": "socks-in",
-      "port": 1080,
+      "port": 10808,
       "listen": "127.0.0.1",
       "protocol": "socks",
       "settings": {
@@ -199,7 +199,7 @@ For multi-user mode, the client password is `<server psk>:<user psk>` joined wit
       }
     },
     { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "blocked" }
+    { "protocol": "blackhole", "tag": "block" }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
@@ -303,19 +303,31 @@ VLESS with `xtls-rprx-vision` flow over REALITY — no certificate required; the
 }
 ```
 
-### Client (VLESS + Vision + REALITY)
+### Client (VLESS + Vision + REALITY, leastPing across multiple servers)
 
-`fingerprint` must impersonate a real browser; `publicKey` / `shortId` / `serverName` must match the server.
+Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observatory` that probes them on a loop and feeds latency into the `leastPing` balancer, so the catch-all routing rule's `balancerTag: "auto"` always picks the fastest server. DNS is split — CN domains resolve via `223.5.5.5` (and `expectIPs: ["geoip:cn"]` filters poisoned answers), everything else falls back to DoH at `8.8.8.8/dns-query`. Inbound port-53 traffic is hijacked to the built-in `dns` outbound; ads are dropped via `geosite:category-ads-all`. `fingerprint` must impersonate a real browser; `publicKey` / `shortId` / `serverName` must match each server.
 
 ```json
 {
   "log": {
     "loglevel": "warning"
   },
+  "dns": {
+    "servers": [
+      "https://8.8.8.8/dns-query",
+      {
+        "address": "223.5.5.5",
+        "port": 53,
+        "domains": ["geosite:cn"],
+        "expectIPs": ["geoip:cn"]
+      }
+    ],
+    "queryStrategy": "UseIPv4"
+  },
   "inbounds": [
     {
       "tag": "socks-in",
-      "port": 1080,
+      "port": 10808,
       "listen": "127.0.0.1",
       "protocol": "socks",
       "settings": {
@@ -323,18 +335,18 @@ VLESS with `xtls-rprx-vision` flow over REALITY — no certificate required; the
       },
       "sniffing": {
         "enabled": true,
-        "destOverride": ["http", "tls"]
+        "destOverride": ["http", "tls", "quic"]
       }
     }
   ],
   "outbounds": [
     {
-      "tag": "proxy",
+      "tag": "vps-a",
       "protocol": "vless",
       "settings": {
         "vnext": [
           {
-            "address": "server.com",
+            "address": "vps-a.example.com",
             "port": 443,
             "users": [
               {
@@ -358,16 +370,70 @@ VLESS with `xtls-rprx-vision` flow over REALITY — no certificate required; the
         }
       }
     },
-    { "protocol": "freedom", "tag": "direct" },
-    { "protocol": "blackhole", "tag": "blocked" }
+    {
+      "tag": "vps-b",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "vps-b.example.com",
+            "port": 443,
+            "users": [
+              {
+                "id": "1a85919c-6ee8-431d-aff4-436a45dc8d2e",
+                "flow": "xtls-rprx-vision",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "chrome",
+          "serverName": "www.cloudflare.com",
+          "publicKey": "9aB1c2D3e4F5g6H7i8J9k0L1m2N3o4P5q6R7s8T9uVw",
+          "shortId": "fedcba9876543210",
+          "spiderX": "/"
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": { "domainStrategy": "UseIPv4" }
+    },
+    { "protocol": "blackhole", "tag": "block" },
+    { "protocol": "dns", "tag": "dns-out" }
   ],
   "routing": {
     "domainStrategy": "IPIfNonMatch",
+    "balancers": [
+      {
+        "tag": "auto",
+        "selector": ["vps-"],
+        "strategy": { "type": "leastPing" }
+      }
+    ],
     "rules": [
+      { "type": "field", "port": 53, "outboundTag": "dns-out" },
+      {
+        "type": "field",
+        "domain": ["geosite:category-ads-all"],
+        "outboundTag": "block"
+      },
       { "type": "field", "ip": ["geoip:private"], "outboundTag": "direct" },
       { "type": "field", "domain": ["geosite:cn"], "outboundTag": "direct" },
-      { "type": "field", "ip": ["geoip:cn"], "outboundTag": "direct" }
+      { "type": "field", "ip": ["geoip:cn"], "outboundTag": "direct" },
+      { "type": "field", "network": "tcp,udp", "balancerTag": "auto" }
     ]
+  },
+  "observatory": {
+    "subjectSelector": ["vps-"],
+    "probeUrl": "https://www.gstatic.com/generate_204",
+    "probeInterval": "1m"
   }
 }
 ```
