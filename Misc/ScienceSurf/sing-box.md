@@ -161,7 +161,7 @@ Each client uses its own user password (not the server master password). Route r
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 10808
+      "listen_port": 10800
     }
   ],
   "outbounds": [
@@ -321,7 +321,7 @@ Production-shape client: `proxy` is a manual `selector`, `auto` is a `urltest` t
       "type": "mixed",
       "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 10808
+      "listen_port": 10800
     }
   ],
   "outbounds": [

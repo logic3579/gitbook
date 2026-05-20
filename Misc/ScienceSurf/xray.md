@@ -171,8 +171,8 @@ For multi-user mode, the client password is `<server psk>:<user psk>` joined wit
   "inbounds": [
     {
       "tag": "socks-in",
-      "port": 10808,
       "listen": "127.0.0.1",
+      "port": 10800,
       "protocol": "socks",
       "settings": {
         "udp": true
@@ -180,6 +180,17 @@ For multi-user mode, the client password is `<server psk>:<user psk>` joined wit
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls"]
+      }
+    },
+    {
+      "tag": "http-in",
+      "listen": "127.0.0.1",
+      "port": 10801,
+      "protocol": "http",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"],
+        "routeOnly": false
       }
     }
   ],
@@ -336,8 +347,8 @@ Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observa
   "inbounds": [
     {
       "tag": "socks-in",
-      "port": 10808,
       "listen": "127.0.0.1",
+      "port": 10800,
       "protocol": "socks",
       "settings": {
         "udp": true
@@ -345,6 +356,17 @@ Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observa
       "sniffing": {
         "enabled": true,
         "destOverride": ["http", "tls", "quic"]
+      }
+    },
+    {
+      "tag": "http-in",
+      "listen": "127.0.0.1",
+      "port": 10801,
+      "protocol": "http",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"],
+        "routeOnly": false
       }
     }
   ],
@@ -433,7 +455,16 @@ Production-shape client: two VLESS outbounds (`vps-a`, `vps-b`) plus an `observa
         "domain": ["geosite:category-ads-all"],
         "outboundTag": "block"
       },
-      { "type": "field", "ip": ["geoip:private"], "outboundTag": "direct" },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private",
+          "223.5.5.5/32",
+          "223.6.6.6/32",
+          "119.29.29.29/32"
+        ],
+        "outboundTag": "direct"
+      },
       { "type": "field", "domain": ["geosite:cn"], "outboundTag": "direct" },
       { "type": "field", "ip": ["geoip:cn"], "outboundTag": "direct" },
       { "type": "field", "network": "tcp,udp", "balancerTag": "auto" }
