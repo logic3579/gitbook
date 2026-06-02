@@ -10,6 +10,7 @@
     - [Helm](./CNCF/AppDefinitionDevelopment/ApplicationDefinitionImageBuild/helm.md)
   - [Continuous Integration & Delivery](./CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/README.md)
     - [Argo](./CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/argo.md)
+    - [Bytebase](./CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/bytebase.md)
     - [GitLab](./CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/gitlab.md)
     - [Jenkins](./CNCF/AppDefinitionDevelopment/ContinuousIntegrationDelivery/jenkins.md)
   - [Database](./CNCF/AppDefinitionDevelopment/Database/README.md)

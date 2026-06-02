@@ -7,5 +7,6 @@ description: Continuous Integration & Delivery
 CI/CD platforms and tools for automating build, test, and deployment pipelines.
 
 - [Argo](argo.md) — Kubernetes-native workflow engine and GitOps continuous delivery toolkit
+- [Bytebase](bytebase.md) — Database DevOps and CI/CD platform with schema change review and GitOps workflow
 - [GitLab](gitlab.md) — DevOps platform with built-in CI/CD, source control, and container registry
 - [Jenkins](jenkins.md) — Extensible open-source automation server for building CI/CD pipelines

@@ -51,7 +51,7 @@ The documentation is organized into six top-level sections:
 ### CNCF Section Structure
 
 `CNCF/` mirrors the CNCF landscape taxonomy with subcategories:
-- `AppDefinitionDevelopment/` — Helm, CI/CD (Argo, GitLab, Jenkins), Databases (MySQL, PostgreSQL, MongoDB, Redis, TiKV), Messaging (Kafka, RabbitMQ, RocketMQ, EMQX)
+- `AppDefinitionDevelopment/` — Helm, CI/CD (Argo, Bytebase, GitLab, Jenkins), Databases (MySQL, PostgreSQL, MongoDB, Redis, TiKV), Messaging (Kafka, RabbitMQ, RocketMQ, EMQX)
 - `CNAI/` — Data Architecture (ClickHouse, Flink), Data Science (PyTorch, TensorFlow)
 - `ObservabilityAnalysis/` — Chaos Engineering (Chaos Mesh), Continuous Optimization (OpenCost, Kubecost), Observability (Prometheus, VictoriaMetrics, Grafana, Elasticsearch, Fluentd, Logstash, Loki, Jaeger, OpenTelemetry)
 - `OrchestrationManagement/` — API Gateway (Higress, Tyk), Coordination & Service Discovery (CoreDNS, Etcd, Nacos, ZooKeeper), RPC (gRPC), Scheduling & Orchestration (Kubernetes: Network, RBAC, Kube Eventer), Service Mesh (Istio), Service Proxy (Envoy, HAProxy, Nginx)
