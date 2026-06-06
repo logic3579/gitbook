@@ -7,7 +7,7 @@ description: Platform
 
 Cloud provider guides and Kubernetes distribution installers.
 
-- [Alibaba Cloud](AlibabaCloud/README.md) — RAM, VPC, and Alibaba Cloud services
-- [AWS](AWS/README.md) — CloudFront, EC2, EKS, and AWS services
-- [Google Cloud](GoogleCloud/README.md) — gcloud, GCE, GKE, and Google Cloud services
+- [Aliyun](Aliyun/README.md) — ECS, Network, OSS, RAM
+- [AWS](AWS/README.md) — CloudFront, EC2, EKS, Network, S3
+- [GCP](GCP/README.md) — Artifact Registry, GCE, GCS, GKE, IAM, Network
 - [Distribution Installer](distribution-installer.md) — Kubernetes distribution installation guides

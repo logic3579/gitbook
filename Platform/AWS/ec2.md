@@ -6,9 +6,7 @@ tags:
 
 # EC2
 
-## Introduction
-
-Amazon Elastic Compute Cloud (EC2) is a core AWS service that provides resizable virtual servers (instances) in the cloud. EC2 offers a wide range of instance types optimized for different workloads, along with flexible pricing models, storage options, and networking configurations. It forms the foundation of most AWS infrastructure deployments.
+Amazon Elastic Compute Cloud (EC2) provides resizable virtual servers with a wide range of instance types, pricing models, storage, and networking configurations.
 
 ## Instance Types
 
@@ -34,21 +32,22 @@ Instance naming convention: `<family><generation><attributes>.<size>` (e.g., `m6
 - **Spot Instances**: Up to 90% discount for interruptible workloads
 - **Dedicated Hosts**: Physical server dedicated to your account for compliance requirements
 
-## Key Concepts
+## CLI
 
-### AMI (Amazon Machine Image)
-
-AMIs are templates for launching instances:
+### AMI
 
 ```bash
-# List available Amazon Linux AMIs
+# List the latest Amazon Linux 2023 AMI
 aws ec2 describe-images \
   --owners amazon \
   --filters "Name=name,Values=al2023-ami-*-x86_64" \
   --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
   --output text
+```
 
-# Launch an instance
+### Run Instances
+
+```bash
 aws ec2 run-instances \
   --image-id ami-0abcdef1234567890 \
   --instance-type t3.medium \
@@ -58,26 +57,7 @@ aws ec2 run-instances \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=my-server}]'
 ```
 
-### Security Groups
-
-```bash
-# Create a security group
-aws ec2 create-security-group \
-  --group-name my-sg \
-  --description "My security group" \
-  --vpc-id vpc-0123456789abcdef0
-
-# Allow SSH and HTTP
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-0123456789abcdef0 \
-  --protocol tcp --port 22 --cidr 10.0.0.0/8
-
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-0123456789abcdef0 \
-  --protocol tcp --port 80 --cidr 0.0.0.0/0
-```
-
-### User Data (Instance Initialization)
+### User Data
 
 ```bash
 aws ec2 run-instances \
@@ -109,9 +89,24 @@ aws ec2 describe-instances \
 aws ec2 stop-instances --instance-ids i-0123456789abcdef0
 aws ec2 start-instances --instance-ids i-0123456789abcdef0
 aws ec2 terminate-instances --instance-ids i-0123456789abcdef0
+
+# Reboot
+aws ec2 reboot-instances --instance-ids i-0123456789abcdef0
+
+# Get console output
+aws ec2 get-console-output --instance-id i-0123456789abcdef0 --output text
 ```
 
-## EBS Volumes
+### Key Pairs
+
+```bash
+aws ec2 create-key-pair --key-name my-keypair --query 'KeyMaterial' --output text > my-keypair.pem
+chmod 400 my-keypair.pem
+aws ec2 describe-key-pairs
+aws ec2 delete-key-pair --key-name my-keypair
+```
+
+### EBS Volumes
 
 ```bash
 # Create a volume
@@ -126,6 +121,17 @@ aws ec2 attach-volume \
   --volume-id vol-0123456789abcdef0 \
   --instance-id i-0123456789abcdef0 \
   --device /dev/xvdf
+
+# Detach
+aws ec2 detach-volume --volume-id vol-0123456789abcdef0
+
+# Resize (after expanding console)
+aws ec2 modify-volume --volume-id vol-0123456789abcdef0 --size 200
+
+# Snapshots
+aws ec2 create-snapshot --volume-id vol-0123456789abcdef0 --description "weekly backup"
+aws ec2 describe-snapshots --owner-ids self
+aws ec2 delete-snapshot --snapshot-id snap-0123456789abcdef0
 ```
 
 > Reference:

@@ -108,9 +108,9 @@ Cloud-managed control planes with provider integrations:
 | Provider | Service | CLI |
 |----------|---------|-----|
 | AWS | EKS | `eksctl create cluster` |
-| Google Cloud | GKE | `gcloud container clusters create` |
+| GCP | GKE | `gcloud container clusters create` |
 | Azure | AKS | `az aks create` |
-| Alibaba Cloud | ACK | `aliyun cs CreateCluster` |
+| Aliyun | ACK | `aliyun cs CreateCluster` |
 
 ### Lightweight / Local
 

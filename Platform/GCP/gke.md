@@ -5,11 +5,7 @@ tags:
   - kubernetes
 ---
 
-# Google Kubernets Engine
-
-## Introduction
-
-...
+# Google Kubernetes Engine
 
 ## Install
 
@@ -129,6 +125,76 @@ Grafana
 
 # Manager
 rancher
+```
+
+## CLI
+
+### Clusters
+
+```bash
+gcloud container clusters create CLUSTER_NAME \
+    --zone=asia-southeast1-a \
+    --num-nodes=3 \
+    --machine-type=e2-standard-4
+gcloud container clusters list
+gcloud container clusters describe CLUSTER_NAME --zone=ZONE
+gcloud container clusters get-credentials CLUSTER_NAME --zone=ZONE
+gcloud container clusters resize CLUSTER_NAME --num-nodes=5 --zone=ZONE
+gcloud container clusters update CLUSTER_NAME --zone=ZONE \
+    --enable-autoscaling --min-nodes=1 --max-nodes=10
+gcloud container clusters delete CLUSTER_NAME --zone=ZONE
+```
+
+### Node Pools
+
+```bash
+gcloud container node-pools list --cluster=CLUSTER_NAME --zone=ZONE
+gcloud container node-pools describe POOL_NAME --cluster=CLUSTER_NAME --zone=ZONE
+gcloud container node-pools create POOL_NAME \
+    --cluster=CLUSTER_NAME \
+    --zone=ZONE \
+    --machine-type=e2-standard-4 \
+    --num-nodes=3 \
+    --enable-autoscaling --min-nodes=1 --max-nodes=10
+gcloud container node-pools update POOL_NAME \
+    --cluster=CLUSTER_NAME --zone=ZONE \
+    --enable-autoscaling --min-nodes=2 --max-nodes=20
+gcloud container node-pools delete POOL_NAME --cluster=CLUSTER_NAME --zone=ZONE
+```
+
+### Workload Identity
+
+```bash
+# Check cluster workload pool
+gcloud container clusters describe CLUSTER_NAME \
+    --project=PROJECT_ID \
+    --region=asia-southeast1 \
+    --format="value(workloadIdentityConfig.workloadPool)"
+# Enable Workload Identity on the cluster
+gcloud container clusters update CLUSTER_NAME \
+    --project=PROJECT_ID \
+    --region=asia-southeast1 \
+    --workload-pool=PROJECT_ID.svc.id.goog
+
+# Inspect node pool workload metadata mode
+gcloud container node-pools list \
+    --project=PROJECT_ID \
+    --region=asia-southeast1 \
+    --cluster=CLUSTER_NAME \
+    --format="table(name, config.workloadMetadataConfig)"
+# Enable GKE metadata server on the node pool
+gcloud container node-pools update POOL_NAME \
+    --project=PROJECT_ID \
+    --zone=asia-southeast1 \
+    --cluster=CLUSTER_NAME \
+    --workload-metadata=GKE_METADATA
+```
+
+### Container Images
+
+```bash
+# Legacy gcr.io (prefer Artifact Registry)
+gcloud container images list-tags gcr.io/PROJECT_ID/IMAGE
 ```
 
 > Reference:

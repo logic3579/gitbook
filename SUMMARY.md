@@ -146,18 +146,26 @@
 ## Platform
 
 - [Overview](./Platform/README.md)
-- [Alibaba Cloud](./Platform/AlibabaCloud/README.md)
-  - [RAM](./Platform/AlibabaCloud/ram.md)
-  - [VPC](./Platform/AlibabaCloud/vpc.md)
+- [Aliyun](./Platform/Aliyun/README.md)
+  - [ACK](./Platform/Aliyun/ack.md)
+  - [ECS](./Platform/Aliyun/ecs.md)
+  - [Network](./Platform/Aliyun/network.md)
+  - [OSS](./Platform/Aliyun/oss.md)
+  - [RAM](./Platform/Aliyun/ram.md)
 - [AWS](./Platform/AWS/README.md)
   - [CloudFront](./Platform/AWS/cloudfront.md)
   - [EC2](./Platform/AWS/ec2.md)
   - [EKS](./Platform/AWS/eks.md)
+  - [Network](./Platform/AWS/network.md)
+  - [S3](./Platform/AWS/s3.md)
 - [Distribution Installer](./Platform/distribution-installer.md)
-- [Google Cloud](./Platform/GoogleCloud/README.md)
-  - [gcloud](./Platform/GoogleCloud/gcloud.md)
-  - [GCE](./Platform/GoogleCloud/gce.md)
-  - [GKE](./Platform/GoogleCloud/gke.md)
+- [GCP](./Platform/GCP/README.md)
+  - [Artifact Registry](./Platform/GCP/artifact-registry.md)
+  - [GCE](./Platform/GCP/gce.md)
+  - [GCS](./Platform/GCP/gcs.md)
+  - [GKE](./Platform/GCP/gke.md)
+  - [IAM](./Platform/GCP/iam.md)
+  - [Network](./Platform/GCP/network.md)
 
 ## Standards
 

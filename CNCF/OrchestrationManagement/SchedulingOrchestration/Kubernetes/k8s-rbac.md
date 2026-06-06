@@ -24,10 +24,10 @@ tags:
 
 **Role and ClusterRole define permission rules**
 
-- rules represent specific authorization rules, similar to permission policies (Policy) in Alibaba Cloud RAM
+- rules represent specific authorization rules, similar to permission policies (Policy) in Aliyun RAM
 - The only difference between Role and ClusterRole is that one is for cluster-level resource control
 
-**RoleBinding and ClusterRoleBinding bind Users, Groups, and ServiceAccounts to Roles or ClusterRoles (similar to assigning Policies to RAM roles or RAM accounts in Alibaba Cloud RAM)**
+**RoleBinding and ClusterRoleBinding bind Users, Groups, and ServiceAccounts to Roles or ClusterRoles (similar to assigning Policies to RAM roles or RAM accounts in Aliyun RAM)**
 
 - User, Group, and ServiceAccount are independent concepts in a Kubernetes cluster, different from system-level concepts. Reference: [https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2](https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2)
 - A RoleBinding can reference any Role in the same namespace; or a RoleBinding can reference a ClusterRole and bind that ClusterRole to the namespace where the RoleBinding resides.

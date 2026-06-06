@@ -16,7 +16,7 @@ tags:
 
 - What are events: Kubernetes architecture is designed based on a state machine. State transitions generate corresponding events. Transitions between normal states generate Normal-level events, while transitions between normal and abnormal states generate Warning-level events.
 
-- kube-eventer component: An open-source component by Alibaba Cloud, used to collect event messages from K8S clusters and store them in custom middleware or storage. (K8S clusters only retain events for 1 hour by default)
+- kube-eventer component: An open-source component by Aliyun, used to collect event messages from K8S clusters and store them in custom middleware or storage. (K8S clusters only retain events for 1 hour by default)
 
 - Official repository: https://github.com/AliyunContainerService/kube-eventer
 

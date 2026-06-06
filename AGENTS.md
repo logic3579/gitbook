@@ -43,7 +43,7 @@ The documentation is organized into six top-level sections:
 |---------|---------|
 | `CNCF/` | Cloud-native tools organized by CNCF landscape categories |
 | `DevOps/` | Programming languages, command manuals, network concepts, Linux system topics |
-| `Platform/` | Cloud provider guides (AWS, GCP, Alibaba Cloud) and Kubernetes distribution installers |
+| `Platform/` | Cloud provider guides (AWS, GCP, Aliyun) and Kubernetes distribution installers |
 | `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
 | `Misc/` | VPN/tunnel technologies and hosting (ScienceSurf), interviews |
 | `Environment/` | Development environment setup (references external repository [logic3579/environment](https://github.com/logic3579/environment)) |
@@ -69,9 +69,9 @@ The documentation is organized into six top-level sections:
 
 ### Platform Section Structure
 
-- `AlibabaCloud/` — RAM, VPC
-- `AWS/` — CloudFront, EC2, EKS
-- `GoogleCloud/` — gcloud, GCE, GKE
+- `Aliyun/` — ACK, ECS, Network (VPC/SG/NAT/LB), OSS, RAM
+- `AWS/` — CloudFront, EC2, EKS, Network (VPC/SG/NAT/LB), S3
+- `GCP/` — Artifact Registry, GCE, GCS, GKE, IAM, Network (VPC/DNS/LB). The `README.md` also includes a `gcloud CLI Basics` section for auth/config/projects/components.
 - `distribution-installer.md` — Kubernetes distribution installation guides
 
 ### Standards Section Structure
@@ -121,7 +121,7 @@ Some documents point to external repositories instead of containing inline conte
 - **Tags**: All content files (non-README) should include `tags` in frontmatter for Obsidian navigation. Use hierarchical nested tags with `/` separator:
   - CNCF section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`
   - DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/system`
-  - Platform section: `platform/aws`, `platform/gcp`, `platform/alibaba`
+  - Platform section: `platform/aws`, `platform/gcp`, `platform/aliyun`
   - Standards section: `standards`
   - Misc section: `misc/vpn`, `misc/interview`
   - Sub-category tags: `database`, `messaging`, `ci-cd`, `monitoring`, `logging`, `tracing`, `kubernetes`, `networking`, `security`, `container`, `storage`, `service-mesh`, `service-proxy`, `api-gateway`, `service-discovery`, `configuration`, `helm`
@@ -146,7 +146,7 @@ Some documents point to external repositories instead of containing inline conte
   | `CNCF/Runtime/ContainerRuntime/` | `cncf-runtime-` |
   | `DevOps/Network/` | `devops-network-` |
   | `DevOps/System/` | `devops-system-` |
-  | `Platform/AlibabaCloud/` | `platform-alibaba-` |
+  | `Platform/Aliyun/` | `platform-aliyun-` |
   | `Standards/` | `standards-` |
 - **Links**: Use standard Markdown links, not Obsidian WikiLink format (`[[...]]`)
 
