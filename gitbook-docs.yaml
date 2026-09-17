@@ -1,0 +1,11 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Logic GitBook
+  structure:
+    - type: space
+      key: space-1
+      title: Logic GitBook
+      path: gitbook
+      default: true
+      content:
+        directory: ./gitbook
