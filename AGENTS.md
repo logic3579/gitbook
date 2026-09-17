@@ -1,143 +1,106 @@
 # AGENTS.md
 
-This file provides guidance to coding agents when working with code in this repository.
+Guidance for coding agents working in this repository.
 
 ## Project Overview
 
-This is a **GitBook-based technical knowledge base** covering cloud-native technologies, DevOps practices, and platform engineering. It is published as a GitBook site.
+This is a **GitBook-based technical knowledge base** covering cloud-native technologies, DevOps practices, and platform engineering.
 
 - Repository: https://github.com/logic3579/gitbook
-- Format: Markdown documents organized following the CNCF landscape taxonomy
-- Also used as an Obsidian vault (`.obsidian/` config present) with the [obsidian-skills](https://github.com/kepano/obsidian-skills) plugin installed
+- Format: Markdown, organized by the CNCF landscape taxonomy
+- Published by GitBook Git sync (`.gitbook.yaml` points at `README.md` and `SUMMARY.md`)
+- Also used as an Obsidian vault (`.obsidian/`). Agent skills: [obsidian-skills](https://github.com/kepano/obsidian-skills) (`obsidian-markdown`, `obsidian-bases`, `json-canvas`)
 
-## Key Files
+Do not use the legacy `gitbook-cli` (`gitbook serve` / `gitbook build`). There is no Node toolchain in this repo. Edit Markdown and let GitBook sync from Git. Local authoring is in the editor or Obsidian.
 
-- `SUMMARY.md` — Table of contents and navigation structure for GitBook. **Must be updated** when adding or removing pages.
-- `README.md` — Landing page for the GitBook site.
-- `.gitbook.yaml` — GitBook configuration (points to `README.md` and `SUMMARY.md`).
-- `content-tracker.base` — Obsidian Bases dashboard for tracking content completion status and stub files.
-- `doc-audit.base` — Obsidian Bases dashboard for documentation quality audit (freshness, word estimates).
-- `CNCF/cncf-landscape.canvas` — Obsidian Canvas visualization of the CNCF technology landscape with tool relationships.
-- `CNCF/ObservabilityAnalysis/observability-stack.canvas` — Canvas showing metrics/logs/traces pipelines and their relationships.
-- `CNCF/OrchestrationManagement/orchestration-ecosystem.canvas` — Canvas showing K8s-centric ecosystem (service discovery, mesh, gateway, RPC).
-- `CNCF/Runtime/runtime-stack.canvas` — Canvas showing container runtime, network, and storage layers.
-- `DevOps/CommandManual/command-index.base` — Obsidian Bases dashboard for categorized CLI command reference with content gap tracking.
+## Source of Truth
 
-## Local Development
+| Concern | File |
+|---------|------|
+| Site navigation | `SUMMARY.md` — **must** be updated when adding, removing, or moving pages |
+| Landing page | `README.md` |
+| GitBook site config | `.gitbook.yaml` |
+| Agent conventions | `AGENTS.md` (this file) |
 
-```bash
-# Install GitBook CLI
-npm install gitbook-cli -g
+Do **not** copy the page catalog into this file. `SUMMARY.md` is the inventory; this file only describes architecture and writing rules.
 
-# Initialize and serve locally
-gitbook init
-gitbook serve    # Live preview at http://localhost:4000
-gitbook build    # Static output to _book/
-```
+## Key Supporting Files
+
+- `content-tracker.base` — Obsidian Bases view of content completeness / stubs
+- `doc-audit.base` — Obsidian Bases view of freshness and size
+- `DevOps/CommandManual/command-index.base` — CLI command reference index
+- `CNCF/cncf-landscape.canvas` — CNCF landscape map
+- `CNCF/ObservabilityAnalysis/observability-stack.canvas` — metrics / logs / traces
+- `CNCF/OrchestrationManagement/orchestration-ecosystem.canvas` — K8s-centric ecosystem
+- `CNCF/Runtime/runtime-stack.canvas` — runtime / network / storage
 
 ## Content Architecture
 
-The documentation is organized into six top-level sections:
+Six top-level sections:
 
 | Section | Purpose |
 |---------|---------|
-| `CNCF/` | Cloud-native tools organized by CNCF landscape categories |
-| `DevOps/` | Programming languages, command manuals, network concepts, Linux system topics |
-| `Platform/` | Cloud provider guides (AWS, GCP, Aliyun) and Kubernetes distribution installers |
-| `Standards/` | Engineering standards: naming conventions, Git Flow, GitHub/GitLab/Docker standards, JiraCDflow |
-| `Misc/` | VPN/tunnel technologies and hosting (ScienceSurf), interviews |
-| `Environment/` | Development environment setup (references external repository [logic3579/environment](https://github.com/logic3579/environment)) |
+| `CNCF/` | Cloud-native tools by CNCF landscape category |
+| `DevOps/` | Languages, CLI manuals, network, Linux system, kernel |
+| `Platform/` | AWS, GCP, Aliyun, and Kubernetes distribution installers |
+| `Standards/` | Naming, Git Flow, GitHub/GitLab/Docker, CI/CD, JiraCDflow |
+| `Misc/` | ScienceSurf (VPN/proxy/hosting) and interviews |
+| `Environment/` | Points at [logic3579/environment](https://github.com/logic3579/environment) |
 
-### CNCF Section Structure
+`CNCF/` category directories (leaf pages live under these; do not enumerate them here):
 
-`CNCF/` mirrors the CNCF landscape taxonomy with subcategories:
-- `AppDefinitionDevelopment/` — Helm, CI/CD (Argo, Bytebase, GitLab, Jenkins), Databases (MySQL, PostgreSQL, MongoDB, Redis, TiKV), Messaging (Kafka, RabbitMQ, RocketMQ, EMQX)
-- `CNAI/` — Data Architecture (ClickHouse, Flink), Data Science (PyTorch, TensorFlow)
-- `ObservabilityAnalysis/` — Chaos Engineering (Chaos Mesh), Continuous Optimization (OpenCost, Kubecost), Observability (Prometheus, VictoriaMetrics, Grafana, Elasticsearch, Fluentd, Logstash, Loki, Jaeger, OpenTelemetry)
-- `OrchestrationManagement/` — API Gateway (Higress, Tyk), Coordination & Service Discovery (CoreDNS, Etcd, Nacos, ZooKeeper), RPC (gRPC), Scheduling & Orchestration (Kubernetes: Network, RBAC, Kube Eventer), Service Mesh (Istio), Service Proxy (Envoy, HAProxy, Nginx)
-- `Provisioning/` — Automation & Configuration (Ansible, Apollo, OpenStack, Salt Project, Terraform), Container Registry (Harbor), Key Management (Vault), Security & Compliance (Cert Manager, Keycloak)
-- `Runtime/` — Cloud Native Network (Cilium, CNI), Cloud Native Storage (CSI, MinIO, Rook, Velero), Container Runtime (Docker, Containerd, CRI-O, Lima)
-- `Serverless/` — (Section placeholder)
+- `AppDefinitionDevelopment/` — Helm, CI/CD, databases, streaming & messaging
+- `CNAI/` — data architecture and data science
+- `ObservabilityAnalysis/` — chaos, cost optimization, observability
+- `OrchestrationManagement/` — gateway, discovery, RPC, Kubernetes, mesh, proxy
+- `Provisioning/` — automation, registry, key management, security
+- `Runtime/` — CNI, CSI, container runtimes
+- `Serverless/` — thin section (landing page only)
 
-### DevOps Section Structure
+Some pages are stubs that link out instead of duplicating another repo:
 
-- Programming Languages: Bash, Golang, Java, Node.js, Python, Ruby
-- `CommandManual/` — CLI references: ai-coding, automation, big-data, build-tools, container-runtime, database, io-tools, memory-tools, network-tools, openssl, package, streaming-messaging, systemd, text-swordsman, version-control, video-tools
-- `Network/` — CDN, Computer Network, HTTP, TCP
-- `System/` — Boot, iptables, KVM, Linux From Scratch, Nix
-- Kernel — Linux kernel topics
-
-### Platform Section Structure
-
-- `Aliyun/` — ACK, ECS, Network (VPC/SG/NAT/LB), OSS, RAM
-- `AWS/` — CloudFront, EC2, EKS, Network (VPC/SG/NAT/LB), S3
-- `GCP/` — Artifact Registry, GCE, GCS, GKE, IAM, Network (VPC/DNS/LB). The `README.md` also includes a `gcloud CLI Basics` section for auth/config/projects/components.
-- `distribution-installer.md` — Kubernetes distribution installation guides
-
-### Standards Section Structure
-
-- `naming-conventions.md` — Naming standards for projects, cloud resources, Kubernetes, and docs
-- `gitflow.md` — Git branching strategy and workflow
-- `JiraCDflow/` — Jira-based release automation workflow
-- `github-standards.md` — GitHub project management and release standards
-- `gitlab-standards.md` — GitLab project management and release standards
-- `docker-standards.md` — Docker image build and release standards
-- `github-actions-cd.md` — GitHub Actions CD workflow standard for ArgoCD GitOps deployment
-- `github-actions-cicd-monorepo.md` — GitHub Actions CI/CD workflow standard for monorepo architecture
-- `github-actions-cicd-multirepo.md` — GitHub Actions CI/CD workflow standard for multirepo architecture
-- `gitlab-cicd-multirepo.md` — GitLab CI/CD workflow standard for multirepo architecture
-
-### Misc Section Structure
-
-- `ScienceSurf/` — Modern proxy platforms (sing-box, Xray), modern VPN (WireGuard, Outline), legacy VPN/tunnel/proxy bundle (`legacy-vpn.md`: IPsec, OpenVPN, SSH Tunnel, ShadowsocksR), hosting
-- `interview.md` — Interview preparation
-
-### External Repository References
-
-Some documents point to external repositories instead of containing inline content:
 - `Environment/README.md` → [logic3579/environment](https://github.com/logic3579/environment)
-- `CNCF/Provisioning/AutomationConfiguration/ansible.md` → [logic3579/automation](https://github.com/logic3579/automation)
-- `CNCF/Provisioning/AutomationConfiguration/saltproject.md` → [logic3579/automation](https://github.com/logic3579/automation)
+- `CNCF/Provisioning/AutomationConfiguration/ansible.md` and `saltproject.md` → [logic3579/automation](https://github.com/logic3579/automation)
 - `CNCF/Provisioning/AutomationConfiguration/terraform.md` → [logic3579/terraform](https://github.com/logic3579/terraform)
 
 ## Naming Conventions
 
-- **Directories**: PascalCase (e.g., `CommandManual/`, `AppDefinitionDevelopment/`). Acronyms stay uppercase (e.g., `CNCF/`, `CNAI/`, `AWS/`).
-- **Documents/files**: kebab-case (e.g., `big-data.md`, `container-runtime.md`, `naming-conventions.md`). Single-word names are just lowercase (e.g., `helm.md`, `docker.md`).
-- **Exceptions**: `README.md`, `SUMMARY.md`, `CLAUDE.md`, `AGENTS.md` follow their respective conventions. Non-documentation directories (code, config, assets like `iplib/`, `archery/`) are excluded from the PascalCase rule.
+- **Directories**: PascalCase (`CommandManual/`, `AppDefinitionDevelopment/`). Acronyms stay uppercase (`CNCF/`, `CNAI/`, `AWS/`).
+- **Documents**: kebab-case (`naming-conventions.md`). Single-word names are lowercase (`helm.md`, `docker.md`).
+- **Exceptions**: `README.md`, `SUMMARY.md`, `AGENTS.md`. Non-documentation trees (code/config such as `Standards/JiraCDflow/archery/`) are excluded from PascalCase.
 
-## Conventions for Adding Content
+## Adding or Changing Content
 
-1. Create the markdown file (kebab-case name) in the appropriate category directory under `CNCF/`, `DevOps/`, `Platform/`, `Standards/`, or `Misc/`.
-2. Add the entry to `SUMMARY.md` in the correct section with proper indentation to maintain the navigation hierarchy.
-3. Each category directory has a `README.md` that serves as the section overview page, following this format: frontmatter (`icon` + `description`) → H1 title → one-line description → sub-page list with brief descriptions.
-4. Embedded YAML configurations and code examples are used extensively throughout the docs — maintain that style.
-5. For tools with dedicated external repositories, use the reference format (frontmatter + brief description + repository link + official references) instead of inline content. See `ansible.md` as a template.
-6. Images are hosted on Cloudflare R2 (`https://gitbook-r2.yakir.top/`). See **Markdown Conventions → Images** below for the upload workflow. Local `attachements/` directories are no longer used.
+1. Put a kebab-case Markdown file in the matching category under `CNCF/`, `DevOps/`, `Platform/`, `Standards/`, or `Misc/`.
+2. Add or remove the entry in `SUMMARY.md` with the existing indent hierarchy.
+3. Update the parent section `README.md` so its sub-page list stays accurate.
+4. Category `README.md` format: frontmatter (`icon` + `description`) → H1 → one-line description → linked sub-page list with brief descriptions.
+5. Keep the existing style: embedded YAML and command examples.
+6. External-repo tools: frontmatter + short description + repo link + official references. Use `ansible.md` as the template.
+7. Host images on Cloudflare R2 (see Images below). Do not commit local `attachements/` directories.
 
-### Markdown Conventions
+## Markdown Conventions
 
-- **Frontmatter**: Every document should have `description` field. The `icon` field (using [FontAwesome](https://fontawesome.com/icons) icon names) is required on every entry that appears as a top-level item in any GitBook sidebar group from `SUMMARY.md` — this includes the root `README.md`, every section landing `README.md`, and any single-file top-level page (e.g. `DevOps/golang.md`, `Standards/gitflow.md`, `Misc/interview.md`, `Platform/distribution-installer.md`). Nested README files inside a collapsed group, and regular content documents that live under a collapsed group, do not need `icon`.
-- **Tags**: All content files (non-README) should include `tags` in frontmatter for Obsidian navigation. Use hierarchical nested tags with `/` separator:
-  - CNCF section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`
-  - DevOps section: `devops/language`, `devops/command`, `devops/network`, `devops/system`
-  - Platform section: `platform/aws`, `platform/gcp`, `platform/aliyun`
-  - Standards section: `standards`
-  - Misc section: `misc/vpn`, `misc/interview`
-  - Sub-category tags: `database`, `messaging`, `ci-cd`, `monitoring`, `logging`, `tracing`, `kubernetes`, `networking`, `security`, `container`, `storage`, `service-mesh`, `service-proxy`, `api-gateway`, `service-discovery`, `configuration`, `helm`
-- **H1 title**: Must match the official tool/project name (e.g., `# ClickHouse`, `# Elasticsearch`, not `# Overview`)
-- **Reference format**: Use the standardized blockquote format at the end of each document:
+- **Frontmatter**: every document needs `description`. `icon` ([FontAwesome](https://fontawesome.com/icons) name) is required on every GitBook sidebar top-level item from `SUMMARY.md`: root `README.md`, section landing `README.md` files, and single-file top-level pages (e.g. `DevOps/golang.md`, `Standards/gitflow.md`, `Misc/interview.md`, `Platform/distribution-installer.md`). Nested READMEs inside a collapsed group, and regular pages under a collapsed group, do not need `icon`.
+- **Tags**: all content files (non-README) need frontmatter `tags` for Obsidian. Use nested tags with `/`:
+  - Section: `cncf/app-definition`, `cncf/cnai`, `cncf/observability`, `cncf/orchestration`, `cncf/provisioning`, `cncf/runtime`, `devops/language`, `devops/command`, `devops/network`, `devops/system`, `devops/kernel`, `platform/aws`, `platform/gcp`, `platform/aliyun`, `standards`, `misc/vpn`, `misc/interview`
+  - Topic (add as needed): `database`, `messaging`, `ci-cd`, `monitoring`, `logging`, `tracing`, `kubernetes`, `networking`, `security`, `container`, `storage`, `service-mesh`, `service-proxy`, `api-gateway`, `service-discovery`, `configuration`, `helm`
+- **H1**: official tool/project name (`# ClickHouse`), not `# Overview`.
+- **References** at the end of each document:
+
   ```markdown
   > Reference:
   >
   > 1. [Official Website](https://example.com/)
   > 2. [Repository](https://github.com/org/repo)
   ```
-- **Images**: Hosted on Cloudflare R2 at `https://gitbook-r2.yakir.top/<prefix><filename>`. Reference with absolute URL via standard Markdown syntax: `![alt](https://gitbook-r2.yakir.top/devops-network-tcp-handshake.png)`. Do not use Hexo `asset_img` or other template syntax. To add a new image:
-  1. Pick the section prefix from the table below.
-  2. Use a URL-safe filename (lowercase, hyphens — no spaces or `%20`).
-  3. Upload via rclone: `rclone copyto path/to/image.png logic-r2:gitbook/<prefix><filename>`.
-  4. Reference the resulting `https://gitbook-r2.yakir.top/<prefix><filename>` URL in markdown.
+
+- **Links**: standard Markdown links only. Do not use Obsidian wikilinks (`[[...]]`).
+- **Images**: host on Cloudflare R2 at `https://gitbook-r2.yakir.top/<prefix><filename>`. Use a normal Markdown image: `![alt](https://gitbook-r2.yakir.top/devops-network-tcp-handshake.png)`.
+  1. Pick a prefix from the table (or add one in the same `{area}-{topic}-` pattern and record it here).
+  2. Filename: lowercase, hyphens, no spaces or `%20`.
+  3. Upload: `rclone copyto path/to/image.png logic-r2:gitbook/<prefix><filename>`
+  4. Reference the resulting URL in Markdown.
 
   | Section | Prefix |
   |---------|--------|
@@ -148,16 +111,11 @@ Some documents point to external repositories instead of containing inline conte
   | `DevOps/System/` | `devops-system-` |
   | `Platform/Aliyun/` | `platform-aliyun-` |
   | `Standards/` | `standards-` |
-- **Links**: Use standard Markdown links, not Obsidian WikiLink format (`[[...]]`)
 
-### Obsidian Integration
+## Obsidian
 
-This vault uses the [obsidian-skills](https://github.com/kepano/obsidian-skills) plugin, which provides `obsidian-markdown`, `obsidian-bases`, and `json-canvas` skills.
+Bases (`.base`) are dashboards over the vault; canvases (`.canvas`) are architecture maps. Both are additive and do not affect GitBook rendering. Content files must stay GitBook-compatible (standard Markdown links, no wikilinks).
 
-- **Bases** (`.base` files): Used for dashboard views of vault content (content tracking, quality audit). Root-level bases track the whole vault; section-level bases (e.g., `DevOps/CommandManual/command-index.base`) focus on specific directories.
-- **Canvas** (`.canvas` files): Used for visual architecture maps. Top-level canvas (e.g., `CNCF/cncf-landscape.canvas`) shows the full landscape; second-level canvas files (e.g., `CNCF/ObservabilityAnalysis/observability-stack.canvas`) zoom into specific domains with detailed data flows and dependencies.
-- **Compatibility**: Content files must use standard Markdown links (not wikilinks) for GitBook compatibility. Obsidian-specific features (tags, bases, canvas) are additive and do not affect GitBook rendering.
+## When Structure Changes
 
-## Pre-commit Checklist
-
-Before every git commit and push, **always update `AGENTS.md` and `CLAUDE.md`** to reflect any structural changes made in the session (new files, moved directories, updated conventions, etc.). The two files must stay in sync with each other and with the actual codebase.
+If the session adds, removes, or moves pages, or changes writing rules: update `SUMMARY.md`, the affected section `README.md`, and this `AGENTS.md` when the architecture or conventions themselves changed. Do not maintain a duplicate page list here.

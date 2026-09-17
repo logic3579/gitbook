@@ -2,7 +2,6 @@ filters:
   and:
     - file.ext == "md"
     - file.name != "SUMMARY"
-    - file.name != "CLAUDE"
     - file.name != "AGENTS"
     - '!file.inFolder("tmp")'
 formulas:

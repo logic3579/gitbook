@@ -28,6 +28,6 @@ _book/
 .obsidian/workspace.json
 .obsidian/plugins/Claudian/data.json
 
-# Local image staging (images are hosted on Cloudflare R2; see CLAUDE.md)
+# Local image staging (images are hosted on Cloudflare R2; see AGENTS.md)
 attachements/
 **/attachements/
