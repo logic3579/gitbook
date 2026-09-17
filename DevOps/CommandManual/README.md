@@ -7,7 +7,6 @@ description: Common Command Manual snippets
 
 CLI references and command snippets for common DevOps tools.
 
-- [AI Coding](ai-coding.md) — Claude Code, Gemini CLI, and Codex CLI
 - [Automation](automation.md) — Ansible and SaltStack CLI references
 - [Big Data](big-data.md) — HDFS and HBase
 - [Build Tools](build-tools.md) — Maven, Gradle, and Make
