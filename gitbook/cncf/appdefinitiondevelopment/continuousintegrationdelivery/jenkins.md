@@ -1,0 +1,102 @@
+---
+description: Jenkins
+tags:
+  - cncf/app-definition
+  - ci-cd
+---
+
+# Jenkins
+
+## Introduction
+
+Jenkins is the leading open-source automation server, used to build, test, and deploy software through pipelines defined as code (Jenkinsfile). With over 1,800 community-contributed plugins, it integrates with virtually any version control system, build tool, and deployment target, and supports distributed builds across heterogeneous agent fleets.
+
+## How to Install
+
+### Starting via Binary
+
+#### Quick Start
+
+```bash
+# download and decompression
+# https://www.jenkins.io/download/
+wget https://get.jenkins.io/war-stable/2.401.1/jenkins.war
+
+# run and init password
+mkdir /opt/jenkins-config
+JENKINS_HOME=/opt/jenkins-config java -jar jenkins.war
+cat /opt/jenkins-config/secrets/initialAdminPassword
+
+
+# On Ubuntu
+# https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+```
+
+### Starting via Docker
+
+```bash
+# create bridge network
+docker network create jenkins
+
+# run
+docker run -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 --restart=on-failure jenkins/jenkins:lts-jdk11 --name jenkins
+# persistence storage info and init password
+docker inspect jenkins_home
+...
+cat /var/lib/docker/volumes/jenkins_home/_data/secrets/initialAdminPassword
+```
+
+### Starting via Kubernetes
+
+```bash
+# Add and update repo
+helm repo add jenkinsci https://charts.jenkins.io
+helm repo update
+
+# Get charts package
+helm pull jenkinsci/jenkins --untar
+cd jenkins
+
+# Configure and install
+vim values.yaml
+helm -n cicd install jenkins . --create-namespace
+
+# Get password
+kubectl -n cicd get secrets jenkins -ojsonpath='{.data.jenkins-admin-password}' |base64 -d
+```
+
+## Pipeline Example
+
+Jenkinsfile with Kubernetes agent:
+
+```Jenkinsfile
+pipeline {
+    agent {
+        kubernetes {
+            defaultContainer 'jnlp'
+        }
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                container('maven') {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                container('kubectl') {
+                    sh 'kubectl apply -f deployment.yaml'
+                }
+            }
+        }
+    }
+}
+```
+
+> Reference:
+>
+> 1. [Official Website](https://www.jenkins.io/doc/book/installing/)
+> 2. [Repository](https://github.com/jenkinsci/jenkins)
